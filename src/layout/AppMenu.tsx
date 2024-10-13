@@ -1,0 +1,111 @@
+/* eslint-disable @next/next/no-img-element */
+
+import React, { useContext } from 'react'
+import { LayoutContext } from './context/layoutcontext'
+import { MenuProvider } from './context/menucontext'
+import Link from 'next/link'
+import { AppMenuItem } from '@/types'
+import AppMenuitem from './AppMenuitem'
+
+const AppMenu = () => {
+    const { layoutConfig } = useContext(LayoutContext)
+
+    const model: AppMenuItem[] = [
+        {
+            label: 'Home',
+            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+        },
+        {
+            label: 'Retail',
+            items: [{ label: 'Retail Sales', icon: 'pi pi-fw pi-shop', to: '/uikit/formlayout' }]
+        },
+        {
+            label: 'Catalog',
+            items: [
+                { label: 'Products', icon: 'pi pi-fw pi-id-card', to: '/admin/products' },
+                { label: 'Categories', icon: 'pi pi-fw pi-id-card', to: '/admin/categories' },
+                { label: 'Manufacturers', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
+                { label: 'Product tags', icon: 'pi pi-fw pi-bookmark', to: '/uikit/floatlabel' },
+                { label: 'Product attributes', icon: 'pi pi-fw pi-exclamation-circle', to: '/uikit/invalidstate' },
+                { label: 'Specification attributes', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
+                { label: 'Customers', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
+                { label: 'Customer roles', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
+                { label: 'Online customers', icon: 'pi pi-fw pi-bars', to: '/uikit/menu' }
+            ]
+        },
+        {
+            label: 'Orders',
+            items: [
+                { label: 'Orders', icon: 'pi pi-fw pi-table', to: '/uikit/table' },
+                { label: 'Return requests', icon: 'pi pi-fw pi-list', to: '/uikit/list' },
+                { label: 'Recurring payments', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
+                { label: 'Carts & Wishlists', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' }
+            ]
+        },
+        {
+            label: 'Pages',
+            icon: 'pi pi-fw pi-briefcase',
+            to: '/pages',
+            items: [
+                {
+                    label: 'Auth',
+                    icon: 'pi pi-fw pi-user',
+                    items: [
+                        {
+                            label: 'Login',
+                            icon: 'pi pi-fw pi-sign-in',
+                            to: '/auth/login'
+                        },
+                        {
+                            label: 'Error',
+                            icon: 'pi pi-fw pi-times-circle',
+                            to: '/auth/error'
+                        },
+                        {
+                            label: 'Access Denied',
+                            icon: 'pi pi-fw pi-lock',
+                            to: '/auth/access'
+                        }
+                    ]
+                },
+                {
+                    label: 'Not Found',
+                    icon: 'pi pi-fw pi-exclamation-circle',
+                    to: '/pages/notfound'
+                }
+            ]
+        },
+        {
+            label: 'Get Started',
+            items: [
+                {
+                    label: 'Documentation',
+                    icon: 'pi pi-fw pi-question',
+                    to: '/documentation'
+                },
+                {
+                    label: 'View Source',
+                    icon: 'pi pi-fw pi-search',
+                    url: 'https://github.com/thien34',
+                    target: '_blank'
+                }
+            ]
+        }
+    ]
+
+    return (
+        <MenuProvider>
+            <ul className='layout-menu'>
+                {model.map((item, i) => {
+                    return !item?.seperator ? <AppMenuitem item={item} root={true} index={i} key={item.label} /> : <li className='menu-separator'></li>
+                })}
+
+                <Link href='https://blocks.primereact.org' target='_blank' style={{ cursor: 'pointer' }}>
+                    <img alt='Prime Blocks' className='w-full mt-3' src={`/layout/images/banner-primeblocks${layoutConfig.colorScheme === 'light' ? '' : '-dark'}.png`} />
+                </Link>
+            </ul>
+        </MenuProvider>
+    )
+}
+
+export default AppMenu
