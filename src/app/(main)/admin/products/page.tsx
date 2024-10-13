@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { PrimeIcons } from 'primereact/api'
@@ -209,27 +208,35 @@ const ProductPage = () => {
         const selectedAttributeCodes = new Set(attributeRows.map((row) => row.selectedAttribute?.code).filter(Boolean))
         return attributes.filter((attr) => !selectedAttributeCodes.has(attr.code))
     }
-    const chooseOptions = { icon: 'pi  pi-images', iconOnly: true, className: 'custom-choose-btn p-button-rounded p-button-outlined' }
+    // const chooseOptions = { icon: 'pi  pi-images', iconOnly: true, className: 'custom-choose-btn p-button-rounded p-button-outlined' }
 
     const handleAddProduct = () => {
         console.log(combinedRows)
         const formData = new FormData()
 
-        uploadedFiles.forEach((file) => {
-            formData.append('images', file)
+        Object.keys(uploadedFiles).forEach((rowIndex) => {
+            const index = Number(rowIndex)
+            if (uploadedFiles[index]) {
+                uploadedFiles[index].forEach((file: File) => {
+                    formData.append('images', file)
+                })
+            }
         })
-        console.log(uploadedFiles)
+
+        console.log(formData)
     }
 
     const onUpload = (event: React.ChangeEvent<HTMLInputElement>, rowIndex: number) => {
         const files = event.target.files
         const newImages: string[] = []
+        const newFiles: File[] = []
 
         if (files) {
             for (let i = 0; i < files.length; i++) {
                 const file = files[i]
                 const imageUrl = URL.createObjectURL(file)
                 newImages.push(imageUrl)
+                newFiles.push(file)
             }
         }
 
@@ -237,18 +244,23 @@ const ProductPage = () => {
             ...prev,
             [rowIndex]: newImages
         }))
+
+        setUploadedFiles((prev) => ({
+            ...prev,
+            [rowIndex]: newFiles
+        }))
     }
+
     const categories = [{ name: 'Phụ kiện Nữ', code: 'female_accessories' }]
 
     const manufactures = [
         { name: 'Thương hiệu 1', code: 'brand1' },
         { name: 'Thương hiệu 2', code: 'brand2' }
     ]
-    const [checked, setChecked] = useState<boolean>(false)
     const [selectedCategory, setSelectedCategory] = useState(null)
     const [selectedManufacture, setSelectedManufacture] = useState(null)
     const [text, setText] = useState<string>('')
-    const [uploadedFiles, setUploadedFiles] = useState([])
+    const [uploadedFiles, setUploadedFiles] = useState<{ [key: number]: File[] }>({})
     const [uploadedImages, setUploadedImages] = useState<{ [key: number]: string[] }>({})
 
     const onRemoveImage = (rowIndex: number, imageIndex: number) => {
