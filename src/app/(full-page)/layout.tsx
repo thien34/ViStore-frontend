@@ -1,15 +1,15 @@
-import { Metadata } from 'next';
-import AppConfig from '../../layout/AppConfig';
-import React from 'react';
+import { Metadata } from 'next'
+import AppConfig from '../../layout/AppConfig'
+import React from 'react'
 
 interface SimpleLayoutProps {
-    children: React.ReactNode;
+    children: React.ReactNode
 }
 
 export const metadata: Metadata = {
-    title: 'PrimeReact Sakai',
+    title: 'ViStore',
     description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.'
-};
+}
 
 export default function SimpleLayout({ children }: SimpleLayoutProps) {
     return (
@@ -17,5 +17,5 @@ export default function SimpleLayout({ children }: SimpleLayoutProps) {
             {children}
             <AppConfig simple />
         </React.Fragment>
-    );
+    )
 }
