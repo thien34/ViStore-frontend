@@ -1,9 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
-
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { LayoutContext } from './context/layoutcontext'
 import { MenuProvider } from './context/menucontext'
 import Link from 'next/link'
+import Image from 'next/image'
 import { AppMenuItem } from '@/types'
 import AppMenuitem from './AppMenuitem'
 
@@ -22,8 +21,8 @@ const AppMenu = () => {
         {
             label: 'Catalog',
             items: [
-                { label: 'Products', icon: 'pi pi-fw pi-id-card', to: '/admin/products' },
-                { label: 'Categories', icon: 'pi pi-fw pi-id-card', to: '/admin/categories' },
+                { label: 'Products', icon: 'pi pi-fw pi-box', to: '/admin/products' },
+                { label: 'Categories', icon: 'pi pi-fw pi-objects-column', to: '/admin/categories' },
                 { label: 'Manufacturers', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
                 { label: 'Product tags', icon: 'pi pi-fw pi-bookmark', to: '/uikit/floatlabel' },
                 { label: 'Product attributes', icon: 'pi pi-fw pi-exclamation-circle', to: '/uikit/invalidstate' },
@@ -99,9 +98,8 @@ const AppMenu = () => {
                 {model.map((item, i) => {
                     return !item?.seperator ? <AppMenuitem item={item} root={true} index={i} key={item.label} /> : <li className='menu-separator'></li>
                 })}
-
                 <Link href='https://blocks.primereact.org' target='_blank' style={{ cursor: 'pointer' }}>
-                    <img alt='Prime Blocks' className='w-full mt-3' src={`/layout/images/banner-primeblocks${layoutConfig.colorScheme === 'light' ? '' : '-dark'}.png`} />
+                    <Image alt='Prime Blocks' className='w-full mt-3' src={`/layout/images/banner-primeblocks${layoutConfig.colorScheme === 'light' ? '' : '-dark'}.png`} width={500} height={150} />
                 </Link>
             </ul>
         </MenuProvider>

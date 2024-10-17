@@ -1,32 +1,29 @@
-/* eslint-disable @next/next/no-sync-scripts */
-import React from 'react';
-
 const Documentation = () => {
     return (
         <>
-            <div className="grid">
-                <div className="col-12">
-                    <div className="card docs">
+            <div className='grid'>
+                <div className='col-12'>
+                    <div className='card docs'>
                         <h4>Current Version</h4>
                         <p>Next v13, React v18, Typescript with PrimeReact v10</p>
 
                         <h5>Getting Started</h5>
                         <p>
                             Sakai is an application template for React based on the popular{' '}
-                            <a href="https://nextjs.org/" className="font-medium hover:underline text-primary">
+                            <a href='https://nextjs.org/' className='font-medium hover:underline text-primary'>
                                 Next.js
                             </a>{' '}
                             framework with new{' '}
-                            <a href="https://nextjs.org/docs/app" className="font-medium hover:underline text-primary">
+                            <a href='https://nextjs.org/docs/app' className='font-medium hover:underline text-primary'>
                                 App Router
                             </a>
                             . To get started, clone the{' '}
-                            <a href="https://github.com/primefaces/sakai-react" className="font-medium hover:underline text-primary">
+                            <a href='https://github.com/primefaces/sakai-react' className='font-medium hover:underline text-primary'>
                                 repository
                             </a>{' '}
                             from GitHub and install the dependencies with npm or yarn.
                         </p>
-                        <pre className="app-code">
+                        <pre className='app-code'>
                             <code>{`"npm install" or "yarn"`}</code>
                         </pre>
 
@@ -35,14 +32,14 @@ const Documentation = () => {
                             template.
                         </p>
 
-                        <pre className="app-code">
+                        <pre className='app-code'>
                             <code>{`"npm run dev" or "yarn dev"`}</code>
                         </pre>
 
                         <h5>Dependencies</h5>
                         <p>Dependencies of Sakai are listed below and needs to be defined at package.json.</p>
 
-                        <pre className="app-code">
+                        <pre className='app-code'>
                             <code>{`"primereact": "^9.6.2",                    //required: PrimeReact components
 "primeicons": "^6.0.1",                    //required: Icons
 "primeflex": "^3.3.0",                     //required: Utility CSS classes
@@ -53,40 +50,40 @@ const Documentation = () => {
                         <p>Sakai consist of a couple of folders where demos and core layout have been separated.</p>
                         <p>
                             There are two{' '}
-                            <a href="https://nextjs.org/docs/app/building-your-application/routing/route-groups" className="font-medium hover:underline text-primary">
+                            <a href='https://nextjs.org/docs/app/building-your-application/routing/route-groups' className='font-medium hover:underline text-primary'>
                                 route groups
                             </a>{' '}
-                            under the app folder; <span className="text-primary font-medium">{`(main)`}</span> represents the pages that reside in the main dashboard layout whereas <span className="text-primary font-medium">{`(full-page)`}</span>{' '}
+                            under the app folder; <span className='text-primary font-medium'>{`(main)`}</span> represents the pages that reside in the main dashboard layout whereas <span className='text-primary font-medium'>{`(full-page)`}</span>{' '}
                             groups the pages with full page content such as landing page or a login page.
                         </p>
-                        <ul className="line-height-3">
+                        <ul className='line-height-3'>
                             <li>
-                                <span className="text-primary font-medium">layout/</span>: Main layout files
+                                <span className='text-primary font-medium'>layout/</span>: Main layout files
                             </li>
                             <li>
-                                <span className="text-primary font-medium">demo/</span>: Contains demo related utilities and helpers
+                                <span className='text-primary font-medium'>demo/</span>: Contains demo related utilities and helpers
                             </li>
                             <li>
-                                <span className="text-primary font-medium">app/</span>: Demo pages
+                                <span className='text-primary font-medium'>app/</span>: Demo pages
                             </li>
                             <li>
-                                <span className="text-primary font-medium">public/demo</span>: Assets used in demos
+                                <span className='text-primary font-medium'>public/demo</span>: Assets used in demos
                             </li>
                             <li>
-                                <span className="text-primary font-medium">public/layout</span>: Assets used in layout such as a logo
+                                <span className='text-primary font-medium'>public/layout</span>: Assets used in layout such as a logo
                             </li>
                             <li>
-                                <span className="text-primary font-medium">styles/demo</span>: Styles used in demos only
+                                <span className='text-primary font-medium'>styles/demo</span>: Styles used in demos only
                             </li>
                             <li>
-                                <span className="text-primary font-medium">styles/layout</span>: SCSS files of the core layout
+                                <span className='text-primary font-medium'>styles/layout</span>: SCSS files of the core layout
                             </li>
                         </ul>
                         <h5>Route Groups</h5>
                         <p>
-                            Root Layout is the main of the application and it is defined at <span className="text-primary font-medium">app/layout.tsx</span> file. It contains the style imports and layout context provider.
+                            Root Layout is the main of the application and it is defined at <span className='text-primary font-medium'>app/layout.tsx</span> file. It contains the style imports and layout context provider.
                         </p>
-                        <pre className="app-code">
+                        <pre className='app-code'>
                             <code>
                                 {`"use client"
 import { LayoutProvider } from "./layout/context/layoutcontext";
@@ -123,10 +120,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
                             </code>
                         </pre>
                         <p>
-                            The pages that are using the layout elements need to be defined under the <span className="text-primary font-medium">app/{'(main)'}/</span> folder. Those pages use the{' '}
-                            <span className="text-primary font-medium">app/{'(main)'}/layout.tsx</span> as the root layout.
+                            The pages that are using the layout elements need to be defined under the <span className='text-primary font-medium'>app/{'(main)'}/</span> folder. Those pages use the{' '}
+                            <span className='text-primary font-medium'>app/{'(main)'}/layout.tsx</span> as the root layout.
                         </p>
-                        <pre className="app-code">
+                        <pre className='app-code'>
                             <code>
                                 {`import { Metadata } from 'next';
 import Layout from "../../layout/layout";
@@ -147,10 +144,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
                             </code>
                         </pre>
                         <p>
-                            Only the pages that are using config sidebar wihout layout elements need to be defined under the <span className="text-primary font-medium">app/{'(full-page)'}/</span> folder. Those pages use the{' '}
-                            <span className="text-primary font-medium">app/{'(full-page)'}/layout.tsx</span> as the root layout.
+                            Only the pages that are using config sidebar wihout layout elements need to be defined under the <span className='text-primary font-medium'>app/{'(full-page)'}/</span> folder. Those pages use the{' '}
+                            <span className='text-primary font-medium'>app/{'(full-page)'}/layout.tsx</span> as the root layout.
                         </p>
-                        <pre className="app-code">
+                        <pre className='app-code'>
                             <code>
                                 {`import { Metadata } from 'next';
 import AppConfig from "../../layout/AppConfig";
@@ -178,10 +175,10 @@ export default function FullPageLayout({ children }: FullPageLayoutProps) {
                         </pre>
                         <h5>Default Configuration</h5>
                         <p>
-                            Initial layout configuration can be defined at the <span className="text-primary font-medium">layout/context/layoutcontext.js</span> file, this step is optional and only necessary when customizing the defaults.
+                            Initial layout configuration can be defined at the <span className='text-primary font-medium'>layout/context/layoutcontext.js</span> file, this step is optional and only necessary when customizing the defaults.
                         </p>
 
-                        <pre className="app-code">
+                        <pre className='app-code'>
                             <code>
                                 {`"use client";
 import React, { useState } from 'react';
@@ -203,17 +200,15 @@ export const LayoutProvider = (props) => {
 
                         <h5>Menu</h5>
                         <p>
-                            Main menu is defined at <span className="text-primary font-medium">AppMenu.js</span> file based on{' '}
-                            <a href="https://www.primefaces.org/primereact/menumodel/" className="font-medium hover:underline text-primary">
+                            Main menu is defined at <span className='text-primary font-medium'>AppMenu.js</span> file based on{' '}
+                            <a href='https://www.primefaces.org/primereact/menumodel/' className='font-medium hover:underline text-primary'>
                                 MenuModel API
                             </a>
                             .
                         </p>
 
                         <h5>PrimeReact Theme</h5>
-                        <p>
-                            Sakai theming is based on the PrimeReact theme being used.
-                        </p>
+                        <p>Sakai theming is based on the PrimeReact theme being used.</p>
 
                         <h5>SASS Variables</h5>
                         <p>
@@ -221,7 +216,7 @@ export const LayoutProvider = (props) => {
                         </p>
 
                         <h6>layout/_variables.scss</h6>
-                        <pre className="app-code" lang="scss">
+                        <pre className='app-code' lang='scss'>
                             <code>
                                 {`
 /* General */
@@ -235,7 +230,7 @@ $transitionDuration:.2s;        /* transition duration of layout elements e.g. s
                 </div>
             </div>
         </>
-    );
-};
+    )
+}
 
-export default Documentation;
+export default Documentation

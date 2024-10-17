@@ -1,24 +1,25 @@
+import Layout from '@/layout/layout'
 import { Metadata } from 'next'
-import Layout from '../../layout/layout'
 
 interface AppLayoutProps {
     children: React.ReactNode
 }
 
 export const metadata: Metadata = {
-    title: 'PrimeReact Sakai',
+    title: 'ViStore',
     description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.',
     robots: { index: false, follow: false },
     openGraph: {
         type: 'website',
-        title: 'PrimeReact SAKAI-REACT',
+        title: 'ViStore',
         url: 'https://sakai.primereact.org/',
         description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.',
         images: ['https://www.primefaces.org/static/social/sakai-react.png'],
         ttl: 604800
     },
     icons: {
-        icon: '/favicon.ico'
+        icon: '/layout/images/ViStore.png',
+        shortcut: '/layout/images/ViStore.png'
     }
 }
 

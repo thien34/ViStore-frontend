@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 import { useRouter } from 'next/navigation'
-import React from 'react'
 import { Button } from 'primereact/button'
 
 const ErrorPage = () => {

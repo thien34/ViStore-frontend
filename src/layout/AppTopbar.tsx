@@ -1,8 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
-
 import Link from 'next/link'
 import { classNames } from 'primereact/utils'
-import React, { forwardRef, useContext, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useContext, useImperativeHandle, useRef } from 'react'
+import Image from 'next/image'
 import { AppTopbarRef } from '@/types'
 import { LayoutContext } from './context/layoutcontext'
 
@@ -21,7 +20,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
     return (
         <div className='layout-topbar'>
             <Link href='/' className='layout-topbar-logo'>
-                <img src={`/layout/images/logo-${layoutConfig.colorScheme !== 'light' ? 'white' : 'dark'}.svg`} width='47.22px' height={'35px'} alt='logo' />
+                <Image src={`/layout/images/logo-${layoutConfig.colorScheme !== 'light' ? 'white' : 'dark'}.svg`} width={47.22} height={35} alt='logo' />
                 <span>
                     <b>Vítore</b>
                 </span>
