@@ -88,56 +88,51 @@ const ProductPage = () => {
     }
     const generateCombinations = () => {
         const selectedAttributes = attributeRows.filter((row) => row.selectedAttribute && row.selectedValues.length > 0)
+
         if (selectedAttributes.length > 0) {
             const values = selectedAttributes.map((row) => row.selectedValues)
-            let newCombinations = [...combinedRows]
+            const newCombinations: CombinedRow[] = []
 
-            if (values.length === 1) {
-                const newRows = values[0].map((value, index) => {
-                    const existingRow = newCombinations[index] || {}
-                    return {
-                        name: value,
-                        sku: existingRow.sku || '',
-                        productCost: existingRow.productCost || 0,
-                        unitPrice: existingRow.unitPrice || 0,
-                        quantity: existingRow.quantity || 0,
-                        gtin: existingRow.gtin || '',
-                        images: []
-                    }
-                })
-                newCombinations = newRows
-            } else if (values.length > 1) {
-                for (const value1 of values[0]) {
-                    for (const value2 of values[1]) {
-                        const existingRowIndex = newCombinations.findIndex((row) => row.name === `${value1} - ${value2}`)
+            const generateCombos = (current: string[], depth: number) => {
+                if (depth === values.length) {
+                    const name = current.join(' - ')
+                    const existingRowIndex = combinedRows.findIndex((row) => row.name === name)
 
-                        if (existingRowIndex === -1) {
-                            newCombinations.push({
-                                name: `${value1} - ${value2}`,
-                                sku: '',
-                                productCost: 0,
-                                unitPrice: 0,
-                                quantity: 0,
-                                gtin: '',
-                                images: []
-                            })
-                        } else {
-                            const existingRow = newCombinations[existingRowIndex]
-                            newCombinations[existingRowIndex] = {
-                                name: `${value1} - ${value2}`,
-                                sku: existingRow.sku || '',
-                                productCost: existingRow.productCost || 0,
-                                unitPrice: existingRow.unitPrice || 0,
-                                quantity: existingRow.quantity || 0,
-                                gtin: existingRow.gtin || '',
-                                images: []
-                            }
-                        }
+                    if (existingRowIndex === -1) {
+                        newCombinations.push({
+                            name: name,
+                            sku: '',
+                            productCost: 0,
+                            unitPrice: 0,
+                            quantity: 0,
+                            gtin: '',
+                            images: []
+                        })
+                    } else {
+                        const existingRow = combinedRows[existingRowIndex]
+                        newCombinations.push({
+                            name: name,
+                            sku: existingRow.sku || '',
+                            productCost: existingRow.productCost || 0,
+                            unitPrice: existingRow.unitPrice || 0,
+                            quantity: existingRow.quantity || 0,
+                            gtin: existingRow.gtin || '',
+                            images: []
+                        })
                     }
+                    return
+                }
+
+                for (const value of values[depth]) {
+                    generateCombos([...current, value], depth + 1)
                 }
             }
 
+            generateCombos([], 0)
+
             setCombinedRows(newCombinations)
+        } else {
+            setCombinedRows([])
         }
     }
 
@@ -209,21 +204,59 @@ const ProductPage = () => {
         return attributes.filter((attr) => !selectedAttributeCodes.has(attr.code))
     }
     // const chooseOptions = { icon: 'pi  pi-images', iconOnly: true, className: 'custom-choose-btn p-button-rounded p-button-outlined' }
+    const handleAddProduct = async () => {
+        const commonProductInfo = {
+            fullDescription: text,
+            weight: 12,
+            published: true,
+            deleted: false,
+            categoryId: selectedCategory?.code || null,
+            manufacturerId: selectedManufacture?.code || null
+        }
 
-    const handleAddProduct = () => {
-        console.log(combinedRows)
-        const formData = new FormData()
-
-        Object.keys(uploadedFiles).forEach((rowIndex) => {
-            const index = Number(rowIndex)
-            if (uploadedFiles[index]) {
-                uploadedFiles[index].forEach((file: File) => {
-                    formData.append('images', file)
-                })
+        const payload = combinedRows.map((combinedRow) => {
+            return {
+                ...commonProductInfo,
+                id: null,
+                name: combinedRow.name,
+                sku: combinedRow.sku,
+                gtin: combinedRow.gtin,
+                quantity: combinedRow.quantity,
+                unitPrice: combinedRow.unitPrice,
+                productCost: combinedRow.productCost,
+                attributes: attributeRows
+                    .map((row) => {
+                        const [attributeValue] = combinedRow.name.split(' - ').filter((value) => row.selectedValues.includes(value))
+                        return {
+                            id: row.selectedAttribute?.code || null,
+                            productId: null,
+                            value: attributeValue
+                        }
+                    })
+                    .filter((attr) => attr.value)
             }
         })
 
-        console.log(formData)
+        console.log(payload)
+
+        try {
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+
+            if (!response.ok) {
+                throw new Error('Failed to add products')
+            }
+
+            const data = await response.json()
+            console.log('Products added successfully:', data)
+        } catch (error) {
+            console.error('Error:', error)
+        }
     }
 
     const onUpload = (event: React.ChangeEvent<HTMLInputElement>, rowIndex: number) => {
@@ -257,8 +290,8 @@ const ProductPage = () => {
         { name: 'Thương hiệu 1', code: 'brand1' },
         { name: 'Thương hiệu 2', code: 'brand2' }
     ]
-    const [selectedCategory, setSelectedCategory] = useState(null)
-    const [selectedManufacture, setSelectedManufacture] = useState(null)
+    const [selectedCategory, setSelectedCategory] = useState<{ code: string } | null>(null)
+    const [selectedManufacture, setSelectedManufacture] = useState<{ code: string } | null>(null)
     const [text, setText] = useState<string>('')
     const [uploadedFiles, setUploadedFiles] = useState<{ [key: number]: File[] }>({})
     const [uploadedImages, setUploadedImages] = useState<{ [key: number]: string[] }>({})
@@ -298,9 +331,7 @@ const ProductPage = () => {
                 </div>
 
                 <div className='flex flex-row gap-4 align-items-center'>
-                    <div className='flex flex-column gap-2 w-full'>
-                        <Editor value={text} onTextChange={(e) => setText(e.htmlValue || '')} style={{ height: '100px', width: '100%' }} placeholder='Enter product description' />
-                    </div>
+                    <div className='flex flex-column gap-2 w-full'>{<Editor value={text} onTextChange={(e) => setText(e.htmlValue || '')} style={{ height: '100px', width: '100%' }} placeholder='Enter product description' />}</div>
                 </div>
             </div>
 
@@ -368,30 +399,32 @@ const ProductPage = () => {
                             <Column
                                 header='Image'
                                 body={(rowData, column) => (
-                                    <div style={{ width: '350px' }}>
+                                    <div style={{ width: '100px' }}>
                                         <label className='cursor-pointer rounded-lg justify-center items-center mb-4'>
-                                            <input type='file' multiple onChange={(event) => onUpload(event, column.rowIndex)} className='absolute inset-0 opacity-0 cursor-pointer' />
+                                            <input type='file' onChange={(event) => onUpload(event, column.rowIndex)} className='absolute inset-0 opacity-0 cursor-pointer' />
                                             <span className='text-gray-600 '>
                                                 <i className='pi pi-image text-2xl mb-2 '></i>
                                             </span>
                                         </label>
 
                                         <hr className='border-t-2 border-gray-300 mb-4' />
-                                        <div className='grid grid-cols-2 gap-4 w-full'>
-                                            {uploadedImages[column.rowIndex] &&
-                                                uploadedImages[column.rowIndex].map((imageSrc, imageIndex) => (
-                                                    <div key={imageIndex} className='relative'>
-                                                        <img src={imageSrc} alt={`Uploaded image ${imageIndex}`} style={{ width: '100px', height: '100px' }} className='rounded-md object-cover shadow-md' />
 
-                                                        <button
-                                                            style={{ borderRadius: '5px' }}
-                                                            className='absolute cursor-pointer border-none rounded-3xl top-0 right-0 bg-red-500 text-white p-1 transition-all duration-300 ease-in-out hover:bg-red-700 hover:scale-110'
-                                                            onClick={() => onRemoveImage(column.rowIndex, imageIndex)}
-                                                        >
-                                                            <i className='pi pi-trash'></i>
-                                                        </button>
-                                                    </div>
-                                                ))}
+                                        <div className='flex justify-center items-center'>
+                                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
+                                                {uploadedImages[column.rowIndex] &&
+                                                    uploadedImages[column.rowIndex].map((imageSrc, imageIndex) => (
+                                                        <div key={imageIndex} className='relative flex justify-center items-center'>
+                                                            <img src={imageSrc} alt={`Uploaded image ${imageIndex}`} style={{ width: '100px', height: '100px' }} className='rounded-md object-cover shadow-md' />
+                                                            <button
+                                                                style={{ borderRadius: '5px' }}
+                                                                className='absolute cursor-pointer border-none rounded-3xl top-0 right-0 bg-red-500 text-white p-1 transition-all duration-300 ease-in-out hover:bg-red-700 hover:scale-110'
+                                                                onClick={() => onRemoveImage(column.rowIndex, imageIndex)}
+                                                            >
+                                                                <i className='pi pi-trash'></i>
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                            </div>
                                         </div>
 
                                         <hr className='border-t-2 border-gray-300 mt-4' />
