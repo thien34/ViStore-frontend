@@ -3,8 +3,14 @@ import { Paging, PagingResponse } from './Paging'
 export interface Category {
     id?: number
     name: string
-    parentCategoryId: number
-    [key: string]: string | number | undefined
+    parentCategoryId: number | null
+    [key: string]: string | number | null | undefined
+}
+
+export interface CategoryNameResponse {
+    id: number
+    name: string
+    children: CategoryNameResponse[]
 }
 
 export interface CategoryPagingResponse extends PagingResponse {
