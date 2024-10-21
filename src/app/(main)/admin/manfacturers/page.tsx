@@ -1,5 +1,9 @@
+'use client'
 const Crud1 = () => {
-    return <>page</>
+    return (
+        <>
+            <div className=''></div>
+        </>
+    )
 }
-
 export default Crud1

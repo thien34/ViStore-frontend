@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { PrimeIcons } from 'primereact/api'
 import { AutoComplete } from 'primereact/autocomplete'
@@ -47,7 +48,7 @@ const columns: ColumnMeta[] = [
 const ProductPage = () => {
     const [attributeRows, setAttributeRows] = useState<AttributeRow[]>([])
     const [combinedRows, setCombinedRows] = useState<CombinedRow[]>([])
-    const [attributes, setAttributes] = useState<Attribute[]>([
+    const [attributes] = useState<Attribute[]>([
         { code: 1, name: 'Màu sắc' },
         { code: 2, name: 'Kích thước' }
     ])
@@ -381,8 +382,7 @@ const ProductPage = () => {
                                             {uploadedImages[column.rowIndex] &&
                                                 uploadedImages[column.rowIndex].map((imageSrc, imageIndex) => (
                                                     <div key={imageIndex} className='relative'>
-                                                        <img src={imageSrc} alt={`Uploaded image ${imageIndex}`} style={{ width: '100px', height: '100px' }} className='rounded-md object-cover shadow-md' />
-
+                                                        <Image src={imageSrc} alt={`Uploaded image ${imageIndex}`} width={100} height={100} className='rounded-md object-cover shadow-md' />
                                                         <button
                                                             style={{ borderRadius: '5px' }}
                                                             className='absolute cursor-pointer border-none rounded-3xl top-0 right-0 bg-red-500 text-white p-1 transition-all duration-300 ease-in-out hover:bg-red-700 hover:scale-110'

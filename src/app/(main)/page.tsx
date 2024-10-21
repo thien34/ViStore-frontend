@@ -8,8 +8,8 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Demo } from '@/types'
 import { ChartData, ChartOptions } from 'chart.js'
-import { ProductService } from '@/demo/service/ProductService'
-import { LayoutContext } from '@/layout/context/layoutcontext'
+import { ProductService } from '@/service/category.service'
+import { LayoutContext } from '@/components/layout/context/layoutcontext'
 import Image from 'next/image'
 
 const lineData: ChartData = {
@@ -106,7 +106,7 @@ const Dashboard = () => {
     }
 
     useEffect(() => {
-        ProductService.getProductsSmall().then((data) => setProducts(data))
+        // ProductService.getProductsSmall().then((data) => setProducts(data))
     }, [])
 
     useEffect(() => {
