@@ -24,7 +24,12 @@ async function EditProduct(props: EditProductProps) {
 
     return (
         <>
-            <ProductAddForm categories={categoriesData} manufacturers={manufacturersData} productAttributes={productAttributesData} product={product} />
+            <ProductAddForm
+                categories={categoriesData}
+                manufacturers={manufacturersData}
+                productAttributes={productAttributesData}
+                product={product}
+            />
         </>
     )
 }

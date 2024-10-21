@@ -7,7 +7,13 @@ const AppFooter = () => {
 
     return (
         <div className='layout-footer'>
-            <Image src={`/layout/images/logo-${layoutConfig.colorScheme === 'light' ? 'dark' : 'white'}.svg`} className='mr-2' alt='Logo' width={20} height={20} />
+            <Image
+                src={`/layout/images/logo-${layoutConfig.colorScheme === 'light' ? 'dark' : 'white'}.svg`}
+                className='mr-2'
+                alt='Logo'
+                width={20}
+                height={20}
+            />
             by
             <span className='font-medium ml-2'>PrimeReact</span>
         </div>

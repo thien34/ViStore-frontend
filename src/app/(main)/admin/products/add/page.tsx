@@ -4,11 +4,19 @@ import ManufacturerService from '@/service/ManufacturerService'
 import ProductAttributeService from '@/service/ProductAttributeService'
 
 export default async function ProductCreatePage() {
-    const [categoriesData, manufacturersData, productAttributesData] = await Promise.all([CategoryService.getAllCategoryNames(), ManufacturerService.getAllManufacturerNames(), ProductAttributeService.getAllProductAttributeNames()])
+    const [categoriesData, manufacturersData, productAttributesData] = await Promise.all([
+        CategoryService.getAllCategoryNames(),
+        ManufacturerService.getAllManufacturerNames(),
+        ProductAttributeService.getAllProductAttributeNames()
+    ])
 
     return (
         <div>
-            <ProductAddForm categories={categoriesData} manufacturers={manufacturersData} productAttributes={productAttributesData} />
+            <ProductAddForm
+                categories={categoriesData}
+                manufacturers={manufacturersData}
+                productAttributes={productAttributesData}
+            />
         </div>
     )
 }

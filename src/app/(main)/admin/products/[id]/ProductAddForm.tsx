@@ -1,5 +1,5 @@
 'use client'
-import { Category } from '@/interface/Category'
+import { Category } from '@/interface/category.interface'
 import { ManufacturerNameResponse } from '@/interface/Manufacture'
 import { ProductResponse } from '@/interface/Product'
 import { Attribute } from '@/interface/ProductAttribute'
@@ -73,28 +73,59 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 <div className='flex flex-row gap-4'>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='productName'>Product Name</label>
-                        <InputText id='productName' value={name} onChange={(e) => setName(e.target.value)} placeholder='Enter product name' />
+                        <InputText
+                            id='productName'
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder='Enter product name'
+                        />
                     </div>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='weight'>Weight</label>
-                        <InputNumber inputId='weight' value={weight} onChange={(e) => setWeight(e.value || 0)} placeholder='Enter weight' mode='decimal' showButtons min={0} suffix='g' />
+                        <InputNumber
+                            inputId='weight'
+                            value={weight}
+                            onChange={(e) => setWeight(e.value || 0)}
+                            placeholder='Enter weight'
+                            mode='decimal'
+                            showButtons
+                            min={0}
+                            suffix='g'
+                        />
                     </div>
                 </div>
 
                 <div className='flex flex-row gap-4 align-items-center'>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='category'>Categories</label>
-                        <Dropdown value={selectedCategory} onChange={(e) => setSelectedCategory(e.value)} options={categories} placeholder='Select a category' optionLabel='name' />
+                        <Dropdown
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.value)}
+                            options={categories}
+                            placeholder='Select a category'
+                            optionLabel='name'
+                        />
                     </div>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='brand'>Manufactures</label>
-                        <Dropdown value={selectedManufacture} onChange={(e) => setSelectedManufacture(e.value)} options={manufacturers} placeholder='Select a manufacture' optionLabel='manufacturerName' />
+                        <Dropdown
+                            value={selectedManufacture}
+                            onChange={(e) => setSelectedManufacture(e.value)}
+                            options={manufacturers}
+                            placeholder='Select a manufacture'
+                            optionLabel='manufacturerName'
+                        />
                     </div>
                 </div>
 
                 <div className='flex flex-row gap-4 align-items-center'>
                     <div className='flex flex-column gap-2 w-full'>
-                        <Editor value={text} onTextChange={(e) => setText(e.htmlValue || '')} style={{ height: '100px', width: '100%' }} placeholder='Enter product description' />
+                        <Editor
+                            value={text}
+                            onTextChange={(e) => setText(e.htmlValue || '')}
+                            style={{ height: '100px', width: '100%' }}
+                            placeholder='Enter product description'
+                        />
                     </div>
                 </div>
 

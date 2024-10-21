@@ -1,11 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
-import { Category } from '@/interface/Category'
+import { Category } from '@/interface/category.interface'
 import { ManufacturerNameResponse } from '@/interface/Manufacture'
 import { ProductAttribute, ProductRequest } from '@/interface/Product'
 import { Attribute } from '@/interface/ProductAttribute'
-
 import ProductService from '@/service/ProducrService'
+import Image from 'next/image'
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { PrimeIcons } from 'primereact/api'
 import { AutoComplete } from 'primereact/autocomplete'
@@ -154,7 +153,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         const newCombinedRows = combinedRows.filter((_, i) => i !== index)
 
         const updatedAttributeRows = attributeRows.map((row) => {
-            const updatedSelectedValues = row.selectedValues.filter((value) => newCombinedRows.some((combinedRow) => combinedRow.name.includes(value)))
+            const updatedSelectedValues = row.selectedValues.filter((value) =>
+                newCombinedRows.some((combinedRow) => combinedRow.name.includes(value))
+            )
             return { ...row, selectedValues: updatedSelectedValues }
         })
 
@@ -242,7 +243,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             return
         }
 
-        const commonProductInfo: Omit<ProductRequest, 'id' | 'name' | 'sku' | 'gtin' | 'quantity' | 'unitPrice' | 'productCost' | 'attributes'> = {
+        const commonProductInfo: Omit<
+            ProductRequest,
+            'id' | 'name' | 'sku' | 'gtin' | 'quantity' | 'unitPrice' | 'productCost' | 'attributes'
+        > = {
             fullDescription: text,
             weight: 12,
             published: true,
@@ -254,7 +258,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         const productsData: ProductRequest[] = combinedRows.map((combinedRow) => {
             const attributes: ProductAttribute[] = attributeRows
                 .map((row) => {
-                    const [attributeValue] = combinedRow.name.split(' - ').filter((value) => row.selectedValues.includes(value))
+                    const [attributeValue] = combinedRow.name
+                        .split(' - ')
+                        .filter((value) => row.selectedValues.includes(value))
                     if (attributeValue) {
                         return {
                             id: row.selectedAttribute?.id || null,
@@ -390,7 +396,16 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 </div>
 
                 <div className='flex flex-row gap-4 align-items-center'>
-                    <div className='flex flex-column gap-2 w-full'>{<Editor value={text} onTextChange={(e) => setText(e.htmlValue || '')} style={{ height: '100px', width: '100%' }} placeholder='Enter product description' />}</div>
+                    <div className='flex flex-column gap-2 w-full'>
+                        {
+                            <Editor
+                                value={text}
+                                onTextChange={(e) => setText(e.htmlValue || '')}
+                                style={{ height: '100px', width: '100%' }}
+                                placeholder='Enter product description'
+                            />
+                        }
+                    </div>
                 </div>
             </div>
 
@@ -400,7 +415,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         <div key={index} className='mb-4 flex items-center'>
                             <Dropdown
                                 value={row.selectedAttribute}
-                                options={[...getAvailableAttributes(), ...productAttributes.filter((attr) => attr.id === row.selectedAttribute?.id)]}
+                                options={[
+                                    ...getAvailableAttributes(),
+                                    ...productAttributes.filter((attr) => attr.id === row.selectedAttribute?.id)
+                                ]}
                                 onChange={(e) => {
                                     const updatedRows = [...attributeRows]
                                     updatedRows[index].selectedAttribute = e.value
@@ -415,13 +433,18 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             <AutoComplete
                                 value={row.selectedValues}
                                 suggestions={row.selectedValues}
-                                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeydown(event, index)}
+                                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                                    handleKeydown(event, index)
+                                }
                                 placeholder='Nhập giá trị và enter'
                                 multiple
                                 onChange={(e) => handleChange(e.value, index)}
                                 className='w-full'
                             />
-                            <Button className='pi pi-trash bg-gray-500 text-xs' onClick={() => removeAttributeRow(index)} />
+                            <Button
+                                className='pi pi-trash bg-gray-500 text-xs'
+                                onClick={() => removeAttributeRow(index)}
+                            />
                         </div>
                     ))}
                     <Button onClick={addAttributeRow} className='flex items-center mb-5'>
@@ -430,7 +453,13 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     </Button>
 
                     {combinedRows.length > 0 && (
-                        <DataTable value={combinedRows} editMode='cell' resizableColumns showGridlines tableStyle={{ minWidth: '50rem' }}>
+                        <DataTable
+                            value={combinedRows}
+                            editMode='cell'
+                            resizableColumns
+                            showGridlines
+                            tableStyle={{ minWidth: '50rem' }}
+                        >
                             {columns.map(({ field, header }) => {
                                 if (field === 'name') {
                                     return <Column key={field} field={field} header={header} style={{ width: '25%' }} />
@@ -460,7 +489,11 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 body={(rowData, column) => (
                                     <div style={{ width: '100px' }}>
                                         <label className='cursor-pointer rounded-lg justify-center items-center mb-4'>
-                                            <input type='file' onChange={(event) => onUpload(event, column.rowIndex)} className='absolute inset-0 opacity-0 cursor-pointer' />
+                                            <input
+                                                type='file'
+                                                onChange={(event) => onUpload(event, column.rowIndex)}
+                                                className='absolute inset-0 opacity-0 cursor-pointer'
+                                            />
                                             <span className='text-gray-600 '>
                                                 <i className='pi pi-image text-2xl mb-2 '></i>
                                             </span>
@@ -472,12 +505,23 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
                                                 {uploadedImages[column.rowIndex] &&
                                                     uploadedImages[column.rowIndex].map((imageSrc, imageIndex) => (
-                                                        <div key={imageIndex} className='relative flex justify-center items-center'>
-                                                            <img src={imageSrc} alt={`Uploaded image ${imageIndex}`} style={{ width: '100px', height: '100px' }} className='rounded-md object-cover shadow-md' />
+                                                        <div
+                                                            key={imageIndex}
+                                                            className='relative flex justify-center items-center'
+                                                        >
+                                                            <Image
+                                                                src={imageSrc}
+                                                                alt={`Uploaded image ${imageIndex}`}
+                                                                width={100}
+                                                                height={100}
+                                                                className='rounded-md object-cover shadow-md'
+                                                            />
                                                             <button
                                                                 style={{ borderRadius: '5px' }}
                                                                 className='absolute cursor-pointer border-none rounded-3xl top-0 right-0 bg-red-500 text-white p-1 transition-all duration-300 ease-in-out hover:bg-red-700 hover:scale-110'
-                                                                onClick={() => onRemoveImage(column.rowIndex, imageIndex)}
+                                                                onClick={() =>
+                                                                    onRemoveImage(column.rowIndex, imageIndex)
+                                                                }
                                                             >
                                                                 <i className='pi pi-trash'></i>
                                                             </button>
@@ -492,7 +536,17 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 style={{ width: '350px', textAlign: 'center' }}
                             />
 
-                            <Column header='Delete' body={(rowData, column) => <Button icon='pi pi-trash' className='p-button-danger' onClick={() => removeCombinationRow(column.rowIndex)} />} style={{ width: '100px', textAlign: 'center' }} />
+                            <Column
+                                header='Delete'
+                                body={(rowData, column) => (
+                                    <Button
+                                        icon='pi pi-trash'
+                                        className='p-button-danger'
+                                        onClick={() => removeCombinationRow(column.rowIndex)}
+                                    />
+                                )}
+                                style={{ width: '100px', textAlign: 'center' }}
+                            />
                         </DataTable>
                     )}
                 </AccordionTab>

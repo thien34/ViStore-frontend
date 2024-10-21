@@ -84,7 +84,10 @@ const Layout = ({ children }: ChildContainerProps) => {
         if (document.body.classList) {
             document.body.classList.remove('blocked-scroll')
         } else {
-            document.body.className = document.body.className.replace(new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'), ' ')
+            document.body.className = document.body.className.replace(
+                new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'),
+                ' '
+            )
         }
     }
 

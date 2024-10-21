@@ -1,4 +1,4 @@
-import { Category, CategoryNameResponse } from '@/interface/Category'
+import { Category, CategoryName } from '@/interface/category.interface'
 
 class CategoryService {
     static async getAllCategoryNames(): Promise<Category[]> {
@@ -16,13 +16,13 @@ class CategoryService {
     }
 }
 
-const flattenCategories = (categories: CategoryNameResponse[], parentId: number | null = null): Category[] => {
+const flattenCategories = (categories: CategoryName[], parentId: number | null = null): Category[] => {
     const flatList: Category[] = []
 
-    const addCategories = (cats: CategoryNameResponse[], parent: number | null) => {
+    const addCategories = (cats: CategoryName[], parent: number | null) => {
         for (const cat of cats) {
             const { id, name, children } = cat
-            flatList.push({ id, name, parentCategoryId: parent !== null ? parent : null })
+            flatList.push({ id, name, categoryParentId: parent !== null ? parent : null })
             if (children && children.length > 0) {
                 addCategories(children, id)
             }

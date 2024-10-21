@@ -26,7 +26,12 @@ const AppMenu = () => {
                 { label: 'Manufacturers', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
                 { label: 'Product tags', icon: 'pi pi-fw pi-bookmark', to: '/uikit/floatlabel' },
                 { label: 'Product attributes', icon: 'pi pi-fw pi-exclamation-circle', to: '/uikit/invalidstate' },
-                { label: 'Specification attributes', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
+                {
+                    label: 'Specification attributes',
+                    icon: 'pi pi-fw pi-mobile',
+                    to: '/uikit/button',
+                    class: 'rotated-icon'
+                },
                 { label: 'Customers', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
                 { label: 'Customer roles', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
                 { label: 'Online customers', icon: 'pi pi-fw pi-bars', to: '/uikit/menu' }
@@ -96,10 +101,20 @@ const AppMenu = () => {
         <MenuProvider>
             <ul className='layout-menu'>
                 {model.map((item, i) => {
-                    return !item?.seperator ? <AppMenuitem item={item} root={true} index={i} key={item.label} /> : <li className='menu-separator'></li>
+                    return !item?.seperator ? (
+                        <AppMenuitem item={item} root={true} index={i} key={item.label} />
+                    ) : (
+                        <li className='menu-separator'></li>
+                    )
                 })}
                 <Link href='https://blocks.primereact.org' target='_blank' style={{ cursor: 'pointer' }}>
-                    <Image alt='Prime Blocks' className='w-full mt-3' src={`/layout/images/banner-primeblocks${layoutConfig.colorScheme === 'light' ? '' : '-dark'}.png`} width={500} height={150} />
+                    <Image
+                        alt='Prime Blocks'
+                        className='w-full mt-3'
+                        src={`/layout/images/banner-primeblocks${layoutConfig.colorScheme === 'light' ? '' : '-dark'}.png`}
+                        width={500}
+                        height={150}
+                    />
                 </Link>
             </ul>
         </MenuProvider>

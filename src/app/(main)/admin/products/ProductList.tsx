@@ -29,7 +29,16 @@ function ProductList({ products }: Props) {
             >
                 <Column field='name' header='Name'></Column>
                 <Column field='deleted' header='Deleted'></Column>
-                <Column header='Edit' body={(rowData) => <Button label='Edit' icon='pi pi-pencil' onClick={() => router.push(`/admin/products/${rowData.id}`)} />} />
+                <Column
+                    header='Edit'
+                    body={(rowData) => (
+                        <Button
+                            label='Edit'
+                            icon='pi pi-pencil'
+                            onClick={() => router.push(`/admin/products/${rowData.id}`)}
+                        />
+                    )}
+                />
             </DataTable>
         </div>
     )

@@ -8,7 +8,6 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Demo } from '@/types'
 import { ChartData, ChartOptions } from 'chart.js'
-import { ProductService } from '@/service/category.service'
 import { LayoutContext } from '@/components/layout/context/layoutcontext'
 import Image from 'next/image'
 
@@ -35,7 +34,7 @@ const lineData: ChartData = {
 }
 
 const Dashboard = () => {
-    const [products, setProducts] = useState<Demo.Product[]>([])
+    const [products] = useState<Demo.Product[]>([])
     const menu1 = useRef<Menu>(null)
     const menu2 = useRef<Menu>(null)
     const [lineOptions, setLineOptions] = useState<ChartOptions>({})
@@ -133,7 +132,10 @@ const Dashboard = () => {
                             <span className='block text-500 font-medium mb-3'>Orders</span>
                             <div className='text-900 font-medium text-xl'>152</div>
                         </div>
-                        <div className='flex align-items-center justify-content-center bg-blue-100 border-round' style={{ width: '2.5rem', height: '2.5rem' }}>
+                        <div
+                            className='flex align-items-center justify-content-center bg-blue-100 border-round'
+                            style={{ width: '2.5rem', height: '2.5rem' }}
+                        >
                             <i className='pi pi-shopping-cart text-blue-500 text-xl' />
                         </div>
                     </div>
@@ -148,7 +150,10 @@ const Dashboard = () => {
                             <span className='block text-500 font-medium mb-3'>Revenue</span>
                             <div className='text-900 font-medium text-xl'>$2.100</div>
                         </div>
-                        <div className='flex align-items-center justify-content-center bg-orange-100 border-round' style={{ width: '2.5rem', height: '2.5rem' }}>
+                        <div
+                            className='flex align-items-center justify-content-center bg-orange-100 border-round'
+                            style={{ width: '2.5rem', height: '2.5rem' }}
+                        >
                             <i className='pi pi-map-marker text-orange-500 text-xl' />
                         </div>
                     </div>
@@ -163,7 +168,10 @@ const Dashboard = () => {
                             <span className='block text-500 font-medium mb-3'>Customers</span>
                             <div className='text-900 font-medium text-xl'>28441</div>
                         </div>
-                        <div className='flex align-items-center justify-content-center bg-cyan-100 border-round' style={{ width: '2.5rem', height: '2.5rem' }}>
+                        <div
+                            className='flex align-items-center justify-content-center bg-cyan-100 border-round'
+                            style={{ width: '2.5rem', height: '2.5rem' }}
+                        >
                             <i className='pi pi-inbox text-cyan-500 text-xl' />
                         </div>
                     </div>
@@ -178,7 +186,10 @@ const Dashboard = () => {
                             <span className='block text-500 font-medium mb-3'>Comments</span>
                             <div className='text-900 font-medium text-xl'>152 Unread</div>
                         </div>
-                        <div className='flex align-items-center justify-content-center bg-purple-100 border-round' style={{ width: '2.5rem', height: '2.5rem' }}>
+                        <div
+                            className='flex align-items-center justify-content-center bg-purple-100 border-round'
+                            style={{ width: '2.5rem', height: '2.5rem' }}
+                        >
                             <i className='pi pi-comment text-purple-500 text-xl' />
                         </div>
                     </div>
@@ -191,9 +202,26 @@ const Dashboard = () => {
                 <div className='card'>
                     <h5>Recent Sales</h5>
                     <DataTable value={products} rows={5} paginator>
-                        <Column header='Image' body={(data) => <Image className='shadow-2' src={`/demo/images/product/${data.image}`} alt={data.image} width={50} height={30} />} />
+                        <Column
+                            header='Image'
+                            body={(data) => (
+                                <Image
+                                    className='shadow-2'
+                                    src={`/demo/images/product/${data.image}`}
+                                    alt={data.image}
+                                    width={50}
+                                    height={30}
+                                />
+                            )}
+                        />
                         <Column field='name' header='Name' sortable style={{ width: '35%' }} />
-                        <Column field='price' header='Price' sortable style={{ width: '35%' }} body={(data) => formatCurrency(data.price)} />
+                        <Column
+                            field='price'
+                            header='Price'
+                            sortable
+                            style={{ width: '35%' }}
+                            body={(data) => formatCurrency(data.price)}
+                        />
                         <Column
                             header='View'
                             style={{ width: '15%' }}
@@ -209,7 +237,14 @@ const Dashboard = () => {
                     <div className='flex justify-content-between align-items-center mb-5'>
                         <h5>Best Selling Products</h5>
                         <div>
-                            <Button type='button' icon='pi pi-ellipsis-v' rounded text className='p-button-plain' onClick={(event) => menu1.current?.toggle(event)} />
+                            <Button
+                                type='button'
+                                icon='pi pi-ellipsis-v'
+                                rounded
+                                text
+                                className='p-button-plain'
+                                onClick={(event) => menu1.current?.toggle(event)}
+                            />
                             <Menu
                                 ref={menu1}
                                 popup
@@ -227,7 +262,10 @@ const Dashboard = () => {
                                 <div className='mt-1 text-600'>Clothing</div>
                             </div>
                             <div className='mt-2 md:mt-0 flex align-items-center'>
-                                <div className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem' style={{ height: '8px' }}>
+                                <div
+                                    className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem'
+                                    style={{ height: '8px' }}
+                                >
                                     <div className='bg-orange-500 h-full' style={{ width: '50%' }} />
                                 </div>
                                 <span className='text-orange-500 ml-3 font-medium'>%50</span>
@@ -239,7 +277,10 @@ const Dashboard = () => {
                                 <div className='mt-1 text-600'>Accessories</div>
                             </div>
                             <div className='mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center'>
-                                <div className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem' style={{ height: '8px' }}>
+                                <div
+                                    className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem'
+                                    style={{ height: '8px' }}
+                                >
                                     <div className='bg-cyan-500 h-full' style={{ width: '16%' }} />
                                 </div>
                                 <span className='text-cyan-500 ml-3 font-medium'>%16</span>
@@ -251,7 +292,10 @@ const Dashboard = () => {
                                 <div className='mt-1 text-600'>Accessories</div>
                             </div>
                             <div className='mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center'>
-                                <div className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem' style={{ height: '8px' }}>
+                                <div
+                                    className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem'
+                                    style={{ height: '8px' }}
+                                >
                                     <div className='bg-pink-500 h-full' style={{ width: '67%' }} />
                                 </div>
                                 <span className='text-pink-500 ml-3 font-medium'>%67</span>
@@ -263,7 +307,10 @@ const Dashboard = () => {
                                 <div className='mt-1 text-600'>Office</div>
                             </div>
                             <div className='mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center'>
-                                <div className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem' style={{ height: '8px' }}>
+                                <div
+                                    className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem'
+                                    style={{ height: '8px' }}
+                                >
                                     <div className='bg-green-500 h-full' style={{ width: '35%' }} />
                                 </div>
                                 <span className='text-green-500 ml-3 font-medium'>%35</span>
@@ -275,7 +322,10 @@ const Dashboard = () => {
                                 <div className='mt-1 text-600'>Accessories</div>
                             </div>
                             <div className='mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center'>
-                                <div className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem' style={{ height: '8px' }}>
+                                <div
+                                    className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem'
+                                    style={{ height: '8px' }}
+                                >
                                     <div className='bg-purple-500 h-full' style={{ width: '75%' }} />
                                 </div>
                                 <span className='text-purple-500 ml-3 font-medium'>%75</span>
@@ -287,7 +337,10 @@ const Dashboard = () => {
                                 <div className='mt-1 text-600'>Clothing</div>
                             </div>
                             <div className='mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center'>
-                                <div className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem' style={{ height: '8px' }}>
+                                <div
+                                    className='surface-300 border-round overflow-hidden w-10rem lg:w-6rem'
+                                    style={{ height: '8px' }}
+                                >
                                     <div className='bg-teal-500 h-full' style={{ width: '40%' }} />
                                 </div>
                                 <span className='text-teal-500 ml-3 font-medium'>%40</span>
@@ -307,7 +360,14 @@ const Dashboard = () => {
                     <div className='flex align-items-center justify-content-between mb-4'>
                         <h5>Notifications</h5>
                         <div>
-                            <Button type='button' icon='pi pi-ellipsis-v' rounded text className='p-button-plain' onClick={(event) => menu2.current?.toggle(event)} />
+                            <Button
+                                type='button'
+                                icon='pi pi-ellipsis-v'
+                                rounded
+                                text
+                                className='p-button-plain'
+                                onClick={(event) => menu2.current?.toggle(event)}
+                            />
                             <Menu
                                 ref={menu2}
                                 popup
@@ -338,7 +398,8 @@ const Dashboard = () => {
                                 <i className='pi pi-download text-xl text-orange-500' />
                             </div>
                             <span className='text-700 line-height-3'>
-                                Your request for withdrawal of <span className='text-blue-500 font-medium'>2500$</span> has been initiated.
+                                Your request for withdrawal of <span className='text-blue-500 font-medium'>2500$</span>{' '}
+                                has been initiated.
                             </span>
                         </li>
                     </ul>
@@ -372,7 +433,8 @@ const Dashboard = () => {
                     className='px-4 py-5 shadow-2 flex flex-column md:flex-row md:align-items-center justify-content-between mb-3'
                     style={{
                         borderRadius: '1rem',
-                        background: 'linear-gradient(0deg, rgba(0, 123, 255, 0.5), rgba(0, 123, 255, 0.5)), linear-gradient(92.54deg, #1C80CF 47.88%, #FFFFFF 100.01%)'
+                        background:
+                            'linear-gradient(0deg, rgba(0, 123, 255, 0.5), rgba(0, 123, 255, 0.5)), linear-gradient(92.54deg, #1C80CF 47.88%, #FFFFFF 100.01%)'
                     }}
                 >
                     <div>
@@ -380,7 +442,10 @@ const Dashboard = () => {
                         <div className='text-white font-medium text-5xl'>Try PrimeBlocks</div>
                     </div>
                     <div className='mt-4 mr-auto md:mt-0 md:mr-0'>
-                        <Link href='https://blocks.primereact.org' className='p-button font-bold px-5 py-3 p-button-warning p-button-rounded p-button-raised'>
+                        <Link
+                            href='https://blocks.primereact.org'
+                            className='p-button font-bold px-5 py-3 p-button-warning p-button-rounded p-button-raised'
+                        >
                             Get Started
                         </Link>
                     </div>

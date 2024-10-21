@@ -54,10 +54,13 @@ class ManagerPath {
     static readonly SPECIFICATION_ATTRIBUTE = '/admin/specification-attributes'
     static readonly SPECIFICATION_ATTRIBUTE_ADD = '/admin/specification-attributes/specification-attributes-add'
     static readonly SPECIFICATION_ATTRIBUTE_UPDATE = '/admin/specification-attributes/specification-attributes-edit/:id'
-    static readonly SPECIFICATION_ATTRIBUTE_GROUP_ADD = '/admin/specification-attributes/specification-attribute-group-add'
-    static readonly SPECIFICATION_ATTRIBUTE_GROUP_UPDATE = '/admin/specification-attributes/specification-attribute-group/:id'
+    static readonly SPECIFICATION_ATTRIBUTE_GROUP_ADD =
+        '/admin/specification-attributes/specification-attribute-group-add'
+    static readonly SPECIFICATION_ATTRIBUTE_GROUP_UPDATE =
+        '/admin/specification-attributes/specification-attribute-group/:id'
 
-    static readonly PRODUCT_SPECIFICATION_ATTRIBUTE_MAPPING_UPDATE = '/admin/products/product-spec-attribute-mapping/edit/:productId/:id'
+    static readonly PRODUCT_SPECIFICATION_ATTRIBUTE_MAPPING_UPDATE =
+        '/admin/products/product-spec-attribute-mapping/edit/:productId/:id'
 
     static readonly PREDEFINED_PRODUCT_ATTRIBUTE_VALUE = '/admin/predefined-product-attribute-values'
 
@@ -76,7 +79,8 @@ class ManagerPath {
 
     static readonly PRODUCT_SPECIFICATION_ATTRIBUTE_MAPPING_ADD = '/admin/product/product-spec-attribute-add'
     static readonly PRODUCT_SPECIFICATION_ATTRIBUTE_MAPPING = '/admin/product-specification-attribute-mappings'
-    static readonly GET_PRODUCT_SPECIFICATION_ATTRIBUTE_MAPPING_BY_PRODUCT_ID = '/admin/product-specification-attribute-mappings/by-product/:productId'
+    static readonly GET_PRODUCT_SPECIFICATION_ATTRIBUTE_MAPPING_BY_PRODUCT_ID =
+        '/admin/product-specification-attribute-mappings/by-product/:productId'
 
     //related product
     static readonly RELATED_PRODUCT = '/admin/related-product/:productId'

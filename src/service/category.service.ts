@@ -1,5 +1,6 @@
 import { Category, CategoryName, CategoryPagingResponse } from '@/interface/category.interface'
 import http from '@/libs/http'
+import { TreeNode } from 'primereact/treenode'
 
 class CategoryService {
     private basePath = '/api/admin/categories'
@@ -31,6 +32,14 @@ class CategoryService {
 
     async delete(id: number): Promise<void> {
         await http.delete<void>(`${this.basePath}/${id}`)
+    }
+
+    convertToTreeNode = (categories: CategoryName[]): TreeNode[] => {
+        return categories.map((category) => ({
+            key: category.id.toString(),
+            label: category.name,
+            children: this.convertToTreeNode(category.children ? category.children : [])
+        }))
     }
 }
 

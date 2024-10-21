@@ -15,8 +15,8 @@ import { TreeNode } from 'primereact/treenode'
 import categoryService from '@/service/category.service'
 
 interface CategoryProps {
-    data: Category[]
-    nodes: TreeNode[]
+    initialData: Category[]
+    initialNodes: TreeNode[]
 }
 
 const emptyCategory: Category = {
@@ -24,9 +24,11 @@ const emptyCategory: Category = {
     categoryParentId: null
 }
 
-const ListView = ({ data, nodes }: CategoryProps) => {
+const ListView = ({ initialData, initialNodes }: CategoryProps) => {
+    const [categories, setCategories] = useState<Category[]>(initialData)
+    const [nodes, setNodes] = useState<TreeNode[]>(initialNodes)
     const [category, setCategory] = useState<Category>(emptyCategory)
-    const [selectedProducts, setSelectedProducts] = useState(null)
+    const [selectedCategories, setSelectedCategories] = useState(null)
     const [submitted, setSubmitted] = useState(false)
     const [categoryDialog, setCategoryDialog] = useState(false)
     const [globalFilter, setGlobalFilter] = useState('')
@@ -48,18 +50,44 @@ const ListView = ({ data, nodes }: CategoryProps) => {
         setCategoryDialog(false)
     }
 
+    const editCategory = (category: Category) => {
+        setCategory({ ...category })
+        setCategoryDialog(true)
+    }
+
+    const fetchCategories = async () => {
+        const { payload: data } = await categoryService.getAll()
+        const { payload: newNodes } = await categoryService.getListName()
+        const treeNodes = categoryService.convertToTreeNode(newNodes)
+
+        setCategories(data.items)
+        setNodes(treeNodes)
+    }
+
     const saveCategory = async () => {
         setSubmitted(true)
         if (category.name.trim()) {
-            await categoryService.create(category)
-            toast.current?.show({
-                severity: 'success',
-                summary: 'Successful',
-                detail: 'Category Created',
-                life: 3000
-            })
+            if (!category.id) {
+                await categoryService.create(category)
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Category Created',
+                    life: 3000
+                })
+            } else {
+                await categoryService.update(category.id, category)
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Category Updated',
+                    life: 3000
+                })
+                console.log('update', category)
+            }
             setCategoryDialog(false)
             setCategory(emptyCategory)
+            await fetchCategories()
         }
     }
 
@@ -96,13 +124,7 @@ const ListView = ({ data, nodes }: CategoryProps) => {
     const actionBodyTemplate = (rowData: Category) => {
         return (
             <>
-                <Button
-                    icon='pi pi-pencil'
-                    rounded
-                    outlined
-                    className='mr-2'
-                    // onClick={() => editProduct(rowData)}
-                />
+                <Button icon='pi pi-pencil' rounded outlined className='mr-2' onClick={() => editCategory(rowData)} />
                 <Button
                     icon='pi pi-trash'
                     rounded
@@ -142,9 +164,9 @@ const ListView = ({ data, nodes }: CategoryProps) => {
                 <Toolbar className='mb-4' start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
                 <DataTable
                     ref={dt}
-                    value={data}
-                    selection={selectedProducts}
-                    // onSelectionChange={(e) => setSelectedProducts(e.value)}
+                    value={categories}
+                    selection={selectedCategories}
+                    onSelectionChange={(e) => setSelectedCategories(e.value)}
                     dataKey='id'
                     removableSort
                     resizableColumns

@@ -10,6 +10,7 @@ const httpInstance = async function <Response>(path: string, method: Method, dat
             Accept: 'application/json',
             cache: 'no-store'
         },
+        next: { revalidate: 0 },
         credentials: 'include',
         ...config
     }

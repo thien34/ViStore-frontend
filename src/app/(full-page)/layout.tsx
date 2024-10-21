@@ -1,5 +1,5 @@
+import AppConfig from '@/components/layout/AppConfig'
 import { Metadata } from 'next'
-import AppConfig from '../../components/layout/AppConfig'
 import React from 'react'
 
 interface SimpleLayoutProps {
