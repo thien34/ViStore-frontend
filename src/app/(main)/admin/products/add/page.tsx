@@ -1,19 +1,20 @@
-import CategoryService from '@/service/CategoryService'
 import ProductAddForm from './ProductForm'
-import ManufacturerService from '@/service/ManufacturerService'
 import ProductAttributeService from '@/service/ProductAttributeService'
+import categoryService from '@/service/category.service'
+import manufacturerService from '@/service/manufacturer.service'
 
 export default async function ProductCreatePage() {
-    const [categoriesData, manufacturersData, productAttributesData] = await Promise.all([
-        CategoryService.getAllCategoryNames(),
-        ManufacturerService.getAllManufacturerNames(),
-        ProductAttributeService.getAllProductAttributeNames()
-    ])
+    const [productAttributesData] = await Promise.all([ProductAttributeService.getAllProductAttributeNames()])
+
+    const { payload: nodes } = await categoryService.getListName()
+    const treeNodes = categoryService.convertToTreeNode(nodes)
+
+    const { payload: manufacturersData } = await manufacturerService.getListName()
 
     return (
         <div>
             <ProductAddForm
-                categories={categoriesData}
+                categories={treeNodes}
                 manufacturers={manufacturersData}
                 productAttributes={productAttributesData}
             />

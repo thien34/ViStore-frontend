@@ -1,6 +1,5 @@
 'use client'
-import { Category } from '@/interface/category.interface'
-import { ManufacturerNameResponse } from '@/interface/Manufacture'
+import { ManufacturerName } from '@/interface/manufacturer.interface'
 import { ProductAttribute, ProductRequest } from '@/interface/Product'
 import { Attribute } from '@/interface/ProductAttribute'
 import ProductService from '@/service/ProducrService'
@@ -15,6 +14,8 @@ import { Dropdown } from 'primereact/dropdown'
 import { Editor } from 'primereact/editor'
 import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
+import { TreeNode } from 'primereact/treenode'
+import { TreeSelect } from 'primereact/treeselect'
 import { useState } from 'react'
 
 interface AttributeRow {
@@ -45,8 +46,8 @@ const columns: ColumnMeta[] = [
     { field: 'quantity', header: 'Quantity' }
 ]
 interface ProductAddFormProps {
-    categories: Category[]
-    manufacturers: ManufacturerNameResponse[]
+    categories: TreeNode[]
+    manufacturers: ManufacturerName[]
     productAttributes: Attribute[]
 }
 
@@ -343,7 +344,6 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 setNameError('')
                             }}
                             placeholder='Enter product name'
-                            aria-describedby='productName-help'
                         />
                         {nameError && <small className='p-error'>{nameError}</small>}
                     </div>
@@ -367,15 +367,17 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 <div className='flex flex-row gap-4 align-items-center'>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='category'>Categories</label>
-                        <Dropdown
-                            value={selectedCategory}
+                        <TreeSelect
+                            id='category'
+                            value={selectedCategory ? String(selectedCategory.id) : null}
                             onChange={(e) => {
-                                setSelectedCategory(e.value)
+                                setSelectedCategory({ id: Number(e.value) })
                                 setCategoryError('')
                             }}
                             options={categories}
+                            filter
                             placeholder='Select a category'
-                            optionLabel='name'
+                            showClear
                         />
                         {categoryError && <small className='p-error'>{categoryError}</small>}
                     </div>
@@ -426,7 +428,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                     generateCombinations()
                                 }}
                                 optionLabel='name'
-                                placeholder='Chọn thuộc tính'
+                                placeholder='Select an attribute'
                                 className='w-[200px] mr-4'
                                 style={{ minWidth: '200px', width: '200px', maxWidth: '200px' }}
                             />
@@ -436,7 +438,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
                                     handleKeydown(event, index)
                                 }
-                                placeholder='Nhập giá trị và enter'
+                                placeholder='Enter values'
                                 multiple
                                 onChange={(e) => handleChange(e.value, index)}
                                 className='w-full'
@@ -449,7 +451,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     ))}
                     <Button onClick={addAttributeRow} className='flex items-center mb-5'>
                         <i className={PrimeIcons.PLUS}></i>
-                        <span className='ml-2'>Thêm thuộc tính</span>
+                        <span className='ml-2'>Add attribute</span>
                     </Button>
 
                     {combinedRows.length > 0 && (
@@ -529,7 +531,6 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                                     ))}
                                             </div>
                                         </div>
-
                                         <hr className='border-t-2 border-gray-300 mt-4' />
                                     </div>
                                 )}

@@ -1,6 +1,6 @@
 'use client'
 import { Category } from '@/interface/category.interface'
-import { ManufacturerNameResponse } from '@/interface/Manufacture'
+import { ManufacturerName } from '@/interface/manufacturer.interface'
 import { ProductResponse } from '@/interface/Product'
 import { Attribute } from '@/interface/ProductAttribute'
 import { Button } from 'primereact/button'
@@ -14,7 +14,7 @@ import React, { useEffect, useState } from 'react'
 
 interface ProductAddFormProps {
     categories: Category[]
-    manufacturers: ManufacturerNameResponse[]
+    manufacturers: ManufacturerName[]
     productAttributes: Attribute[]
     product: ProductResponse
 }
@@ -35,7 +35,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [name, setName] = useState<string>('')
     const [weight, setWeight] = useState<number>(0)
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
-    const [selectedManufacture, setSelectedManufacture] = useState<ManufacturerNameResponse | null>(null)
+    const [selectedManufacture, setSelectedManufacture] = useState<ManufacturerName | null>(null)
     const [text, setText] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
     const [products, setProducts] = useState<Product[]>([

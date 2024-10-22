@@ -1,9 +1,14 @@
-'use client'
-const Crud1 = () => {
+import manufacturerService from '@/service/manufacturer.service'
+import ListView from './_components/ListView'
+
+const ManufacturerPage = async () => {
+    const { payload: data } = await manufacturerService.getAll()
+
     return (
         <>
-            <div className=''></div>
+            <ListView initialData={data.items} />
         </>
     )
 }
-export default Crud1
+
+export default ManufacturerPage

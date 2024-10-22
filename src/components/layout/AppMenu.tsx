@@ -23,7 +23,7 @@ const AppMenu = () => {
             items: [
                 { label: 'Products', icon: 'pi pi-fw pi-box', to: '/admin/products' },
                 { label: 'Categories', icon: 'pi pi-fw pi-objects-column', to: '/admin/categories' },
-                { label: 'Manufacturers', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
+                { label: 'Manufacturers', icon: 'pi pi-fw pi-sitemap', to: '/admin/manfacturers' },
                 { label: 'Product tags', icon: 'pi pi-fw pi-bookmark', to: '/uikit/floatlabel' },
                 { label: 'Product attributes', icon: 'pi pi-fw pi-exclamation-circle', to: '/uikit/invalidstate' },
                 {
