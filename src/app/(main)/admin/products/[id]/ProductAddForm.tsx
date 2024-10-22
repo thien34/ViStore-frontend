@@ -2,7 +2,7 @@
 import { Category } from '@/interface/category.interface'
 import { ManufacturerName } from '@/interface/manufacturer.interface'
 import { ProductResponse } from '@/interface/Product'
-import { Attribute } from '@/interface/ProductAttribute'
+import { ProductAttributeName } from '@/interface/productAttribute.interface'
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react'
 interface ProductAddFormProps {
     categories: Category[]
     manufacturers: ManufacturerName[]
-    productAttributes: Attribute[]
+    productAttributes: ProductAttributeName[]
     product: ProductResponse
 }
 

@@ -9,76 +9,76 @@ import { Toolbar } from 'primereact/toolbar'
 import { useRef, useState } from 'react'
 import { Dialog } from 'primereact/dialog'
 import { classNames } from 'primereact/utils'
-import { Manufacturer } from '@/interface/manufacturer.interface'
-import manufacturerService from '@/service/manufacturer.service'
+import { ProductAttribute } from '@/interface/productAttribute.interface'
+import productAttributeService from '@/service/productAttribute.service'
 
-interface ManufacturerProps {
-    initialData: Manufacturer[]
+interface ProductAttributeProps {
+    initialData: ProductAttribute[]
 }
 
-const emptyManufacturer: Manufacturer = {
+const emptyProductAttribute: ProductAttribute = {
     name: '',
     description: ''
 }
 
-const ListView = ({ initialData }: ManufacturerProps) => {
-    const [manufacturers, setManufacturers] = useState<Manufacturer[]>(initialData)
-    const [manufacturer, setManufacturer] = useState<Manufacturer>(emptyManufacturer)
-    const [selectedManufacturers, setSelectedManufacturers] = useState<Manufacturer>()
+const ListView = ({ initialData }: ProductAttributeProps) => {
+    const [productAttributes, setProductAttributes] = useState<ProductAttribute[]>(initialData)
+    const [productAttribute, setProductAttribute] = useState<ProductAttribute>(emptyProductAttribute)
+    const [selectedProductAttributes, setSelectedProductAttributes] = useState<ProductAttribute>()
     const [submitted, setSubmitted] = useState(false)
-    const [manufacturerDialog, setManufacturerDialog] = useState(false)
+    const [productAttributeDialog, setProductAttributeDialog] = useState(false)
     const [globalFilter, setGlobalFilter] = useState('')
     const toast = useRef<Toast>(null)
-    const dt = useRef<DataTable<Manufacturer[]>>(null)
+    const dt = useRef<DataTable<ProductAttribute[]>>(null)
 
     const exportCSV = () => {
         dt.current?.exportCSV()
     }
 
     const openNew = () => {
-        setManufacturer(emptyManufacturer)
+        setProductAttribute(emptyProductAttribute)
         setSubmitted(false)
-        setManufacturerDialog(true)
+        setProductAttributeDialog(true)
     }
 
     const hideDialog = () => {
         setSubmitted(false)
-        setManufacturerDialog(false)
+        setProductAttributeDialog(false)
     }
 
-    const editManufacturer = (manufacturer: Manufacturer) => {
-        setManufacturer({ ...manufacturer })
-        setManufacturerDialog(true)
+    const editProductAttribute = (productAttribute: ProductAttribute) => {
+        setProductAttribute({ ...productAttribute })
+        setProductAttributeDialog(true)
     }
 
-    const fetchManufacturers = async () => {
-        const { payload: data } = await manufacturerService.getAll()
-        setManufacturers(data.items)
+    const fetchProductAttributes = async () => {
+        const { payload: data } = await productAttributeService.getAll()
+        setProductAttributes(data.items)
     }
 
-    const saveManufacturer = async () => {
+    const saveProductAttribute = async () => {
         setSubmitted(true)
-        if (manufacturer.name.trim()) {
-            if (!manufacturer.id) {
-                await manufacturerService.create(manufacturer)
+        if (productAttribute.name.trim()) {
+            if (!productAttribute.id) {
+                await productAttributeService.create(productAttribute)
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Successful',
-                    detail: 'Manufacturer Created',
+                    detail: 'Product Attribute Created',
                     life: 3000
                 })
             } else {
-                await manufacturerService.update(manufacturer.id, manufacturer)
+                await productAttributeService.update(productAttribute.id, productAttribute)
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Successful',
-                    detail: 'Manufacturer Updated',
+                    detail: 'Product Attribute Updated',
                     life: 3000
                 })
             }
-            setManufacturerDialog(false)
-            setManufacturer(emptyManufacturer)
-            await fetchManufacturers()
+            setProductAttributeDialog(false)
+            setProductAttribute(emptyProductAttribute)
+            await fetchProductAttributes()
         }
     }
 
@@ -92,7 +92,9 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     severity='danger'
                     // onClick={confirmDeleteSelected}
                     disabled={
-                        !selectedManufacturers || !Array.isArray(selectedManufacturers) || !selectedManufacturers.length
+                        !selectedProductAttributes ||
+                        !Array.isArray(selectedProductAttributes) ||
+                        !selectedProductAttributes.length
                     }
                 />
             </div>
@@ -114,7 +116,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
         )
     }
 
-    const actionBodyTemplate = (rowData: Manufacturer) => {
+    const actionBodyTemplate = (rowData: ProductAttribute) => {
         return (
             <>
                 <Button
@@ -122,7 +124,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     rounded
                     outlined
                     className='mr-2'
-                    onClick={() => editManufacturer(rowData)}
+                    onClick={() => editProductAttribute(rowData)}
                 />
                 <Button
                     icon='pi pi-trash'
@@ -137,7 +139,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
 
     const header = (
         <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
-            <h5 className='m-0'>Manage Manufacturers</h5>
+            <h5 className='m-0'>Manage Product Attributes</h5>
             <span className='block mt-2 md:mt-0 p-input-icon-left'>
                 <i className='pi pi-search' />
                 <InputText
@@ -149,10 +151,10 @@ const ListView = ({ initialData }: ManufacturerProps) => {
         </div>
     )
 
-    const manufacturerDialogFooter = (
+    const productAttributeDialogFooter = (
         <>
             <Button label='Cancel' icon='pi pi-times' outlined onClick={hideDialog} />
-            <Button label='Save' icon='pi pi-check' onClick={saveManufacturer} />
+            <Button label='Save' icon='pi pi-check' onClick={saveProductAttribute} />
         </>
     )
 
@@ -163,9 +165,9 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                 <Toolbar className='mb-4' start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
                 <DataTable
                     ref={dt}
-                    value={manufacturers}
-                    selection={selectedManufacturers}
-                    onSelectionChange={(e) => setSelectedManufacturers(e.value)}
+                    value={productAttributes}
+                    selection={selectedProductAttributes}
+                    onSelectionChange={(e) => setSelectedProductAttributes(e.value)}
                     dataKey='id'
                     removableSort
                     resizableColumns
@@ -174,9 +176,9 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} manfacturers'
+                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} product attributes'
                     globalFilter={globalFilter}
-                    emptyMessage='No manufacturers found.'
+                    emptyMessage='No product attribute found.'
                     header={header}
                 >
                     <Column
@@ -203,13 +205,13 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                 </DataTable>
             </div>
             <Dialog
-                visible={manufacturerDialog}
+                visible={productAttributeDialog}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                header='Manfacture Details'
+                header='Product Attribute Details'
                 style={{ width: '30vw' }}
                 modal
                 className='p-fluid'
-                footer={manufacturerDialogFooter}
+                footer={productAttributeDialogFooter}
                 onHide={hideDialog}
             >
                 <div className='field'>
@@ -218,13 +220,13 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     </label>
                     <InputText
                         id='name'
-                        value={manufacturer.name}
-                        onChange={(e) => setManufacturer({ ...manufacturer, name: e.target.value })}
+                        value={productAttribute.name}
+                        onChange={(e) => setProductAttribute({ ...productAttribute, name: e.target.value })}
                         required
                         autoFocus
-                        className={classNames({ 'p-invalid': submitted && !manufacturer.name })}
+                        className={classNames({ 'p-invalid': submitted && !productAttribute.name })}
                     />
-                    {submitted && !manufacturer.name && <small className='p-error'>Name is required.</small>}
+                    {submitted && !productAttribute.name && <small className='p-error'>Name is required.</small>}
                 </div>
                 <div className='field'>
                     <label htmlFor='description' className='font-bold'>
@@ -232,8 +234,8 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     </label>
                     <InputText
                         id='description'
-                        value={manufacturer.description}
-                        onChange={(e) => setManufacturer({ ...manufacturer, description: e.target.value })}
+                        value={productAttribute.description}
+                        onChange={(e) => setProductAttribute({ ...productAttribute, description: e.target.value })}
                         required
                         autoFocus
                     />

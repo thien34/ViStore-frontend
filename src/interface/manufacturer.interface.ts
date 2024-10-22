@@ -8,7 +8,7 @@ export interface Manufacturer {
 
 export interface ManufacturerName {
     id: number
-    manufacturerName: string
+    name: string
 }
 
 export type ManufacturerPagingResponse = PagingResponse<Manufacturer>

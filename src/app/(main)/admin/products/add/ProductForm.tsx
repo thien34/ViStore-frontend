@@ -1,7 +1,7 @@
 'use client'
 import { ManufacturerName } from '@/interface/manufacturer.interface'
 import { ProductAttribute, ProductRequest } from '@/interface/Product'
-import { Attribute } from '@/interface/ProductAttribute'
+import { ProductAttributeName } from '@/interface/productAttribute.interface'
 import ProductService from '@/service/ProducrService'
 import Image from 'next/image'
 import { Accordion, AccordionTab } from 'primereact/accordion'
@@ -19,7 +19,7 @@ import { TreeSelect } from 'primereact/treeselect'
 import { useState } from 'react'
 
 interface AttributeRow {
-    selectedAttribute: Attribute | null
+    selectedAttribute: ProductAttributeName | null
     selectedValues: string[]
 }
 
@@ -48,7 +48,7 @@ const columns: ColumnMeta[] = [
 interface ProductAddFormProps {
     categories: TreeNode[]
     manufacturers: ManufacturerName[]
-    productAttributes: Attribute[]
+    productAttributes: ProductAttributeName[]
 }
 
 const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacturers, productAttributes }) => {
