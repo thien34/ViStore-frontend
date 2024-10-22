@@ -4,6 +4,7 @@ import { Category } from '@/interface/category.interface'
 import { ManufacturerName } from '@/interface/manufacturer.interface'
 import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import { ProductAttributeName } from '@/interface/productAttribute.interface'
+import { useRouter } from 'next/navigation'
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
@@ -28,7 +29,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [selectedManufacture, setSelectedManufacture] = useState<ManufacturerName | null>(null)
     const [text, setText] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
-
+    const router = useRouter()
     useEffect(() => {
         if (product) {
             setName(product.name)
@@ -130,7 +131,12 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             />
                         )}
                     />
-                    <Column header='Action' body={(rowData) => <Button>Edit</Button>}></Column>
+                    <Column
+                        header='Action'
+                        body={(rowData) => (
+                            <Button onClick={() => router.push(`/admin/products/details/${rowData.id}`)}>Edit</Button>
+                        )}
+                    ></Column>
                 </DataTable>
                 <div className=''>
                     <Button label='Save' onClick={handleSave} />
