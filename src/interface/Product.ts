@@ -22,6 +22,11 @@ export interface ProductAttribute {
     value?: string
 }
 
+export interface ProductAttributeValueResponse {
+    id: number
+    value: string
+    imageUrl?: string
+}
 export interface ProductResponse {
     id: number
     name: string
@@ -30,4 +35,16 @@ export interface ProductResponse {
     manufacturerId: number
     weight: number
     description: string
+}
+export interface ProductResponseDetails {
+    id: number
+    name: string
+    deleted: boolean
+    categoryId: number
+    manufacturerId: number
+    sku: string
+    price: number
+    quantity: number
+    productCost: number
+    attributes: ProductAttributeValueResponse[]
 }
