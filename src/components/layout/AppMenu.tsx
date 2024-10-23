@@ -24,7 +24,7 @@ const AppMenu = () => {
                 { label: 'Products', icon: 'pi pi-fw pi-box', to: '/admin/products' },
                 { label: 'Categories', icon: 'pi pi-fw pi-objects-column', to: '/admin/categories' },
                 { label: 'Manufacturers', icon: 'pi pi-fw pi-sitemap', to: '/admin/manfacturers' },
-                { label: 'Product tags', icon: 'pi pi-fw pi-bookmark', to: '/uikit/floatlabel' },
+                { label: 'Product tags', icon: 'pi pi-fw pi-bookmark', to: '/admin/product-tags' },
                 { label: 'Product attributes', icon: 'pi pi-fw pi-th-large', to: '/admin/product-attributes' },
                 {
                     label: 'Specification attributes',
