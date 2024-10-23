@@ -1,8 +1,8 @@
 import CategoryService from '@/service/CategoryService'
-import ProductAddForm from './ProductAddForm'
 import ProductService from '@/service/ProducrService'
 import manufacturerService from '@/service/manufacturer.service'
 import productAttributeService from '@/service/productAttribute.service'
+import ProductAddForm from './ProductAddForm'
 
 interface EditProductProps {
     params: {
@@ -13,11 +13,11 @@ interface EditProductProps {
 
 async function EditProduct(props: EditProductProps) {
     const { id } = props.params
-    const [categoriesData, product] = await Promise.all([
+    const [categoriesData, product, products] = await Promise.all([
         CategoryService.getAllCategoryNames(),
-        ProductService.getProductById(+id)
+        ProductService.getProductById(+id),
+        ProductService.getProductsByParentId(+id)
     ])
-
     const { payload: manufacturersData } = await manufacturerService.getListName()
     const { payload: productAttributesData } = await productAttributeService.getListName()
 
@@ -28,6 +28,7 @@ async function EditProduct(props: EditProductProps) {
                 manufacturers={manufacturersData}
                 productAttributes={productAttributesData}
                 product={product}
+                products={products}
             />
         </>
     )

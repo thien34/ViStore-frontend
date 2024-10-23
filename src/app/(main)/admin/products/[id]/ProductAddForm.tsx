@@ -1,8 +1,10 @@
+/* eslint-disable jsx-a11y/alt-text */
 'use client'
 import { Category } from '@/interface/category.interface'
 import { ManufacturerName } from '@/interface/manufacturer.interface'
-import { ProductResponse } from '@/interface/Product'
+import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import { ProductAttributeName } from '@/interface/productAttribute.interface'
+import { useRouter } from 'next/navigation'
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
@@ -17,42 +19,17 @@ interface ProductAddFormProps {
     manufacturers: ManufacturerName[]
     productAttributes: ProductAttributeName[]
     product: ProductResponse
+    products: ProductResponseDetails[]
 }
 
-interface Product {
-    id: string
-    code: string
-    name: string
-    description: string
-    image: string
-    price: number
-    category: string
-    quantity: number
-    inventoryStatus: string
-    rating: number
-}
-const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacturers, product }) => {
+const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacturers, product, products }) => {
     const [name, setName] = useState<string>('')
     const [weight, setWeight] = useState<number>(0)
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
     const [selectedManufacture, setSelectedManufacture] = useState<ManufacturerName | null>(null)
     const [text, setText] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
-    const [products, setProducts] = useState<Product[]>([
-        {
-            id: '1000',
-            code: 'f230fh0g3',
-            name: 'Bamboo Watch',
-            description: 'Product Description',
-            image: 'bamboo-watch.jpg',
-            price: 65,
-            category: 'Accessories',
-            quantity: 24,
-            inventoryStatus: 'INSTOCK',
-            rating: 5
-        }
-    ])
-
+    const router = useRouter()
     useEffect(() => {
         if (product) {
             setName(product.name)
@@ -132,10 +109,34 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 {errorMessage && <small className='p-error'>{errorMessage}</small>}
 
                 <DataTable value={products} tableStyle={{ minWidth: '50rem' }}>
-                    <Column field='code' header='Code'></Column>
+                    <Column
+                        field=''
+                        header='STT'
+                        body={(rowData, options: { rowIndex: number }) => options.rowIndex + 1}
+                    ></Column>
+                    <Column field='sku' header='SKU'></Column>
                     <Column field='name' header='Name'></Column>
-                    <Column field='category' header='Category'></Column>
                     <Column field='quantity' header='Quantity'></Column>
+                    <Column field='price' header='Price'></Column>
+                    <Column
+                        header='Image'
+                        body={(rowData) => (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={
+                                    rowData.imageUrl ||
+                                    'https://bizweb.dktcdn.net/thumb/1024x1024/100/415/445/products/370031-black-1.jpg'
+                                }
+                                style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                            />
+                        )}
+                    />
+                    <Column
+                        header='Action'
+                        body={(rowData) => (
+                            <Button onClick={() => router.push(`/admin/products/details/${rowData.id}`)}>Edit</Button>
+                        )}
+                    ></Column>
                 </DataTable>
                 <div className=''>
                     <Button label='Save' onClick={handleSave} />

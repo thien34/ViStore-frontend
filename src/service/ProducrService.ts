@@ -1,4 +1,4 @@
-import { ProductRequest, ProductResponse } from '@/interface/Product'
+import { ProductRequest, ProductResponse, ProductResponseDetails } from '@/interface/Product'
 
 class ProductService {
     static async addProducts(productsData: ProductRequest[], uploadedFiles: File[][]) {
@@ -43,6 +43,32 @@ class ProductService {
         if (!response.ok) {
             const errorResponse = await response.json()
             throw new Error(`Failed to get product: ${errorResponse.message || 'Unknown error'}`)
+        }
+
+        const result = await response.json()
+        return result.data
+    }
+
+    static async getProductsByParentId(parentId: number): Promise<ProductResponseDetails[]> {
+        const response = await fetch(`http://localhost:8080/api/admin/products/parent/${parentId}`, {
+            cache: 'no-store'
+        })
+
+        if (!response.ok) {
+            const errorResponse = await response.json()
+            throw new Error(`Failed to get products by parent ID: ${errorResponse.message || 'Unknown error'}`)
+        }
+
+        const result = await response.json()
+        return result.data
+    }
+
+    static async getProductDetails(id: number): Promise<ProductResponseDetails> {
+        const response = await fetch(`http://localhost:8080/api/admin/products/details/${id}`, { cache: 'no-store' })
+
+        if (!response.ok) {
+            const errorResponse = await response.json()
+            throw new Error(`Failed to get product details: ${errorResponse.message || 'Unknown error'}`)
         }
 
         const result = await response.json()
