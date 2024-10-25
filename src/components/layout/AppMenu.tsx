@@ -24,16 +24,15 @@ const AppMenu = () => {
                 { label: 'Products', icon: 'pi pi-fw pi-box', to: '/admin/products' },
                 { label: 'Categories', icon: 'pi pi-fw pi-objects-column', to: '/admin/categories' },
                 { label: 'Manufacturers', icon: 'pi pi-fw pi-sitemap', to: '/admin/manfacturers' },
-                { label: 'Product tags', icon: 'pi pi-fw pi-bookmark', to: '/uikit/floatlabel' },
+                { label: 'Product tags', icon: 'pi pi-fw pi-bookmark', to: '/admin/product-tags' },
                 { label: 'Product attributes', icon: 'pi pi-fw pi-th-large', to: '/admin/product-attributes' },
                 {
                     label: 'Specification attributes',
                     icon: 'pi pi-fw pi-mobile',
-                    to: '/uikit/button',
-                    class: 'rotated-icon'
+                    to: '/uikit/button'
                 },
-                { label: 'Customers', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
-                { label: 'Customer roles', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
+                { label: 'Customers', icon: 'pi pi-fw pi-users', to: '/uikit/overlay' },
+                { label: 'Customer roles', icon: 'pi pi-fw pi-key', to: '/admin/customer-roles' },
                 { label: 'Online customers', icon: 'pi pi-fw pi-bars', to: '/uikit/menu' }
             ]
         },
