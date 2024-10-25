@@ -29,11 +29,10 @@ const AppMenu = () => {
                 {
                     label: 'Specification attributes',
                     icon: 'pi pi-fw pi-mobile',
-                    to: '/uikit/button',
-                    class: 'rotated-icon'
+                    to: '/uikit/button'
                 },
-                { label: 'Customers', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
-                { label: 'Customer roles', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
+                { label: 'Customers', icon: 'pi pi-fw pi-users', to: '/uikit/overlay' },
+                { label: 'Customer roles', icon: 'pi pi-fw pi-key', to: '/admin/customer-roles' },
                 { label: 'Online customers', icon: 'pi pi-fw pi-bars', to: '/uikit/menu' }
             ]
         },

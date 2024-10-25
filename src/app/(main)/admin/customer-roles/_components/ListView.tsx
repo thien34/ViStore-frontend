@@ -9,76 +9,77 @@ import { Toolbar } from 'primereact/toolbar'
 import { useRef, useState } from 'react'
 import { Dialog } from 'primereact/dialog'
 import { classNames } from 'primereact/utils'
-import { Manufacturer } from '@/interface/manufacturer.interface'
-import manufacturerService from '@/service/manufacturer.service'
+import { Role } from '@/interface/role.interface'
+import roleService from '@/service/role.service'
+import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch'
 
-interface ManufacturerProps {
-    initialData: Manufacturer[]
+interface RoleProps {
+    initialData: Role[]
 }
 
-const emptyManufacturer: Manufacturer = {
+const emptyRole: Role = {
     name: '',
-    description: ''
+    active: true
 }
 
-const ListView = ({ initialData }: ManufacturerProps) => {
-    const [manufacturers, setManufacturers] = useState<Manufacturer[]>(initialData)
-    const [manufacturer, setManufacturer] = useState<Manufacturer>(emptyManufacturer)
-    const [selectedManufacturers, setSelectedManufacturers] = useState<Manufacturer>()
+const ListView = ({ initialData }: RoleProps) => {
+    const [roles, setRoles] = useState<Role[]>(initialData)
+    const [role, setRole] = useState<Role>(emptyRole)
+    const [selectedRoles, setSelectedRoles] = useState<Role>()
     const [submitted, setSubmitted] = useState(false)
-    const [manufacturerDialog, setManufacturerDialog] = useState(false)
+    const [roleDialog, setRoleDialog] = useState(false)
     const [globalFilter, setGlobalFilter] = useState('')
     const toast = useRef<Toast>(null)
-    const dt = useRef<DataTable<Manufacturer[]>>(null)
+    const dt = useRef<DataTable<Role[]>>(null)
 
     const exportCSV = () => {
         dt.current?.exportCSV()
     }
 
     const openNew = () => {
-        setManufacturer(emptyManufacturer)
+        setRole(emptyRole)
         setSubmitted(false)
-        setManufacturerDialog(true)
+        setRoleDialog(true)
     }
 
     const hideDialog = () => {
         setSubmitted(false)
-        setManufacturerDialog(false)
+        setRoleDialog(false)
     }
 
-    const editManufacturer = (manufacturer: Manufacturer) => {
-        setManufacturer({ ...manufacturer })
-        setManufacturerDialog(true)
+    const editRole = (role: Role) => {
+        setRole({ ...role })
+        setRoleDialog(true)
     }
 
-    const fetchManufacturers = async () => {
-        const { payload: data } = await manufacturerService.getAll()
-        setManufacturers(data.items)
+    const fetchRoles = async () => {
+        const { payload: data } = await roleService.getAll()
+        setRoles(data.items)
     }
 
-    const saveManufacturer = async () => {
+    const saveRole = async () => {
         setSubmitted(true)
-        if (manufacturer.name.trim()) {
-            if (!manufacturer.id) {
-                await manufacturerService.create(manufacturer)
+        if (role.name.trim()) {
+            if (!role.id) {
+                await roleService.create(role)
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Successful',
-                    detail: 'Manufacturer Created',
+                    detail: 'Role Created',
                     life: 3000
                 })
             } else {
-                await manufacturerService.update(manufacturer.id, manufacturer)
+                await roleService.update(role.id, role)
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Successful',
-                    detail: 'Manufacturer Updated',
+                    detail: 'Role Updated',
                     life: 3000
                 })
             }
-            setManufacturerDialog(false)
-            setManufacturer(emptyManufacturer)
-            await fetchManufacturers()
+            setRoleDialog(false)
+            setRole(emptyRole)
+            await fetchRoles()
         }
     }
 
@@ -91,9 +92,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     icon='pi pi-trash'
                     severity='danger'
                     // onClick={confirmDeleteSelected}
-                    disabled={
-                        !selectedManufacturers || !Array.isArray(selectedManufacturers) || !selectedManufacturers.length
-                    }
+                    disabled={!selectedRoles || !Array.isArray(selectedRoles) || !selectedRoles.length}
                 />
             </div>
         )
@@ -114,16 +113,10 @@ const ListView = ({ initialData }: ManufacturerProps) => {
         )
     }
 
-    const actionBodyTemplate = (rowData: Manufacturer) => {
+    const actionBodyTemplate = (rowData: Role) => {
         return (
             <>
-                <Button
-                    icon='pi pi-pencil'
-                    rounded
-                    outlined
-                    className='mr-2'
-                    onClick={() => editManufacturer(rowData)}
-                />
+                <Button icon='pi pi-pencil' rounded outlined className='mr-2' onClick={() => editRole(rowData)} />
                 <Button
                     icon='pi pi-trash'
                     rounded
@@ -137,7 +130,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
 
     const header = (
         <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
-            <h5 className='m-0'>Manage Manufacturers</h5>
+            <h5 className='m-0'>Manage Roles</h5>
             <span className='block mt-2 md:mt-0 p-input-icon-left'>
                 <i className='pi pi-search' />
                 <InputText
@@ -149,10 +142,10 @@ const ListView = ({ initialData }: ManufacturerProps) => {
         </div>
     )
 
-    const manufacturerDialogFooter = (
+    const roleDialogFooter = (
         <>
             <Button label='Cancel' icon='pi pi-times' outlined onClick={hideDialog} />
-            <Button label='Save' icon='pi pi-check' onClick={saveManufacturer} />
+            <Button label='Save' icon='pi pi-check' onClick={saveRole} />
         </>
     )
 
@@ -163,9 +156,9 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                 <Toolbar className='mb-4' start={leftToolbarTemplate} end={rightToolbarTemplate}></Toolbar>
                 <DataTable
                     ref={dt}
-                    value={manufacturers}
-                    selection={selectedManufacturers}
-                    onSelectionChange={(e) => setSelectedManufacturers(e.value)}
+                    value={roles}
+                    selection={selectedRoles}
+                    onSelectionChange={(e) => setSelectedRoles(e.value)}
                     dataKey='id'
                     removableSort
                     resizableColumns
@@ -174,9 +167,9 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} manfacturers'
+                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} roles'
                     globalFilter={globalFilter}
-                    emptyMessage='No manufacturers found.'
+                    emptyMessage='No roles found.'
                     header={header}
                 >
                     <Column
@@ -193,7 +186,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                             minWidth: '4rem'
                         }}
                     />
-                    <Column field='description' header='Description' />
+                    <Column field='active' header='Active' />
                     <Column
                         body={actionBodyTemplate}
                         style={{
@@ -203,13 +196,13 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                 </DataTable>
             </div>
             <Dialog
-                visible={manufacturerDialog}
+                visible={roleDialog}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                header='Manfacture Details'
+                header='Role Details'
                 style={{ width: '30vw' }}
                 modal
                 className='p-fluid'
-                footer={manufacturerDialogFooter}
+                footer={roleDialogFooter}
                 onHide={hideDialog}
             >
                 <div className='field'>
@@ -218,23 +211,22 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     </label>
                     <InputText
                         id='name'
-                        value={manufacturer.name}
-                        onChange={(e) => setManufacturer({ ...manufacturer, name: e.target.value })}
+                        value={role.name}
+                        onChange={(e) => setRole({ ...role, name: e.target.value })}
                         required
                         autoFocus
-                        className={classNames({ 'p-invalid': submitted && !manufacturer.name })}
+                        className={classNames({ 'p-invalid': submitted && !role.name })}
                     />
-                    {submitted && !manufacturer.name && <small className='p-error'>Name is required.</small>}
+                    {submitted && !role.name && <small className='p-error'>Name is required.</small>}
                 </div>
-                <div className='field'>
-                    <label htmlFor='description' className='font-bold'>
-                        Description
+                <div className='field flex items-center gap-3'>
+                    <label htmlFor='active' className='font-bold'>
+                        Active
                     </label>
-                    <InputText
-                        id='description'
-                        value={manufacturer.description}
-                        onChange={(e) => setManufacturer({ ...manufacturer, description: e.target.value })}
-                        required
+                    <InputSwitch
+                        id='active'
+                        checked={role.active}
+                        onChange={(e: InputSwitchChangeEvent) => setRole({ ...role, active: e.target.value })}
                     />
                 </div>
             </Dialog>

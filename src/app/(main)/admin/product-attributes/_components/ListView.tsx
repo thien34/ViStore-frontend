@@ -236,8 +236,6 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
                         id='description'
                         value={productAttribute.description}
                         onChange={(e) => setProductAttribute({ ...productAttribute, description: e.target.value })}
-                        required
-                        autoFocus
                     />
                 </div>
             </Dialog>
