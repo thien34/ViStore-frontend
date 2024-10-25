@@ -36,6 +36,12 @@ export interface ProductResponse {
     weight: number
     description: string
 }
+
+export interface Attribute {
+    id: number
+    name: string
+    attributes: ProductAttributeValueResponse[]
+}
 export interface ProductResponseDetails {
     id: number
     name: string
@@ -46,5 +52,5 @@ export interface ProductResponseDetails {
     price: number
     quantity: number
     productCost: number
-    attributes: ProductAttributeValueResponse[]
+    attributes: Attribute[]
 }

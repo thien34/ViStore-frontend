@@ -1,5 +1,6 @@
 import ProductService from '@/service/ProducrService'
 import ProductDetailsForm from './ProductDetailsForn'
+import productAttributeService from '@/service/productAttribute.service'
 
 interface EditProductProps {
     params: {
@@ -11,9 +12,10 @@ interface EditProductProps {
 export default async function ProductDetails(props: EditProductProps) {
     const { id } = props.params
     const data = await ProductService.getProductDetails(+id)
+    const { payload: productAttributesData } = await productAttributeService.getListName()
     return (
         <>
-            <ProductDetailsForm product={data} />
+            <ProductDetailsForm product={data} productAttributes={productAttributesData} />
         </>
     )
 }

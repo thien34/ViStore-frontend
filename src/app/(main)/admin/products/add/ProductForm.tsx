@@ -18,7 +18,7 @@ import { TreeNode } from 'primereact/treenode'
 import { TreeSelect } from 'primereact/treeselect'
 import { useState } from 'react'
 
-interface AttributeRow {
+export interface AttributeRow {
     selectedAttribute: ProductAttributeName | null
     selectedValues: string[]
 }
