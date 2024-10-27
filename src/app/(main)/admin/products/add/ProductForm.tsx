@@ -40,7 +40,6 @@ interface ColumnMeta {
 
 const columns: ColumnMeta[] = [
     { field: 'name', header: 'Name' },
-    { field: 'sku', header: 'Sku' },
     { field: 'unitPrice', header: 'Unit Price' },
     { field: 'productCost', header: 'Product Cost' },
     { field: 'quantity', header: 'Quantity' }

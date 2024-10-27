@@ -9,6 +9,7 @@ export interface ProductAttribute {
 export interface ProductAttributeName {
     id: number
     name: string
+    value?: string
 }
 
 export type ProductAttributePagingResponse = PagingResponse<ProductAttribute>

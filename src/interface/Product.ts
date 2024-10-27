@@ -1,3 +1,5 @@
+import { ProductAttributeName } from './productAttribute.interface'
+
 export interface ProductRequest {
     id?: number
     name: string
@@ -35,13 +37,10 @@ export interface ProductResponse {
     manufacturerId: number
     weight: number
     description: string
+    categoryName: number
+    manufacturerName: number
 }
 
-export interface Attribute {
-    id: number
-    name: string
-    attributes: ProductAttributeValueResponse[]
-}
 export interface ProductResponseDetails {
     id: number
     name: string
@@ -52,5 +51,7 @@ export interface ProductResponseDetails {
     price: number
     quantity: number
     productCost: number
-    attributes: Attribute[]
+    imageUrl: string
+    gtin: string
+    attributes: ProductAttributeName[]
 }

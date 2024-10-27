@@ -10,12 +10,14 @@ type Props = {
 }
 
 function ProductList({ products }: Props) {
-    const paginatorLeft = <Button type='button' icon='pi pi-refresh' text />
-    const paginatorRight = <Button type='button' icon='pi pi-download' text />
     const router = useRouter()
 
     return (
-        <div className='card'>
+        <div className='card '>
+            <div className='flex justify-content-between mb-5'>
+                <h2>Product List</h2>
+                <Button label='Add New Product' onClick={() => router.push('/admin/products/add')} />
+            </div>
             <DataTable
                 value={products}
                 paginator
@@ -24,19 +26,15 @@ function ProductList({ products }: Props) {
                 tableStyle={{ minWidth: '50rem' }}
                 paginatorTemplate='RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink'
                 currentPageReportTemplate='{first} to {last} of {totalRecords}'
-                paginatorLeft={paginatorLeft}
-                paginatorRight={paginatorRight}
             >
-                <Column field='name' header='Name'></Column>
-                <Column field='deleted' header='Deleted'></Column>
+                <Column field='name' header='Product Name'></Column>
+                <Column field='categoryName' header='Category'></Column>
+                <Column field='manufacturerName' header='Manufacturer'></Column>
+
                 <Column
                     header='Edit'
                     body={(rowData) => (
-                        <Button
-                            label='Edit'
-                            icon='pi pi-pencil'
-                            onClick={() => router.push(`/admin/products/${rowData.id}`)}
-                        />
+                        <Button label='Edit' onClick={() => router.push(`/admin/products/${rowData.id}`)} />
                     )}
                 />
             </DataTable>
