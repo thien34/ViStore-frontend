@@ -74,6 +74,23 @@ class ProductService {
         const result = await response.json()
         return result.data
     }
+
+    static async updateProduct(id: number, productData: Partial<ProductRequest>) {
+        const response = await fetch(`http://localhost:8080/api/admin/products/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productData)
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            throw new Error(`Failed to update product: ${errorResponse.message || 'Unknown error'}`);
+        }
+
+        return response.json();
+    }
 }
 
 export default ProductService

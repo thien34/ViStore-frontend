@@ -29,6 +29,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [selectedManufacture, setSelectedManufacture] = useState<ManufacturerName | null>(null)
     const [text, setText] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
+
     const router = useRouter()
     useEffect(() => {
         if (product) {
@@ -51,6 +52,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='productName'>Product Name</label>
                         <InputText
+                            tooltip='Enter the name of the product'
+                            tooltipOptions={{ position: 'bottom' }}
                             id='productName'
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -68,6 +71,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             showButtons
                             min={0}
                             suffix='g'
+                            tooltip='Enter the weight of the product in grams'
+                            tooltipOptions={{ position: 'bottom' }}
                         />
                     </div>
                 </div>
@@ -81,6 +86,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             options={categories}
                             placeholder='Select a category'
                             optionLabel='name'
+                            tooltip='Select the category for the product'
+                            tooltipOptions={{ position: 'bottom' }}
                         />
                     </div>
                     <div className='flex flex-column gap-2 w-full'>
@@ -91,12 +98,16 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             options={manufacturers}
                             placeholder='Select a manufacture'
                             optionLabel='manufacturerName'
+                            tooltip='Select the manufacturer of the product'
+                            tooltipOptions={{ position: 'bottom' }}
                         />
                     </div>
                 </div>
 
                 <div className='flex flex-row gap-4 align-items-center'>
                     <div className='flex flex-column gap-2 w-full'>
+                        <label htmlFor='brand'>Description</label>
+
                         <Editor
                             value={text}
                             onTextChange={(e) => setText(e.htmlValue || '')}
@@ -108,7 +119,15 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
                 {errorMessage && <small className='p-error'>{errorMessage}</small>}
 
-                <DataTable value={products} tableStyle={{ minWidth: '50rem' }}>
+                <DataTable
+                    value={products}
+                    tableStyle={{ minWidth: '50rem' }}
+                    paginator
+                    rows={5}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                    paginatorTemplate='RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink'
+                    currentPageReportTemplate='{first} to {last} of {totalRecords}'
+                >
                     <Column
                         field=''
                         header='STT'
@@ -138,9 +157,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         )}
                     ></Column>
                 </DataTable>
-                <div className=''>
-                    <Button label='Save' onClick={handleSave} />
-                </div>
+
+                <Button label='Save' onClick={handleSave} />
             </div>
         </div>
     )
