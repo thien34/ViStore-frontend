@@ -1,5 +1,6 @@
 import Layout from '@/components/layout/layout'
 import { Metadata } from 'next'
+import { Suspense } from 'react'
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -29,5 +30,9 @@ export const viewport = {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-    return <Layout>{children}</Layout>
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <Layout>{children}</Layout>
+        </Suspense>
+    )
 }

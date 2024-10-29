@@ -32,6 +32,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
     const router = useRouter()
     useEffect(() => {
+        setErrorMessage('')
         if (product) {
             setName(product.name)
             setWeight(product.weight || 0)
