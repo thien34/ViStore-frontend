@@ -353,6 +353,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             onChange={(e) => {
                                 setWeight(e.value || 0)
                             }}
+                            value={weight}
                             placeholder='Enter weight'
                             mode='decimal'
                             defaultValue={0}
