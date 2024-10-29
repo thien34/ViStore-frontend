@@ -51,7 +51,6 @@ const CustomerForm = ({ roles }: FormProps) => {
                 detail: 'Customer Created',
                 life: 3000
             })
-            setCustomer(emptyCustomer)
             router.push('/admin/customers')
         }
     }
@@ -160,6 +159,7 @@ const CustomerForm = ({ roles }: FormProps) => {
                         <div className='text-xl font-medium mb-6'>Role</div>
                         <div className='field'>
                             <label htmlFor='roleName' className='font-medium w-full'>
+                                {customer.customerRoles}
                                 Role name
                             </label>
                             <Dropdown
@@ -169,10 +169,14 @@ const CustomerForm = ({ roles }: FormProps) => {
                                 optionLabel='name'
                                 style={{ width: '100%' }}
                                 placeholder='Select a role'
-                                className={
-                                    (classNames({ 'p-invalid': submitted && !customer.customerRoles }), 'md:w-full')
-                                }
+                                className={classNames(
+                                    { 'p-invalid': submitted && customer.customerRoles.length < 1 },
+                                    'md:w-full'
+                                )}
                             />
+                            {submitted && customer.customerRoles.length < 1 && (
+                                <small className='p-error block'>Customer Role is required.</small>
+                            )}
                         </div>
                     </div>
                 </div>
