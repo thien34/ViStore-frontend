@@ -12,10 +12,14 @@ import { Calendar } from 'primereact/calendar'
 import { classNames } from 'primereact/utils'
 import customerService from '@/service/customer.service'
 import { useRouter } from 'next/navigation'
+import { DataTable } from 'primereact/datatable'
+import { Column } from 'primereact/column'
+import { AddressesResponse } from '@/interface/address.interface'
 
 interface FormProps {
     roles: RoleName[]
     initialData: Customer
+    initAddresses: AddressesResponse[]
 }
 const emptyCustomer: Customer = {
     email: '',
@@ -35,10 +39,13 @@ const activities = [
     { name: 'Inactive', key: false }
 ]
 
-const CustomerForm = ({ roles, initialData }: FormProps) => {
+const CustomerForm = ({ roles, initialData, initAddresses }: FormProps) => {
     const toast = useRef<Toast>(null)
     const [customer, setCustomer] = useState<Customer>(initialData)
     const [submitted, setSubmitted] = useState(false)
+    const [selectedAddreses, setSelectedAddreses] = useState<AddressesResponse>()
+    const [globalFilter, setGlobalFilter] = useState('')
+    const dt = useRef<DataTable<AddressesResponse[]>>(null)
     const router = useRouter()
 
     const saveCustomer = async () => {
@@ -54,6 +61,41 @@ const CustomerForm = ({ roles, initialData }: FormProps) => {
             setCustomer(emptyCustomer)
             router.push('/admin/customers')
         }
+    }
+
+    const header = (
+        <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
+            <h5 className='m-0'>Manage Address</h5>
+            <span className='block mt-2 md:mt-0 p-input-icon-left'>
+                <i className='pi pi-search' />
+                <InputText
+                    type='search'
+                    onInput={(e) => setGlobalFilter(e.currentTarget.value)}
+                    placeholder='Search...'
+                />
+            </span>
+        </div>
+    )
+
+    const actionBodyTemplate = (rowData: Customer) => {
+        return (
+            <>
+                <Button
+                    icon='pi pi-pencil'
+                    rounded
+                    outlined
+                    className='mr-2'
+                    onClick={() => router.push(`/admin/customers/${rowData.id}`)}
+                />
+                <Button
+                    icon='pi pi-trash'
+                    rounded
+                    outlined
+                    severity='danger'
+                    // onClick={() => confirmDeleteProduct(rowData)}
+                />
+            </>
+        )
     }
 
     return (
@@ -152,7 +194,7 @@ const CustomerForm = ({ roles, initialData }: FormProps) => {
                     </div>
                 </div>
                 <div className='col-12 md:col-4'>
-                    <div className='card'>
+                    <div className='card mb-4'>
                         <div className='text-xl font-medium mb-6'>Role</div>
                         <div className='field'>
                             <Dropdown
@@ -178,10 +220,48 @@ const CustomerForm = ({ roles, initialData }: FormProps) => {
                     </div>
                 </div>
             </div>
-            <div className='card'>
-                <div className='text-xl font-medium mb-6'>Addresses</div>
+            <div className='card mt-2'>
+                <div className='flex justify-content-between align-items-center mb-6'>
+                    <div className='text-xl font-medium'>Addresses</div>
+                    <Button label='Add new address' onClick={() => saveCustomer()} />
+                </div>
+                <DataTable
+                    ref={dt}
+                    value={initAddresses}
+                    selection={selectedAddreses}
+                    onSelectionChange={(e) => setSelectedAddreses(e.value)}
+                    dataKey='id'
+                    removableSort
+                    resizableColumns
+                    showGridlines
+                    paginator
+                    rows={10}
+                    rowsPerPageOptions={[5, 10, 25]}
+                    paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
+                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} addresses'
+                    globalFilter={globalFilter}
+                    emptyMessage='No addresses found.'
+                    header={header}
+                >
+                    <Column
+                        selectionMode='multiple'
+                        headerStyle={{
+                            width: '4rem'
+                        }}
+                    />
+                    <Column
+                        field='name'
+                        header='Name'
+                        body={(rowData: AddressesResponse) => `${rowData.firstName} ${rowData.lastName}`}
+                        sortable
+                    />
+                    <Column field='email' header='Email' sortable />
+                    <Column field='phoneNumber' header='Phone number' sortable />
+                    <Column field='addressDetail' header='Address' sortable />
+                    <Column body={actionBodyTemplate}></Column>
+                </DataTable>
             </div>
-            <div className='mt-3'>
+            <div className='my-3'>
                 <Button label='Submit' onClick={() => saveCustomer()} />
             </div>
         </>
