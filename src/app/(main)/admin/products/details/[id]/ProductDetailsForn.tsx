@@ -1,11 +1,11 @@
 'use client'
-import ManagerPath from '@/constants/ManagerPath'
 import { ProductResponseDetails } from '@/interface/Product'
 import { ProductAttributeName } from '@/interface/productAttribute.interface'
 import AttributeValueService from '@/service/AttributeValueService'
 import PictureService from '@/service/PictureService'
 import ProductService from '@/service/ProducrService'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { PrimeIcons } from 'primereact/api'
 import { AutoComplete, AutoCompleteChangeEvent, AutoCompleteCompleteEvent } from 'primereact/autocomplete'
@@ -197,7 +197,6 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
 
     return (
         <div className='card'>
-            <Toast ref={toast} />
             <h5>Edit Product Details</h5>
             <div className='flex flex-column gap-4'>
                 <div className='p-grid p-fluid'>
@@ -210,12 +209,11 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 tooltip='Enter the SKU for the product'
                                 id='sku'
                                 tooltipOptions={{ position: 'bottom' }}
-                                className={errors.sku ? 'p-invalid' : ''}
                                 value={formData.sku}
                                 onChange={(e) => handleChange(e, 'sku')}
                             />
-                            {errors.sku && <small className='p-error'>{errors.sku}</small>}
                         </div>
+
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='name' className='mb-2'>
                                 Product Name
@@ -227,9 +225,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 disabled
                                 value={formData.name}
                                 onChange={(e) => handleChange(e, 'name')}
-                                className={errors.name ? 'p-invalid' : ''}
                             />
-                            {errors.name && <small className='p-error'>{errors.name}</small>}
                         </div>
                     </div>
                     <div className='flex flex-row gap-4 mt-2'>
@@ -305,8 +301,9 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                         <div className='flex flex-col items-center gap-4 w-full'>
                             <Tooltip target='.image' />
 
-                            <img
-                                style={{ width: '100px' }}
+                            <Image
+                                width={100}
+                                height={100}
                                 className='object-cover rounded-lg shadow-lg border border-gray-200 mb-2 image'
                                 src={imageUrl}
                                 data-pr-tooltip='Product Image'

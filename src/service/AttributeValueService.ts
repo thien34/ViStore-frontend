@@ -1,4 +1,4 @@
-import { AttributeValue } from '@/interface/AttributeValue';
+import { AttributeValue } from '@/interface/attributeValue.interface.';
 import http from '@/libs/http';
 
 class AttributeValueService {
