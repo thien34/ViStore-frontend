@@ -1,4 +1,4 @@
-import { AddressPagingResponse } from '@/interface/address.interface'
+import { AddressPagingResponse, AddressRequest } from '@/interface/address.interface'
 import http from '@/libs/http'
 import { Address } from 'cluster'
 
@@ -15,7 +15,7 @@ class AddressService {
         return response.payload
     }
 
-    async create(address: Omit<Address, 'id'>): Promise<Address> {
+    async create(address: AddressRequest): Promise<Address> {
         const response = await http.post<Address>(`${this.basePath}`, address)
         return response.payload
     }

@@ -82,14 +82,14 @@ class ProductService {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(productData)
-        });
+        })
 
         if (!response.ok) {
-            const errorResponse = await response.json();
-            throw new Error(`Failed to update product: ${errorResponse.message || 'Unknown error'}`);
+            const errorResponse = await response.json()
+            throw new Error(`Failed to update product: ${errorResponse.message || 'Unknown error'}`)
         }
 
-        return response.json();
+        return response.json()
     }
 }
 

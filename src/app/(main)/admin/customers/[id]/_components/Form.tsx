@@ -14,12 +14,16 @@ import customerService from '@/service/customer.service'
 import { useRouter } from 'next/navigation'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-import { AddressesResponse } from '@/interface/address.interface'
+import { AddressesResponse, Province } from '@/interface/address.interface'
+import AddressForm from './AddressForm'
+import addressService from '@/service/address.service'
 
 interface FormProps {
     roles: RoleName[]
     initialData: Customer
     initAddresses: AddressesResponse[]
+    provinces: Province[]
+    customerId: number
 }
 const emptyCustomer: Customer = {
     email: '',
@@ -39,14 +43,25 @@ const activities = [
     { name: 'Inactive', key: false }
 ]
 
-const CustomerForm = ({ roles, initialData, initAddresses }: FormProps) => {
+const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId }: FormProps) => {
     const toast = useRef<Toast>(null)
+    const [addresses, setAddresses] = useState<AddressesResponse[]>(initAddresses)
     const [customer, setCustomer] = useState<Customer>(initialData)
     const [submitted, setSubmitted] = useState(false)
     const [selectedAddreses, setSelectedAddreses] = useState<AddressesResponse>()
     const [globalFilter, setGlobalFilter] = useState('')
     const dt = useRef<DataTable<AddressesResponse[]>>(null)
     const router = useRouter()
+
+    const addressFormRef = useRef<{ openNew: () => void }>(null)
+    const openAddressDialog = () => {
+        addressFormRef.current?.openNew()
+    }
+
+    const fetchAddresses = async () => {
+        const { payload: data } = await addressService.getAll(customerId)
+        setAddresses(data.items)
+    }
 
     const saveCustomer = async () => {
         setSubmitted(true)
@@ -223,11 +238,11 @@ const CustomerForm = ({ roles, initialData, initAddresses }: FormProps) => {
             <div className='card mt-2'>
                 <div className='flex justify-content-between align-items-center mb-6'>
                     <div className='text-xl font-medium'>Addresses</div>
-                    <Button label='Add new address' onClick={() => saveCustomer()} />
+                    <Button label='Add new address' onClick={openAddressDialog} />
                 </div>
                 <DataTable
                     ref={dt}
-                    value={initAddresses}
+                    value={addresses}
                     selection={selectedAddreses}
                     onSelectionChange={(e) => setSelectedAddreses(e.value)}
                     dataKey='id'
@@ -264,6 +279,12 @@ const CustomerForm = ({ roles, initialData, initAddresses }: FormProps) => {
             <div className='my-3'>
                 <Button label='Submit' onClick={() => saveCustomer()} />
             </div>
+            <AddressForm
+                provinces={provinces}
+                ref={addressFormRef}
+                customerId={customerId}
+                fetchAdresses={fetchAddresses}
+            />
         </>
     )
 }
