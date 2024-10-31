@@ -64,6 +64,10 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
     }
 
     const saveCustomer = async () => {
+        if (customer == initialData) {
+            router.push('/admin/customers')
+            return
+        }
         setSubmitted(true)
         if (customer.email.trim()) {
             await customerService.create(customer)
