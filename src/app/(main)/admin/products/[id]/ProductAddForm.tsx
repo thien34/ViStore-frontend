@@ -12,7 +12,8 @@ import { Dropdown } from 'primereact/dropdown'
 import { Editor } from 'primereact/editor'
 import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
-import React, { useEffect, useState } from 'react'
+import { Toast } from 'primereact/toast'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface ProductAddFormProps {
     categories: Category[]
@@ -29,6 +30,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [selectedManufacture, setSelectedManufacture] = useState<ManufacturerName | null>(null)
     const [text, setText] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
+    const toast = useRef<Toast>(null)
 
     const router = useRouter()
     useEffect(() => {
@@ -43,11 +45,20 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     }, [product, categories, manufacturers])
 
     const handleSave = async () => {
-        // Logic lưu sản phẩm
+        if (!name || !selectedCategory || !selectedManufacture) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Please fill all required fields: Name, Category, and Manufacturer.',
+                life: 3000
+            })
+            return
+        }
     }
 
     return (
         <div className='card'>
+            <Toast ref={toast} />
             <div className='flex flex-column gap-4'>
                 <div className='flex flex-row gap-4'>
                     <div className='flex flex-column gap-2 w-full'>

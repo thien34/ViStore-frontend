@@ -16,7 +16,10 @@ import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
 import { TreeNode } from 'primereact/treenode'
 import { TreeSelect } from 'primereact/treeselect'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { Toast } from 'primereact/toast'
+import { useRouter } from 'next/navigation'
+import ManagerPath from '@/constants/ManagerPath'
 
 export interface AttributeRow {
     selectedAttribute: ProductAttributeName | null
@@ -63,6 +66,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [nameError, setNameError] = useState<string>('')
     const [categoryError, setCategoryError] = useState<string>('')
     const [manufactureError, setManufactureError] = useState<string>('')
+    const toast = useRef<Toast>(null)
+    const router = useRouter()
 
     const addCustomTag = (tag: string, index: number) => {
         setAttributeRows((prevRows) => {
@@ -80,7 +85,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             const input = (event.target as HTMLInputElement).value
             addCustomTag(input, index)
             ;(event.target as HTMLInputElement).value = ''
-            generateCombinations()
+                setTimeout(() => {
+                    generateCombinations()
+                }, 100);
         }
     }
 
@@ -211,7 +218,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         }
     }
     const validateFields = () => {
-        const errors: { name?: string; category?: string; manufacture?: string } = {}
+        const errors: { name?: string; category?: string; manufacture?: string; attribute?: string } = {}
 
         if (!name) {
             errors.name = 'Product name is required'
@@ -224,7 +231,18 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         if (!selectedManufacture) {
             errors.manufacture = 'Manufacturer is required'
         }
-
+        const missingAttributes = attributeRows.filter((row) => {
+            return row.selectedAttribute && row.selectedValues.length === 0
+        })
+        if (missingAttributes.length > 0) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Please select all attributes for each combination',
+                life: 3000
+            });
+            errors.attribute = 'Please select all attributes for each combination';
+        }
         return errors
     }
     const isSkuUnique = (sku: string) => {
@@ -292,8 +310,21 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
             const data = await ProductService.addProducts(productsData, uploadedFilesArray)
             console.log('Products added successfully:', data)
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Products added successfully!',
+                life: 3000
+            })
+            router.push(ManagerPath.PRODUCT)
         } catch (error) {
             console.error('Error:', error)
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to add products.',
+                life: 3000
+            })
         }
     }
 
@@ -331,229 +362,237 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     }
 
     return (
-        <div className='card'>
-            <div className='flex flex-column gap-4'>
-                <div className='flex flex-row gap-4'>
-                    <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='productName'>Product Name</label>
-                        <InputText
-                            id='productName'
-                            onChange={(e) => {
-                                setName(e.target.value)
-                                setNameError('')
-                            }}
-                            placeholder='Enter product name'
-                        />
-                        {nameError && <small className='p-error'>{nameError}</small>}
-                    </div>
-                    <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='weight'>Weight</label>
-                        <InputNumber
-                            inputId='minmax-buttons'
-                            onChange={(e) => {
-                                setWeight(e.value || 0)
-                            }}
-                            value={weight}
-                            placeholder='Enter weight'
-                            mode='decimal'
-                            defaultValue={0}
-                            showButtons
-                            min={0}
-                            suffix='g'
-                        />
-                    </div>
-                </div>
-
-                <div className='flex flex-row gap-4 align-items-center'>
-                    <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='category'>Categories</label>
-                        <TreeSelect
-                            id='category'
-                            value={selectedCategory ? String(selectedCategory.id) : null}
-                            onChange={(e) => {
-                                setSelectedCategory({ id: Number(e.value) })
-                                setCategoryError('')
-                            }}
-                            options={categories}
-                            filter
-                            placeholder='Select a category'
-                            showClear
-                        />
-                        {categoryError && <small className='p-error'>{categoryError}</small>}
-                    </div>
-                    <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='brand'>Manufactures</label>
-                        <Dropdown
-                            value={selectedManufacture}
-                            onChange={(e) => {
-                                setSelectedManufacture(e.value)
-                                setManufactureError('')
-                            }}
-                            options={manufacturers}
-                            placeholder='Select a manufacture'
-                            optionLabel='manufacturerName'
-                        />
-                        {manufactureError && <small className='p-error'>{manufactureError}</small>}
-                    </div>
-                </div>
-
-                <div className='flex flex-row gap-4 align-items-center'>
-                    <div className='flex flex-column gap-2 w-full'>
-                        {
-                            <Editor
-                                value={text}
-                                onTextChange={(e) => setText(e.htmlValue || '')}
-                                style={{ height: '100px', width: '100%' }}
-                                placeholder='Enter product description'
-                            />
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <Accordion className='mt-5'>
-                <AccordionTab header='Attributes'>
-                    {attributeRows.map((row, index) => (
-                        <div key={index} className='mb-4 flex items-center'>
-                            <Dropdown
-                                value={row.selectedAttribute}
-                                options={[
-                                    ...getAvailableAttributes(),
-                                    ...productAttributes.filter((attr) => attr.id === row.selectedAttribute?.id)
-                                ]}
+        <div>
+            <Toast ref={toast} />
+            <div className='card'>
+                <div className='flex flex-column gap-4'>
+                    <div className='flex flex-row gap-4'>
+                        <div className='flex flex-column gap-2 w-full'>
+                            <label htmlFor='productName'>Product Name</label>
+                            <InputText
+                                id='productName'
                                 onChange={(e) => {
-                                    const updatedRows = [...attributeRows]
-                                    updatedRows[index].selectedAttribute = e.value
-                                    setAttributeRows(updatedRows)
-                                    generateCombinations()
+                                    setName(e.target.value)
+                                    setNameError('')
                                 }}
-                                optionLabel='name'
-                                placeholder='Select an attribute'
-                                className='w-[200px] mr-4'
-                                style={{ minWidth: '200px', width: '200px', maxWidth: '200px' }}
+                                placeholder='Enter product name'
                             />
-                            <AutoComplete
-                                value={row.selectedValues}
-                                suggestions={row.selectedValues}
-                                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
-                                    handleKeydown(event, index)
-                                }
-                                placeholder='Enter values'
-                                multiple
-                                onChange={(e) => handleChange(e.value, index)}
-                                className='w-full'
-                            />
-                            <Button
-                                className='pi pi-trash bg-gray-500 text-xs'
-                                onClick={() => removeAttributeRow(index)}
+                            {nameError && <small className='p-error'>{nameError}</small>}
+                        </div>
+                        <div className='flex flex-column gap-2 w-full'>
+                            <label htmlFor='weight'>Weight</label>
+                            <InputNumber
+                                inputId='minmax-buttons'
+                                onChange={(e) => {
+                                    setWeight(e.value || 0)
+                                }}
+                                placeholder='Enter weight'
+                                mode='decimal'
+                                defaultValue={0}
+                                showButtons
+                                min={0}
+                                suffix='g'
                             />
                         </div>
-                    ))}
-                    <Button onClick={addAttributeRow} className='flex items-center mb-5'>
-                        <i className={PrimeIcons.PLUS}></i>
-                        <span className='ml-2'>Add attribute</span>
-                    </Button>
+                    </div>
 
-                    {combinedRows.length > 0 && (
-                        <DataTable
-                            value={combinedRows}
-                            editMode='cell'
-                            resizableColumns
-                            showGridlines
-                            tableStyle={{ minWidth: '50rem' }}
-                        >
-                            {columns.map(({ field, header }) => {
-                                if (field === 'name') {
-                                    return <Column key={field} field={field} header={header} style={{ width: '25%' }} />
-                                }
-                                return (
-                                    <Column
-                                        key={field}
-                                        field={field}
-                                        header={header}
-                                        editor={(options) => (
-                                            <InputText
-                                                type='text'
-                                                style={{
-                                                    width: '100%'
-                                                }}
-                                                value={options.value}
-                                                onChange={(e) => options.editorCallback?.(e.target.value)}
+                    <div className='flex flex-row gap-4 align-items-center'>
+                        <div className='flex flex-column gap-2 w-full'>
+                            <label htmlFor='category'>Categories</label>
+                            <TreeSelect
+                                id='category'
+                                value={selectedCategory ? String(selectedCategory.id) : null}
+                                onChange={(e) => {
+                                    setSelectedCategory({ id: Number(e.value) })
+                                    setCategoryError('')
+                                }}
+                                options={categories}
+                                filter
+                                placeholder='Select a category'
+                                showClear
+                            />
+                            {categoryError && <small className='p-error'>{categoryError}</small>}
+                        </div>
+                        <div className='flex flex-column gap-2 w-full'>
+                            <label htmlFor='brand'>Manufactures</label>
+                            <Dropdown
+                                value={selectedManufacture}
+                                onChange={(e) => {
+                                    setSelectedManufacture(e.value)
+                                    setManufactureError('')
+                                }}
+                                options={manufacturers}
+                                placeholder='Select a manufacture'
+                                optionLabel='manufacturerName'
+                            />
+                            {manufactureError && <small className='p-error'>{manufactureError}</small>}
+                        </div>
+                    </div>
+
+                    <div className='flex flex-row gap-4 align-items-center'>
+                        <div className='flex flex-column gap-2 w-full'>
+                            {
+                                <Editor
+                                    value={text}
+                                    onTextChange={(e) => setText(e.htmlValue || '')}
+                                    style={{ height: '100px', width: '100%' }}
+                                    placeholder='Enter product description'
+                                />
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <Accordion className='mt-5'>
+                    <AccordionTab header='Attributes'>
+                        {attributeRows.map((row, index) => (
+                            <div key={index} className='mb-4 flex items-center'>
+                                <Dropdown
+                                    value={row.selectedAttribute}
+                                    options={[
+                                        ...getAvailableAttributes(),
+                                        ...productAttributes.filter((attr) => attr.id === row.selectedAttribute?.id)
+                                    ]}
+                                    onChange={(e) => {
+                                        const updatedRows = [...attributeRows]
+                                        updatedRows[index].selectedAttribute = e.value
+                                        setAttributeRows(updatedRows)
+                                        generateCombinations()
+                                    }}
+                                    optionLabel='name'
+                                    placeholder='Select an attribute'
+                                    className='w-[200px] mr-4'
+                                    style={{ minWidth: '200px', width: '200px', maxWidth: '200px' }}
+                                />
+                                <AutoComplete
+                                    value={row.selectedValues}
+                                    suggestions={row.selectedValues}
+                                    onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                                        handleKeydown(event, index)
+                                    }
+                                    placeholder='Enter values'
+                                    multiple
+                                    onChange={(e) => handleChange(e.value, index)}
+                                    className='w-full'
+                                />
+                                <Button
+                                    className='pi pi-trash bg-gray-500 text-xs'
+                                    onClick={() => removeAttributeRow(index)}
+                                />
+                            </div>
+                        ))}
+                        <Button onClick={addAttributeRow} className='flex items-center mb-5'>
+                            <i className={PrimeIcons.PLUS}></i>
+                            <span className='ml-2'>Add attribute</span>
+                        </Button>
+
+                        {combinedRows.length > 0 && (
+                            <DataTable
+                                value={combinedRows}
+                                editMode='cell'
+                                resizableColumns
+                                showGridlines
+                                tableStyle={{ minWidth: '50rem' }}
+                            >
+                                {columns.map(({ field, header }) => {
+                                    if (field === 'name') {
+                                        return (
+                                            <Column
+                                                key={field}
+                                                field={field}
+                                                header={header}
+                                                style={{ width: '25%' }}
                                             />
-                                        )}
-                                        onCellEditComplete={onCellEditComplete}
-                                        style={{ width: '25%' }}
-                                    />
-                                )
-                            })}
-                            <Column
-                                header='Image'
-                                body={(rowData, column) => (
-                                    <div style={{ width: '100px' }}>
-                                        <label className='cursor-pointer rounded-lg justify-center items-center mb-4'>
-                                            <input
-                                                type='file'
-                                                onChange={(event) => onUpload(event, column.rowIndex)}
-                                                className='absolute inset-0 opacity-0 cursor-pointer'
-                                            />
-                                            <span className='text-gray-600 '>
-                                                <i className='pi pi-image text-2xl mb-2 '></i>
-                                            </span>
-                                        </label>
+                                        )
+                                    }
+                                    return (
+                                        <Column
+                                            key={field}
+                                            field={field}
+                                            header={header}
+                                            editor={(options) => (
+                                                <InputText
+                                                    type='text'
+                                                    style={{
+                                                        width: '100%'
+                                                    }}
+                                                    value={options.value}
+                                                    onChange={(e) => options.editorCallback?.(e.target.value)}
+                                                />
+                                            )}
+                                            onCellEditComplete={onCellEditComplete}
+                                            style={{ width: '25%' }}
+                                        />
+                                    )
+                                })}
+                                <Column
+                                    header='Image'
+                                    body={(rowData, column) => (
+                                        <div style={{ width: '100px' }}>
+                                            <label className='cursor-pointer rounded-lg justify-center items-center mb-4'>
+                                                <input
+                                                    type='file'
+                                                    onChange={(event) => onUpload(event, column.rowIndex)}
+                                                    className='absolute inset-0 opacity-0 cursor-pointer'
+                                                />
+                                                <span className='text-gray-600 '>
+                                                    <i className='pi pi-image text-2xl mb-2 '></i>
+                                                </span>
+                                            </label>
 
-                                        <hr className='border-t-2 border-gray-300 mb-4' />
+                                            <hr className='border-t-2 border-gray-300 mb-4' />
 
-                                        <div className='flex justify-center items-center'>
-                                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
-                                                {uploadedImages[column.rowIndex] &&
-                                                    uploadedImages[column.rowIndex].map((imageSrc, imageIndex) => (
-                                                        <div
-                                                            key={imageIndex}
-                                                            className='relative flex justify-center items-center'
-                                                        >
-                                                            <Image
-                                                                src={imageSrc}
-                                                                alt={`Uploaded image ${imageIndex}`}
-                                                                width={100}
-                                                                height={100}
-                                                                className='rounded-md object-cover shadow-md'
-                                                            />
-                                                            <button
-                                                                style={{ borderRadius: '5px' }}
-                                                                className='absolute cursor-pointer border-none rounded-3xl top-0 right-0 bg-red-500 text-white p-1 transition-all duration-300 ease-in-out hover:bg-red-700 hover:scale-110'
-                                                                onClick={() =>
-                                                                    onRemoveImage(column.rowIndex, imageIndex)
-                                                                }
+                                            <div className='flex justify-center items-center'>
+                                                <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
+                                                    {uploadedImages[column.rowIndex] &&
+                                                        uploadedImages[column.rowIndex].map((imageSrc, imageIndex) => (
+                                                            <div
+                                                                key={imageIndex}
+                                                                className='relative flex justify-center items-center'
                                                             >
-                                                                <i className='pi pi-trash'></i>
-                                                            </button>
-                                                        </div>
-                                                    ))}
+                                                                <Image
+                                                                    src={imageSrc}
+                                                                    alt={`Uploaded image ${imageIndex}`}
+                                                                    width={100}
+                                                                    height={100}
+                                                                    className='rounded-md object-cover shadow-md'
+                                                                />
+                                                                <button
+                                                                    style={{ borderRadius: '5px' }}
+                                                                    className='absolute cursor-pointer border-none rounded-3xl top-0 right-0 bg-red-500 text-white p-1 transition-all duration-300 ease-in-out hover:bg-red-700 hover:scale-110'
+                                                                    onClick={() =>
+                                                                        onRemoveImage(column.rowIndex, imageIndex)
+                                                                    }
+                                                                >
+                                                                    <i className='pi pi-trash'></i>
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                </div>
                                             </div>
+                                            <hr className='border-t-2 border-gray-300 mt-4' />
                                         </div>
-                                        <hr className='border-t-2 border-gray-300 mt-4' />
-                                    </div>
-                                )}
-                                style={{ width: '350px', textAlign: 'center' }}
-                            />
+                                    )}
+                                    style={{ width: '350px', textAlign: 'center' }}
+                                />
 
-                            <Column
-                                header='Delete'
-                                body={(rowData, column) => (
-                                    <Button
-                                        icon='pi pi-trash'
-                                        className='p-button-danger'
-                                        onClick={() => removeCombinationRow(column.rowIndex)}
-                                    />
-                                )}
-                                style={{ width: '100px', textAlign: 'center' }}
-                            />
-                        </DataTable>
-                    )}
-                </AccordionTab>
-            </Accordion>
-
-            <Button onClick={handleAddProduct}>Add New</Button>
+                                <Column
+                                    header='Delete'
+                                    body={(rowData, column) => (
+                                        <Button
+                                            icon='pi pi-trash'
+                                            className='p-button-danger'
+                                            onClick={() => removeCombinationRow(column.rowIndex)}
+                                        />
+                                    )}
+                                    style={{ width: '100px', textAlign: 'center' }}
+                                />
+                            </DataTable>
+                        )}
+                    </AccordionTab>
+                </Accordion>
+                <Button onClick={handleAddProduct}>Add New</Button>
+            </div>
         </div>
     )
 }
