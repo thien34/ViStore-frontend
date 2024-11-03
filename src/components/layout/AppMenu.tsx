@@ -16,7 +16,7 @@ const AppMenu = () => {
         },
         {
             label: 'Retail',
-            items: [{ label: 'Retail Sales', icon: 'pi pi-fw pi-shop', to: '/uikit/formlayout' }]
+            items: [{ label: 'Retail Sales', icon: 'pi pi-fw pi-shop', to: '/admin/retail' }]
         },
         {
             label: 'Catalog',
