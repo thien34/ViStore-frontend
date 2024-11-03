@@ -2,7 +2,7 @@ import CategoryService from '@/service/CategoryService'
 import ProductService from '@/service/ProducrService'
 import manufacturerService from '@/service/manufacturer.service'
 import productAttributeService from '@/service/productAttribute.service'
-import ProductAddForm from './_components/ProductAddForm'
+import ProductAddForm from './ProductAddForm'
 
 interface EditProductProps {
     params: {

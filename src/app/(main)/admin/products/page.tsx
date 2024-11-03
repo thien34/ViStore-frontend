@@ -1,5 +1,5 @@
 import ProductService from '@/service/ProducrService'
-import ProductList from './details/_components/ProductList'
+import ProductList from './ProductList'
 
 export default async function ProductPage() {
     const products = await ProductService.getAllProducts()
