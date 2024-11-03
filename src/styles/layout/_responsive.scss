@@ -97,3 +97,15 @@
         }
     }
 }
+
+@media (min-width: 768px) {
+    .md\:w-\[49\%\] {
+        width: 49% !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .md\:w-\[32\%\] {
+        width: 32% !important;
+    }
+}

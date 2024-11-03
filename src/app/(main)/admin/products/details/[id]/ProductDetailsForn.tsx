@@ -6,6 +6,7 @@ import AttributeValueService from '@/service/AttributeValueService'
 import PictureService from '@/service/PictureService'
 import ProductService from '@/service/ProducrService'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { PrimeIcons } from 'primereact/api'
 import { AutoComplete, AutoCompleteChangeEvent, AutoCompleteCompleteEvent } from 'primereact/autocomplete'
@@ -305,8 +306,9 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                         <div className='flex flex-col items-center gap-4 w-full'>
                             <Tooltip target='.image' />
 
-                            <img
-                                style={{ width: '100px' }}
+                            <Image
+                                width={100}
+                                height={100}
                                 className='object-cover rounded-lg shadow-lg border border-gray-200 mb-2 image'
                                 src={imageUrl}
                                 data-pr-tooltip='Product Image'

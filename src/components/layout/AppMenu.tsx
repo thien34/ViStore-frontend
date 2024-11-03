@@ -31,9 +31,8 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-mobile',
                     to: '/uikit/button'
                 },
-                { label: 'Customers', icon: 'pi pi-fw pi-users', to: '/uikit/overlay' },
-                { label: 'Customer roles', icon: 'pi pi-fw pi-key', to: '/admin/customer-roles' },
-                { label: 'Online customers', icon: 'pi pi-fw pi-bars', to: '/uikit/menu' }
+                { label: 'Customers', icon: 'pi pi-fw pi-users', to: '/admin/customers' },
+                { label: 'Customer roles', icon: 'pi pi-fw pi-key', to: '/admin/customer-roles' }
             ]
         },
         {
