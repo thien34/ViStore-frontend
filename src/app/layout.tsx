@@ -6,7 +6,7 @@ import 'primeicons/primeicons.css'
 import '../styles/layout/layout.scss'
 import '../styles/demo/Demos.scss'
 import { LayoutProvider } from '@/components/layout/context/layoutcontext'
-
+import '@/styles/layout/index.css'
 interface RootLayoutProps {
     children: React.ReactNode
 }

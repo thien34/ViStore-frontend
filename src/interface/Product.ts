@@ -36,6 +36,7 @@ export interface ProductResponse {
     categoryId: number
     manufacturerId: number
     weight: number
+    sku: string
     description: string
     categoryName: number
     manufacturerName: number
