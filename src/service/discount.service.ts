@@ -22,6 +22,14 @@ class DiscountService {
 
         return response.json();
     }
+    async getById(id: number) {
+        const response = await http.get<Promotion>(`${this.basePath}/${id}`)
+        return response
+    }
+    async update(id: number, address: Omit<Promotion, 'id'>): Promise<Promotion> {
+        const response = await http.put<Promotion>(`${this.basePath}/${id}`, address)
+        return response.payload
+    }
 }
 
 const discountService = new DiscountService();

@@ -103,12 +103,24 @@ const ListView = ({ initialData }: DiscountProps) => {
             />
         )
     }
+    const editButtonTemplate = (rowData: Promotion) => {
+        return (
+            <Button
+                icon='pi pi-pencil'
+                severity='info'
+                aria-label='Edit'
+                rounded
+                onClick={() => router.push(`/admin/discounts/${rowData.id}`)}
+            />
+        )
+    }
+
     return (
         <>
             <Toast ref={toast} />
             <div className='card'>
                 {leftToolbarTemplate()}
-                <DataTable value={filteredDiscounts} paginator rows={6} emptyMessage='No discounts found.'>
+                <DataTable value={filteredDiscounts} emptyMessage='No discounts found.'>
                     <Column field='name' header='Discount Name' sortable />
                     <Column header='Discount Value' body={formatDiscountValue} />
                     <Column
@@ -134,6 +146,7 @@ const ListView = ({ initialData }: DiscountProps) => {
                         filterMatchMode={FilterMatchMode.EQUALS}
                     />
                     <Column field='status' header='Status' body={statusBodyTemplate} sortable />
+                    <Column body={editButtonTemplate} header='Actions' />
                 </DataTable>
             </div>
         </>
