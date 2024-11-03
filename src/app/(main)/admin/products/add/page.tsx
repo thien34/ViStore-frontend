@@ -1,4 +1,4 @@
-import ProductAddForm from './ProductForm'
+import ProductAddForm from './_components/ProductForm'
 import categoryService from '@/service/category.service'
 import manufacturerService from '@/service/manufacturer.service'
 import productAttributeService from '@/service/productAttribute.service'

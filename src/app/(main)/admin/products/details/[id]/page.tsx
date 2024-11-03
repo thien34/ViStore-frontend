@@ -1,5 +1,5 @@
 import ProductService from '@/service/ProducrService'
-import ProductDetailsForm from './ProductDetailsForn'
+import ProductDetailsForm from '../_components/ProductDetailsForn'
 import productAttributeService from '@/service/productAttribute.service'
 
 interface EditProductProps {
