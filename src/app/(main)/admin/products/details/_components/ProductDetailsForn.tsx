@@ -1,9 +1,12 @@
 'use client'
+import ManagerPath from '@/constants/ManagerPath'
 import { ProductResponseDetails } from '@/interface/Product'
 import { ProductAttributeName } from '@/interface/productAttribute.interface'
 import AttributeValueService from '@/service/AttributeValueService'
 import PictureService from '@/service/PictureService'
 import ProductService from '@/service/ProducrService'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { PrimeIcons } from 'primereact/api'
 import { AutoComplete, AutoCompleteChangeEvent, AutoCompleteCompleteEvent } from 'primereact/autocomplete'
@@ -11,6 +14,7 @@ import { Button } from 'primereact/button'
 import { Dropdown } from 'primereact/dropdown'
 import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
+import { Toast } from 'primereact/toast'
 import { Tooltip } from 'primereact/tooltip'
 import React, { useRef, useState } from 'react'
 import Barcode from 'react-barcode'
@@ -29,14 +33,24 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
     const [formData, setFormData] = useState<ProductResponseDetails>(product)
     const [imageUrl, setImageUrl] = useState<string>(product.imageUrl)
     const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+    const router = useRouter()
 
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const toast = useRef<Toast>(null)
     const [attributeRows, setAttributeRows] = useState<AttributeRow[]>(
         product.attributes.map((attr) => ({
             selectedAttribute: { id: attr.id, name: attr.name },
             selectedValues: attr.value
         }))
     )
+    const [errors, setErrors] = useState({
+        sku: '',
+        name: '',
+        price: '',
+        quantity: '',
+        productCost: '',
+        attributes: ''
+    })
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -44,8 +58,57 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
     ) => {
         setFormData({ ...formData, [field]: e.target.value })
     }
+    const validateFields = () => {
+        const newErrors = { sku: '', name: '', price: '', quantity: '', productCost: '', attributes: '' }
+        let isValid = true
+
+        if (!formData.sku.trim()) {
+            newErrors.sku = 'SKU is required'
+            isValid = false
+        }
+        if (!formData.name.trim()) {
+            newErrors.name = 'Product name is required'
+            isValid = false
+        }
+        if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 0) {
+            newErrors.price = 'Price must be greater than 0'
+            isValid = false
+        }
+        if (!formData.quantity || isNaN(Number(formData.quantity)) || formData.quantity <= 0) {
+            newErrors.quantity = 'Quantity must be greater than 0'
+            isValid = false
+        }
+        if (!formData.productCost || isNaN(Number(formData.productCost)) || formData.productCost <= 0) {
+            newErrors.productCost = 'Product cost must be greater than 0'
+            isValid = false
+        }
+
+        const missingAttributes = attributeRows.filter((row) => {
+            return row.selectedAttribute && !row.selectedValues
+        })
+        if (missingAttributes.length > 0) {
+            newErrors.attributes = 'Please select all attributes for each combination'
+            isValid = false
+        }
+
+        setErrors(newErrors)
+        return isValid
+    }
 
     const handleSave = async () => {
+        const isValid = validateFields()
+        if (Object.keys(isValid).length > 0) {
+            return
+        }
+        if (!isValid) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Please fill in all required fields',
+                life: 3000
+            })
+            return
+        }
         const filteredAttributes = attributeRows
             .filter((attr) => attr.selectedAttribute !== null)
             .map((attr) => ({
@@ -77,6 +140,12 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
         try {
             await ProductService.updateProduct(formData.id, productData)
             console.log('Product updated successfully.')
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'Product updated successfully!',
+                life: 3000
+            })
         } catch (error) {
             console.error('Failed to update product:', error)
         }
@@ -94,9 +163,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
         try {
             const { payload } = await AttributeValueService.getAttributeValues(product.id, attribuetId)
 
-            if (!Array.isArray(payload)) {
-                return []
-            }
+            if (!Array.isArray(payload)) return []
 
             const uniqueNames = Array.from(new Set(payload.map((value) => value.name)))
 
@@ -131,6 +198,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
 
     return (
         <div className='card'>
+            <Toast ref={toast} />
             <h5>Edit Product Details</h5>
             <div className='flex flex-column gap-4'>
                 <div className='p-grid p-fluid'>
@@ -143,11 +211,12 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 tooltip='Enter the SKU for the product'
                                 id='sku'
                                 tooltipOptions={{ position: 'bottom' }}
+                                className={errors.sku ? 'p-invalid' : ''}
                                 value={formData.sku}
                                 onChange={(e) => handleChange(e, 'sku')}
                             />
+                            {errors.sku && <small className='p-error'>{errors.sku}</small>}
                         </div>
-
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='name' className='mb-2'>
                                 Product Name
@@ -159,7 +228,9 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 disabled
                                 value={formData.name}
                                 onChange={(e) => handleChange(e, 'name')}
+                                className={errors.name ? 'p-invalid' : ''}
                             />
+                            {errors.name && <small className='p-error'>{errors.name}</small>}
                         </div>
                     </div>
                     <div className='flex flex-row gap-4 mt-2'>
@@ -181,8 +252,10 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                     )
                                 }}
                                 mode='currency'
+                                className={errors.price ? 'p-invalid' : ''}
                                 currency='USD'
                             />
+                            {errors.price && <small className='p-error'>{errors.price}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='productCost' className='mb-2'>
@@ -202,8 +275,10 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                     )
                                 }}
                                 mode='currency'
+                                className={errors.productCost ? 'p-invalid' : ''}
                                 currency='USD'
                             />
+                            {errors.productCost && <small className='p-error'>{errors.productCost}</small>}
                         </div>
                     </div>
                     <div className='flex flex-row gap-4 mt-2'>
@@ -224,7 +299,9 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                         'quantity' as keyof ProductResponseDetails
                                     )
                                 }
+                                className={errors.quantity ? 'p-invalid' : ''}
                             />
+                            {errors.quantity && <small className='p-error'>{errors.quantity}</small>}
                         </div>
                         <div className='grid grid-cols-1 items-center gap-4 w-full'>
                             <Tooltip target='.image' />
