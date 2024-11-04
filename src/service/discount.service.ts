@@ -1,10 +1,18 @@
-import { Promotion, PromotionsPagingResponse } from '@/interface/discount.interface';
+import { Promotion } from '@/interface/discount.interface';
 import http from '@/libs/http';
 class DiscountService {
     private basePath = '/api/admin/discounts';
     async getAll() {
-        const response = await http.get<PromotionsPagingResponse>(this.basePath);
-        return response;
+        const response = await fetch('http://localhost:8080/api/admin/discounts?discountTypeId=ASSIGNED_TO_PRODUCTS', { cache: 'no-store' });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            throw new Error(`Failed to get discounts: ${errorResponse.message || 'Unknown error'}`);
+        }
+
+        const result = await response.json();
+        console.log(result.data);
+        return result.data;
     }
     async createDiscount(discountData: Promotion) {
         const response = await fetch('http://localhost:8080/api/admin/discounts', {

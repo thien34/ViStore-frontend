@@ -30,7 +30,6 @@ const DiscountUpdate = () => {
     const [loading, setLoading] = useState<boolean>(true)
     const [fetchedProducts, setFetchedProducts] = useState<ProductResponseDetails[]>([])
     const [selectedFetchedProducts, setSelectedFetchedProducts] = useState<ProductResponseDetails[]>([])
-    const [usePercentage] = useState<boolean>(true)
     const [checked, setChecked] = useState<boolean>(false)
     const [selectedProducts, setSelectedProducts] = useState<ProductResponse[]>([])
     const [comments, setComments] = useState<string>('')
@@ -62,7 +61,6 @@ const DiscountUpdate = () => {
                 setToDate(data.endDateUtc ? new Date(data.endDateUtc) : null)
                 setChecked(data.isActive || false)
                 setComments(data.comment || '')
-
                 const appliedProducts: ProductResponse[] = data.appliedProducts || []
                 setSelectedFetchedProducts(appliedProducts)
 
@@ -122,6 +120,7 @@ const DiscountUpdate = () => {
             isActive: checked,
             name: discountName,
             comment: comments,
+            discountTypeId: 1,
             usePercentage: true,
             discountPercentage: value,
             startDateUtc: fromDate?.toISOString(),
