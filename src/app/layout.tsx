@@ -5,6 +5,7 @@ import 'primeflex/primeflex.css'
 import 'primeicons/primeicons.css'
 import '../styles/layout/layout.scss'
 import '../styles/demo/Demos.scss'
+import '../styles/layout/global.css'
 import { LayoutProvider } from '@/components/layout/context/layoutcontext'
 
 interface RootLayoutProps {

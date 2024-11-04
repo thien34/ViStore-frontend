@@ -48,8 +48,21 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
         setWards([])
     }
 
-    const openNew = () => {
-        setAddress(emtyAddress)
+    const openNew = async (idAddress: number | null) => {
+        if (idAddress) {
+            const { payload: address } = await addressService.getById(idAddress)
+            setAddress(address)
+            if (address.provinceId) {
+                const { payload: districts } = await districtService.getAll(address.provinceId)
+                setDistricts(districts)
+            }
+            if (address.districtId) {
+                const { payload: wards } = await wardService.getAll(address.districtId)
+                setWards(wards)
+            }
+        } else {
+            setAddress(emtyAddress)
+        }
         setSubmitted(false)
         setAddressDialog(true)
     }
@@ -79,16 +92,26 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
         setSubmitted(true)
         address.customerId = customerId
         if (address.email.trim()) {
-            await addressService.create(address)
-            toast.current?.show({
-                severity: 'success',
-                summary: 'Successful',
-                detail: 'Address Created',
-                life: 3000
-            })
+            if (address.id) {
+                await addressService.update(address.id, address)
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Address Updated',
+                    life: 3000
+                })
+            } else {
+                await addressService.create(address)
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Address Created',
+                    life: 3000
+                })
+            }
+            hideDialog()
+            fetchAdresses()
         }
-        hideDialog()
-        fetchAdresses()
     }
 
     const addressDialogFooter = (
@@ -99,6 +122,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
     )
     return (
         <>
+            <Toast ref={toast} />
             <Dialog
                 visible={addressDialog}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
@@ -109,8 +133,8 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                 footer={addressDialogFooter}
                 onHide={hideDialog}
             >
-                <div className='flex flex-wrap justify-content-between w-full'>
-                    <div className='field w-full md:w-[49%]'>
+                <div className='flex w-full gap-x-5'>
+                    <div className='field w-full'>
                         <label htmlFor='firstName' className='font-medium block'>
                             First name
                         </label>
@@ -126,7 +150,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             <small className='p-error block'>First name is required.</small>
                         )}
                     </div>
-                    <div className='field w-full md:w-[49%]'>
+                    <div className='field w-full'>
                         <label htmlFor='lastName' className='font-medium block'>
                             Last name
                         </label>
@@ -142,8 +166,8 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                         )}
                     </div>
                 </div>
-                <div className='flex flex-wrap justify-content-between w-full'>
-                    <div className='field w-full md:w-[49%]'>
+                <div className='flex w-full gap-x-5'>
+                    <div className='field w-full'>
                         <label htmlFor='email' className='font-medium block'>
                             Email
                         </label>
@@ -160,7 +184,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                         />
                         {submitted && !address.email && <small className='p-error'>Email is required.</small>}
                     </div>
-                    <div className='field w-full md:w-[49%]'>
+                    <div className='field w-full'>
                         <label htmlFor='phoneNumber' className='font-medium block'>
                             Phone number
                         </label>
@@ -176,8 +200,8 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                         )}
                     </div>
                 </div>
-                <div className='flex flex-wrap justify-content-between w-full'>
-                    <div className='field w-full md:w-[32%]'>
+                <div className='flex w-full gap-x-4'>
+                    <div className='field w-full'>
                         <label htmlFor='province' className='font-medium block'>
                             Province
                         </label>
@@ -197,7 +221,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             <small className='p-error block'>Province is required.</small>
                         )}
                     </div>
-                    <div className='field w-full md:w-[32%]'>
+                    <div className='field w-full'>
                         <label htmlFor='district' className='font-medium block'>
                             District
                         </label>
@@ -218,7 +242,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             <small className='p-error block'>District is required.</small>
                         )}
                     </div>
-                    <div className='field w-full md:w-[32%]'>
+                    <div className='field w-full'>
                         <label htmlFor='ward' className='font-medium block'>
                             Ward
                         </label>

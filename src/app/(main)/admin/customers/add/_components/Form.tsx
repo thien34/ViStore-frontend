@@ -58,7 +58,7 @@ const CustomerForm = ({ roles }: FormProps) => {
     return (
         <>
             <Toast ref={toast} />
-            <div className='grid'>
+            <div className='flex'>
                 <div className='col-12 md:col-8'>
                     <div className='card'>
                         <div className='text-xl font-medium mb-6'>General</div>

@@ -18,6 +18,11 @@ class CustomerService {
         const response = await http.post<Customer>(`${this.basePath}`, customer)
         return response.payload
     }
+
+    async update(id: number, customer: Omit<Customer, 'id'>) {
+        const response = await http.put<Customer>(`${this.basePath}/${id}`, customer)
+        return response.payload
+    }
 }
 
 const customerService = new CustomerService()

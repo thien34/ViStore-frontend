@@ -11,6 +11,7 @@ export interface AddressesResponse {
 }
 
 export interface AddressRequest {
+    id?: number
     firstName: string
     lastName: string
     email: string
@@ -20,7 +21,7 @@ export interface AddressRequest {
     wardId: string
     addressName: string
     phoneNumber: string
-    customerId: number
+    customerId?: number
 }
 
 export type AddressPagingResponse = PagingResponse<AddressesResponse>

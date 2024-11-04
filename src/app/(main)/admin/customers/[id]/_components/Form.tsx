@@ -25,14 +25,7 @@ interface FormProps {
     provinces: Province[]
     customerId: number
 }
-const emptyCustomer: Customer = {
-    email: '',
-    firstName: '',
-    lastName: '',
-    gender: '',
-    dateOfBirth: null,
-    customerRoles: []
-}
+
 const genders = [
     { name: 'Male', key: '0' },
     { name: 'Female', key: '1' }
@@ -53,9 +46,9 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
     const dt = useRef<DataTable<AddressesResponse[]>>(null)
     const router = useRouter()
 
-    const addressFormRef = useRef<{ openNew: () => void }>(null)
-    const openAddressDialog = () => {
-        addressFormRef.current?.openNew()
+    const addressFormRef = useRef<{ openNew: (idAddress: number | null) => void }>(null)
+    const openAddressDialog = (idAddress: number | null) => {
+        addressFormRef.current?.openNew(idAddress)
     }
 
     const fetchAddresses = async () => {
@@ -70,14 +63,13 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
         }
         setSubmitted(true)
         if (customer.email.trim()) {
-            await customerService.create(customer)
+            await customerService.update(customerId, customer)
             toast.current?.show({
                 severity: 'success',
                 summary: 'Successful',
-                detail: 'Customer Created',
+                detail: 'Customer Updated',
                 life: 3000
             })
-            setCustomer(emptyCustomer)
             router.push('/admin/customers')
         }
     }
@@ -104,7 +96,7 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                     rounded
                     outlined
                     className='mr-2'
-                    onClick={() => router.push(`/admin/customers/${rowData.id}`)}
+                    onClick={() => openAddressDialog(rowData.id ?? null)}
                 />
                 <Button
                     icon='pi pi-trash'
@@ -120,8 +112,8 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
     return (
         <>
             <Toast ref={toast} />
-            <div className='grid'>
-                <div className='col-12 md:col-8'>
+            <div className='flex gap-x-4'>
+                <div className='w-2/3'>
                     <div className='card h-full'>
                         <div className='text-xl font-medium mb-6'>General</div>
                         <div className='field'>
@@ -197,9 +189,9 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                                                 <RadioButton
                                                     inputId={gender.key}
                                                     name='gender'
-                                                    value={gender}
-                                                    onChange={(e) => setCustomer({ ...customer, gender: e.value.key })}
-                                                    checked={customer.gender === gender.name.toUpperCase()}
+                                                    value={gender.key}
+                                                    onChange={(e) => setCustomer({ ...customer, gender: e.value })}
+                                                    checked={customer.gender == gender.key}
                                                 />
                                                 <label htmlFor={gender.key} className='ml-2'>
                                                     {gender.name}
@@ -212,7 +204,7 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                         </div>
                     </div>
                 </div>
-                <div className='col-12 md:col-4'>
+                <div className='w-1/3'>
                     <div className='card mb-4'>
                         <div className='text-xl font-medium mb-6'>Role</div>
                         <div className='field'>
@@ -223,6 +215,10 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                                 optionLabel='name'
                                 style={{ width: '100%' }}
                             />
+                            <div className='flex items-center gap-x-1 mt-2'>
+                                <i className='pi pi-exclamation-circle'></i>
+                                <small className='p-info'>The role determines the customer&apos;s permissions.</small>
+                            </div>
                         </div>
                     </div>
                     <div className='card'>
@@ -230,11 +226,15 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                         <div className='field'>
                             <Dropdown
                                 value={activities.find((active) => active.key === customer.active)}
-                                onChange={(e) => setCustomer({ ...customer, active: e.value })}
+                                onChange={(e) => setCustomer({ ...customer, active: e.value.key })}
                                 options={activities}
                                 optionLabel='name'
                                 style={{ width: '100%' }}
                             />
+                            <div className='flex items-center gap-x-1 mt-2'>
+                                <i className='pi pi-exclamation-circle'></i>
+                                <small className='p-info'>User&apos;s account status.</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -242,7 +242,7 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
             <div className='card mt-2'>
                 <div className='flex justify-content-between align-items-center mb-6'>
                     <div className='text-xl font-medium'>Addresses</div>
-                    <Button label='Add new address' onClick={openAddressDialog} />
+                    <Button label='Add new address' onClick={() => openAddressDialog(null)} />
                 </div>
                 <DataTable
                     ref={dt}

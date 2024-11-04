@@ -1,7 +1,7 @@
 import { PagingRequest, PagingResponse } from './paging.interface'
 
 export interface Customer {
-    id?: number
+    id?: number | null
     customerGuid?: string
     email: string
     firstName: string

@@ -1,6 +1,5 @@
 import { AddressPagingResponse, AddressRequest } from '@/interface/address.interface'
 import http from '@/libs/http'
-import { Address } from 'cluster'
 
 class AddressService {
     private basePath = '/api/admin/addresses'
@@ -10,18 +9,18 @@ class AddressService {
         return response
     }
 
-    async getById(id: number): Promise<Address> {
-        const response = await http.get<Address>(`${this.basePath}/${id}`)
+    async getById(id: number) {
+        const response = await http.get<AddressRequest>(`${this.basePath}/${id}`)
+        return response
+    }
+
+    async create(address: AddressRequest) {
+        const response = await http.post(`${this.basePath}`, address)
         return response.payload
     }
 
-    async create(address: AddressRequest): Promise<Address> {
-        const response = await http.post<Address>(`${this.basePath}`, address)
-        return response.payload
-    }
-
-    async update(id: number, address: Omit<Address, 'id'>): Promise<Address> {
-        const response = await http.put<Address>(`${this.basePath}/${id}`, address)
+    async update(id: number, address: Omit<AddressRequest, 'id'>) {
+        const response = await http.put(`${this.basePath}/${id}`, address)
         return response.payload
     }
 
