@@ -85,9 +85,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             const input = (event.target as HTMLInputElement).value
             addCustomTag(input, index)
             ;(event.target as HTMLInputElement).value = ''
-                setTimeout(() => {
-                    generateCombinations()
-                }, 100);
+            setTimeout(() => {
+                generateCombinations()
+            }, 100)
         }
     }
 
@@ -240,8 +240,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 summary: 'Error',
                 detail: 'Please select all attributes for each combination',
                 life: 3000
-            });
-            errors.attribute = 'Please select all attributes for each combination';
+            })
+            errors.attribute = 'Please select all attributes for each combination'
         }
         return errors
     }

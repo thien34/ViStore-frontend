@@ -91,6 +91,24 @@ class ProductService {
 
         return response.json()
     }
+
+    static async getProuctsDetails(): Promise<ProductResponse[]> {
+        const response = await fetch(`http://localhost:8080/api/admin/products/product-details`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+
+            throw new Error(`Failed to fetch product details: ${errorResponse.message || 'Unknown error'}`);
+        }
+
+        const result = await response.json()
+        return result.data
+    }
 }
 
 export default ProductService

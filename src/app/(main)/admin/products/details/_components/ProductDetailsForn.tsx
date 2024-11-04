@@ -1,4 +1,5 @@
 'use client'
+import ManagerPath from '@/constants/ManagerPath'
 import { ProductResponseDetails } from '@/interface/Product'
 import { ProductAttributeName } from '@/interface/productAttribute.interface'
 import AttributeValueService from '@/service/AttributeValueService'
@@ -197,6 +198,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
 
     return (
         <div className='card'>
+            <Toast ref={toast} />
             <h5>Edit Product Details</h5>
             <div className='flex flex-column gap-4'>
                 <div className='p-grid p-fluid'>
@@ -209,11 +211,12 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 tooltip='Enter the SKU for the product'
                                 id='sku'
                                 tooltipOptions={{ position: 'bottom' }}
+                                className={errors.sku ? 'p-invalid' : ''}
                                 value={formData.sku}
                                 onChange={(e) => handleChange(e, 'sku')}
                             />
+                            {errors.sku && <small className='p-error'>{errors.sku}</small>}
                         </div>
-
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='name' className='mb-2'>
                                 Product Name
@@ -225,7 +228,9 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 disabled
                                 value={formData.name}
                                 onChange={(e) => handleChange(e, 'name')}
+                                className={errors.name ? 'p-invalid' : ''}
                             />
+                            {errors.name && <small className='p-error'>{errors.name}</small>}
                         </div>
                     </div>
                     <div className='flex flex-row gap-4 mt-2'>
@@ -250,7 +255,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 className={errors.price ? 'p-invalid' : ''}
                                 currency='USD'
                             />
-                            {(errors.price && <small className='p-error'>{errors.price}</small>)}
+                            {errors.price && <small className='p-error'>{errors.price}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='productCost' className='mb-2'>
@@ -273,7 +278,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 className={errors.productCost ? 'p-invalid' : ''}
                                 currency='USD'
                             />
-                            {(errors.productCost && <small className='p-error'>{errors.productCost}</small>)}
+                            {errors.productCost && <small className='p-error'>{errors.productCost}</small>}
                         </div>
                     </div>
                     <div className='flex flex-row gap-4 mt-2'>
@@ -296,34 +301,30 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 }
                                 className={errors.quantity ? 'p-invalid' : ''}
                             />
-                            {(errors.quantity && <small className='p-error'>{errors.quantity}</small>)}
+                            {errors.quantity && <small className='p-error'>{errors.quantity}</small>}
                         </div>
-                        <div className='flex flex-col items-center gap-4 w-full'>
+                        <div className='grid grid-cols-1 items-center gap-4 w-full'>
                             <Tooltip target='.image' />
 
-                            <Image
-                                width={100}
-                                height={100}
+                            <img
+                                style={{ width: '100px' }}
                                 className='object-cover rounded-lg shadow-lg border border-gray-200 mb-2 image'
                                 src={imageUrl}
                                 data-pr-tooltip='Product Image'
                                 alt='Product'
                             />
+
                             <Tooltip target='.upload' />
-                            <label
-                                data-pr-tooltip='Upload Image'
-                                className='flex flex-col items-center justify-center cursor-pointer upload'
-                            >
-                                <input
-                                    onChange={handleImageUpload}
-                                    type='file'
-                                    ref={fileInputRef}
-                                    className='absolute inset-0 opacity-0 cursor-pointer '
-                                />
-                                <span className='flex items-center justify-center p-4 bg-violet-50 rounded-lg text-gray-600'>
+                            <label data-pr-tooltip='Upload Image' className='block cursor-pointer upload'>
+                                <input onChange={handleImageUpload} type='file' ref={fileInputRef} className='hidden' />
+                                <span
+                                    className='flex items-center justify-center p-4 bg-violet-50 rounded-lg text-gray-600'
+                                    style={{ pointerEvents: 'none' }}
+                                >
                                     <i className='pi pi-image text-5xl mb-2'></i>
                                 </span>
                             </label>
+
                             <Tooltip target='.gtin' />
                             <span className='gtin' data-pr-tooltip='Gtin'>
                                 <Barcode value={product.gtin} />
@@ -334,7 +335,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                 <Accordion className='mt-5' activeIndex={0}>
                     <AccordionTab header='Attributes'>
                         {attributeRows.map((row, index) => (
-                            <div key={index} className='mb-4 flex items-center justify-between'>
+                            <div key={index} className='mb-4 grid grid-cols-3 items-center gap-4'>
                                 <Dropdown
                                     value={attributeRows[index].selectedAttribute}
                                     options={[
@@ -348,7 +349,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                     }}
                                     optionLabel='name'
                                     placeholder='Select an attribute'
-                                    className='w-[200px] mr-4'
+                                    className='w-[200px]'
                                     style={{ minWidth: '200px', width: '200px', maxWidth: '200px' }}
                                 />
                                 <AutoComplete
@@ -369,11 +370,10 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                     }}
                                     dropdown
                                 />
-
                                 <Button
                                     tooltip='Delete'
                                     onClick={() => removeAttributeRow(index)}
-                                    className='pi pi-trash bg-gray-500 text-xs ml-4'
+                                    className='pi pi-trash bg-gray-500 h-[3rem]'
                                 />
                             </div>
                         ))}
