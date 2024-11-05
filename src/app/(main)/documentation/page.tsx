@@ -246,9 +246,9 @@ export const LayoutProvider = (props) => {
                             <code>
                                 {`
 /* General */
-$scale:14px;                    /* initial font size */ 
-$borderRadius:12px;             /* border radius of layout element e.g. card, sidebar */ 
-$transitionDuration:.2s;        /* transition duration of layout elements e.g. sidebar */ 
+$scale:14px;                    /* initial font size */
+$borderRadius:12px;             /* border radius of layout element e.g. card, sidebar */
+$transitionDuration:.2s;        /* transition duration of layout elements e.g. sidebar */
 `}
                             </code>
                         </pre>

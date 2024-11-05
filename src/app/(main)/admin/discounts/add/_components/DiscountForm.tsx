@@ -11,21 +11,18 @@ import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import ProductService from '@/service/ProducrService'
 import { Image } from 'primereact/image'
 import { InputNumber } from 'primereact/inputnumber'
-import { ProgressSpinner } from 'primereact/progressspinner'
 import { Checkbox } from 'primereact/checkbox'
 import { InputTextarea } from 'primereact/inputtextarea'
 import discountService from '@/service/discount.service'
 
 const DiscountForm = () => {
     const toast = useRef<Toast>(null)
-
     const [discountName, setDiscountName] = useState<string>('')
     const [value, setValue] = useState<number | null>(null)
     const [fromDate, setFromDate] = useState<Date | null>(null)
     const [toDate, setToDate] = useState<Date | null>(null)
     const [selectedProducts, setSelectedProducts] = useState<ProductResponse[]>([])
     const [products, setProducts] = useState<ProductResponse[]>([])
-    const [loading, setLoading] = useState<boolean>(true)
     const [fetchedProducts, setFetchedProducts] = useState<ProductResponseDetails[]>([])
     const [selectedFetchedProducts, setSelectedFetchedProducts] = useState<ProductResponseDetails[]>([])
     const [checked, setChecked] = useState<boolean>(false)
@@ -46,7 +43,7 @@ const DiscountForm = () => {
         toDate: null,
         dateError: null,
         productError: null
-    });
+    })
 
     const showSuccessToast = () => {
         toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Discount created successfully!' })
@@ -91,7 +88,7 @@ const DiscountForm = () => {
     }
 
     const validateForm = () => {
-        let isValid = true;
+        let isValid = true
         const newErrors: {
             discountName: string | null
             value: string | null
@@ -106,48 +103,47 @@ const DiscountForm = () => {
             toDate: null,
             dateError: null,
             productError: null
-        };
+        }
 
         if (!discountName.trim()) {
-            newErrors.discountName = 'Discount name is required.';
-            isValid = false;
+            newErrors.discountName = 'Discount name is required.'
+            isValid = false
         }
 
         if (value === null || isNaN(value) || value <= 0) {
-            newErrors.value = 'Please enter a valid positive discount value.';
-            isValid = false;
+            newErrors.value = 'Please enter a valid positive discount value.'
+            isValid = false
         }
 
         if (!fromDate) {
-            newErrors.fromDate = 'From Date is required.';
-            isValid = false;
+            newErrors.fromDate = 'From Date is required.'
+            isValid = false
         } else if (isNaN(fromDate.getTime())) {
-            newErrors.fromDate = 'Invalid From Date.';
-            isValid = false;
+            newErrors.fromDate = 'Invalid From Date.'
+            isValid = false
         }
 
         if (!toDate) {
-            newErrors.toDate = 'To Date is required.';
-            isValid = false;
+            newErrors.toDate = 'To Date is required.'
+            isValid = false
         } else if (isNaN(toDate.getTime())) {
-            newErrors.toDate = 'Invalid To Date.';
-            isValid = false;
+            newErrors.toDate = 'Invalid To Date.'
+            isValid = false
         }
 
         if (fromDate && toDate && fromDate > toDate) {
-            newErrors.dateError = 'The start date cannot be after the end date.';
-            isValid = false;
+            newErrors.dateError = 'The start date cannot be after the end date.'
+            isValid = false
         }
 
         if (selectedFetchedProducts.length === 0) {
-            newErrors.productError = 'At least one product must be selected.';
-            isValid = false;
+            newErrors.productError = 'At least one product must be selected.'
+            isValid = false
         }
 
-        setErrors(newErrors);
-        return isValid;
-    };
-
+        setErrors(newErrors)
+        return isValid
+    }
 
     const handleChange = (e: any) => {
         setChecked(e.checked || false)
@@ -173,22 +169,13 @@ const DiscountForm = () => {
         } else {
             setFetchedProducts([])
         }
-
-        console.log('Currently Selected Product IDs:', selectedIds)
     }
 
     useEffect(() => {
         const fetchProducts = async () => {
-            try {
-                const productData = await ProductService.getAllProducts()
-                setProducts(productData)
-            } catch (error) {
-                console.error('Error fetching products:', error)
-            } finally {
-                setLoading(false)
-            }
+            const productData = await ProductService.getAllProducts()
+            setProducts(productData)
         }
-
         fetchProducts()
     }, [])
 
@@ -200,19 +187,6 @@ const DiscountForm = () => {
         )
     }
 
-    if (loading) {
-        return (
-            <div className='card'>
-                <ProgressSpinner
-                    className='flex items-center justify-center'
-                    style={{ width: '50px', height: '50px' }}
-                    strokeWidth='8'
-                    fill='var(--surface-ground)'
-                    animationDuration='.5s'
-                />
-            </div>
-        )
-    }
     return (
         <div className='card'>
             <Toast ref={toast} />

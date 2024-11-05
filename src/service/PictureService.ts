@@ -2,6 +2,7 @@ import http from '@/libs/http'
 
 class PictureService {
     private static basePath = '/api/admin/picture'
+
     static async savePicture(image: File): Promise<string> {
         const formData = new FormData()
         formData.append('image', image)

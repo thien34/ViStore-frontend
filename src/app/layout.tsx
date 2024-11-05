@@ -7,7 +7,6 @@ import '../styles/layout/layout.scss'
 import '../styles/demo/Demos.scss'
 import '../styles/layout/global.css'
 import { LayoutProvider } from '@/components/layout/context/layoutcontext'
-import '@/styles/layout/index.css'
 interface RootLayoutProps {
     children: React.ReactNode
 }

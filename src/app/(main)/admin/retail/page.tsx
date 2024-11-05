@@ -1,5 +1,5 @@
 'use client'
-import CartService from '@/service/CartService'
+import CartService from '@/service/cart.service'
 import { Button } from 'primereact/button'
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup'
 import { useLocalStorage, useUpdateEffect } from 'primereact/hooks'
@@ -11,7 +11,6 @@ import { Toast } from 'primereact/toast'
 import React, { useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import ProductListComponent from './_components/ProductList'
-type Props = {}
 
 type Tab = {
     id: string
@@ -20,7 +19,7 @@ type Tab = {
     billId: string
 }
 
-export default function Retail({}: Props) {
+export default function Retail() {
     const [tabs, setTabs] = useState<Tab[]>([])
     const [activeIndex, setActiveIndex] = useState(0)
     const [billId, setBillId] = useLocalStorage<string>('billId', '')
@@ -30,8 +29,7 @@ export default function Retail({}: Props) {
         CartService.getBills()
             .then((res) => {
                 if (res) {
-                    const billData = res
-                    const newTabs = Object.entries(billData)
+                    const newTabs = Object.entries(res)
                         .sort(([, quantityA], [, quantityB]) => Number(quantityA) - Number(quantityB))
                         .map(([billId, quantity]) => ({
                             id: billId,
@@ -50,11 +48,11 @@ export default function Retail({}: Props) {
 
     const tabHeaderTemplate = (options: TabPanelHeaderTemplateOptions, header: string) => {
         return (
-            <div className='flex align-items-center gap-2 p-3' style={{ cursor: 'pointer' }} onClick={options.onClick}>
-                <span className='font-bold white-space-nowrap'>{header}</span>
+            <div className="flex align-items-center gap-2 p-3" style={{ cursor: 'pointer' }} onClick={options.onClick}>
+                <span className="font-bold white-space-nowrap">{header}</span>
                 <Button
-                    icon='pi pi-times'
-                    className='p-button-rounded p-button-text p-button-sm ml-2'
+                    icon="pi pi-times"
+                    className="p-button-rounded p-button-text p-button-sm ml-2"
                     onClick={(e) => {
                         e.stopPropagation()
                         confirmDelete(options.index, header, e.currentTarget)
@@ -126,14 +124,14 @@ export default function Retail({}: Props) {
     }
 
     return (
-        <div className='card'>
-            <div className='flex justify-between items-center'>
-                <h2 className=''>Retail Sales</h2>
-                <Button label='Create bill' onClick={addTab} />
+        <div className="card">
+            <div className="flex justify-between items-center">
+                <h2 className="">Retail Sales</h2>
+                <Button label="Create bill" onClick={addTab} />
             </div>
 
-            <TabView className='mt-5' activeIndex={activeIndex} onTabChange={handleTabChange}>
-                {tabs.map((tab, index) => (
+            <TabView className="mt-5" activeIndex={activeIndex} onTabChange={handleTabChange}>
+                {tabs.map((tab) => (
                     <TabPanel
                         key={tab.id}
                         closable
@@ -147,13 +145,4 @@ export default function Retail({}: Props) {
             <Toast ref={toast} />
         </div>
     )
-}
-
-const styles = {
-    headerContainer: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '1rem'
-    }
 }

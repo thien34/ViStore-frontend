@@ -63,20 +63,19 @@ class ProductService {
         return result.data
     }
     static async getProductsByParentIds(parentIds: number[]): Promise<ProductResponseDetails[]> {
-        const queryString = parentIds.map(id => `parentIds=${id}`).join('&'); // Create a proper query string
+        const queryString = parentIds.map((id) => `parentIds=${id}`).join('&') // Create a proper query string
         const response = await fetch(`http://localhost:8080/api/admin/products/by-parent-ids?${queryString}`, {
             cache: 'no-store'
-        });
+        })
 
         if (!response.ok) {
-            const errorResponse = await response.json();
-            throw new Error(`Failed to get products by parent IDs: ${errorResponse.message || 'Unknown error'}`);
+            const errorResponse = await response.json()
+            throw new Error(`Failed to get products by parent IDs: ${errorResponse.message || 'Unknown error'}`)
         }
 
-        const result = await response.json();
-        return result.data;
+        const result = await response.json()
+        return result.data
     }
-
 
     static async getProductDetails(id: number): Promise<ProductResponseDetails> {
         const response = await fetch(`http://localhost:8080/api/admin/products/details/${id}`, { cache: 'no-store' })
@@ -113,12 +112,12 @@ class ProductService {
             headers: {
                 'Content-Type': 'application/json'
             }
-        });
+        })
 
         if (!response.ok) {
-            const errorResponse = await response.json();
+            const errorResponse = await response.json()
 
-            throw new Error(`Failed to fetch product details: ${errorResponse.message || 'Unknown error'}`);
+            throw new Error(`Failed to fetch product details: ${errorResponse.message || 'Unknown error'}`)
         }
 
         const result = await response.json()

@@ -7,6 +7,7 @@ import { Button } from 'primereact/button'
 import { FilterMatchMode } from 'primereact/api'
 import { FaCartPlus } from 'react-icons/fa'
 import { ProductResponse } from '@/interface/Product'
+import Image from 'next/image'
 
 interface ProductDialogProps {
     products: ProductResponse[]
@@ -14,7 +15,7 @@ interface ProductDialogProps {
     setVisible: (visible: boolean) => void
     filters: any
     setFilters: (filters: any) => void
-    onFilter: (e: any) => void
+    onFilter?: (e: any) => void
     addProductToCart: (product: ProductResponse) => void
     globalFilterValue: string
     onGlobalFilterChange: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -61,7 +62,7 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
                     field='imageUrl'
                     header='Image'
                     body={(rowData) => (
-                        <img
+                        <Image
                             src={
                                 rowData.imageUrl ||
                                 'https://bizweb.dktcdn.net/thumb/1024x1024/100/415/445/products/370031-black-1.jpg'

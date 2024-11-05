@@ -2,18 +2,14 @@
 import React, { useRef, useState } from 'react'
 import { FilterMatchMode, FilterOperator } from 'primereact/api'
 import { DataTableFilterMeta } from 'primereact/datatable'
-
 import { InputText } from 'primereact/inputtext'
-
 import { Button } from 'primereact/button'
-
 import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import ProductService from '@/service/ProducrService'
 import { useLocalStorage, useMountEffect, useUpdateEffect } from 'primereact/hooks'
-import { CartResponse, ShoppingCart } from '@/interface/Cart'
-import CartService from '@/service/CartService'
+import { CartResponse, ShoppingCart } from '@/interface/cart.interface'
+import CartService from '@/service/cart.service'
 import { v4 as uuidv4 } from 'uuid'
-import { MdDelete } from 'react-icons/md'
 import ProductDialog from './ProductDialog'
 import QuantityDialog from './QuantityDialog'
 import CartItem from './CartItem'
@@ -46,7 +42,6 @@ const defaultFilters: DataTableFilterMeta = {
 
 export default function ProductListComponent() {
     const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters)
-    const [loading, setLoading] = useState<boolean>(false)
     const [globalFilterValue, setGlobalFilterValue] = useState<string>('')
     const [product, setProduct] = useState<ProductResponseDetails>()
     const [billId, setBillId] = useLocalStorage<string>('billId', '')
@@ -60,7 +55,7 @@ export default function ProductListComponent() {
 
     const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
-        let _filters = { ...filters }
+        const _filters = { ...filters }
 
         // @ts-ignore
         _filters['global'].value = value
@@ -124,7 +119,7 @@ export default function ProductListComponent() {
             rejectLabel: 'No',
             accept: () => {
                 CartService.deleteBill(cart.cartUUID)
-                    .then((res) => {
+                    .then(() => {
                         toast.current?.show({
                             severity: 'success',
                             summary: 'Success',
@@ -159,9 +154,6 @@ export default function ProductListComponent() {
                 }}
                 globalFilterValue={globalFilterValue}
                 onGlobalFilterChange={onGlobalFilterChange}
-                onFilter={function (e: any): void {
-                    throw new Error('Function not implemented.')
-                }}
             />
 
             <QuantityDialog
@@ -180,13 +172,4 @@ export default function ProductListComponent() {
             </div>
         </div>
     )
-}
-
-const styles = {
-    headerContainer: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '1rem'
-    }
 }

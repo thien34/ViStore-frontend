@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { MdDelete } from 'react-icons/md'
-import { CartResponse } from '@/interface/Cart'
+import { CartResponse } from '@/interface/cart.interface'
 import { InputNumber } from 'primereact/inputnumber'
 import { RiDeleteBin6Line } from 'react-icons/ri'
+import Image from 'next/image'
 
 interface CartItemProps {
     cart: CartResponse
@@ -31,7 +31,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, onDelete }) => {
 
     return (
         <div className='p-4 rounded-lg flex items-start gap-4 border border-gray-300 shadow-md my-5'>
-            <img
+            <Image
                 src={
                     cart.productResponse.imageUrl ||
                     'https://bizweb.dktcdn.net/thumb/1024x1024/100/415/445/products/370031-black-1.jpg'
@@ -39,6 +39,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, onDelete }) => {
                 alt={cart.productResponse.name}
                 className='w-24 h-24 object-cover rounded-lg'
             />
+
             <div className='flex-1'>
                 <div className='flex justify-between items-center'>
                     <div className='font-semibold text-lg flex-grow flex-shrink-0 w-2/5 max-w-xs overflow-hidden text-ellipsis whitespace-nowrap'>

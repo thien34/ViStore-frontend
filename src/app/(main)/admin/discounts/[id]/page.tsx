@@ -112,8 +112,8 @@ const DiscountUpdate = () => {
 
     const handleUpdateDiscount = async () => {
         if (!validateForm()) {
-            showFailedToast();
-            return;
+            showFailedToast()
+            return
         }
 
         const discountPayload = {
@@ -125,26 +125,25 @@ const DiscountUpdate = () => {
             discountPercentage: value,
             startDateUtc: fromDate?.toISOString(),
             endDateUtc: toDate?.toISOString(),
-            selectedProductVariantIds: selectedFetchedProducts.map((product) => product.id),
-        };
+            selectedProductVariantIds: selectedFetchedProducts.map((product) => product.id)
+        }
 
         try {
-            setLoading(true);
+            setLoading(true)
 
-            await discountService.update(Number(id), discountPayload);
+            await discountService.update(Number(id), discountPayload)
 
-            showSuccessToast();
+            showSuccessToast()
 
-            router.push('/admin/discounts');
+            router.push('/admin/discounts')
         } catch (error) {
-            console.error('Failed to update discount:', error);
+            console.error('Failed to update discount:', error)
 
-            showFailedToast();
+            showFailedToast()
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
-
+    }
 
     const validateForm = () => {
         let isValid = true
