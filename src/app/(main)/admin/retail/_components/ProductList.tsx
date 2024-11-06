@@ -2,7 +2,6 @@
 import React, { useRef, useState } from 'react'
 import { FilterMatchMode, FilterOperator } from 'primereact/api'
 import { DataTableFilterMeta } from 'primereact/datatable'
-import { InputText } from 'primereact/inputtext'
 import { Button } from 'primereact/button'
 import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import ProductService from '@/service/ProducrService'
@@ -15,6 +14,7 @@ import QuantityDialog from './QuantityDialog'
 import CartItem from './CartItem'
 import { confirmPopup } from 'primereact/confirmpopup'
 import { Toast } from 'primereact/toast'
+import CustommerOrder from './CustommerOrder'
 
 const defaultFilters: DataTableFilterMeta = {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -40,15 +40,25 @@ const defaultFilters: DataTableFilterMeta = {
     verified: { value: null, matchMode: FilterMatchMode.EQUALS }
 }
 
-export default function ProductListComponent() {
+interface ProductListComponentProps {
+    updateTabTotalItems: (billId: string, newTotalItems: number) => void
+}
+
+export default function ProductListComponent({ updateTabTotalItems }: ProductListComponentProps) {
     const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters)
     const [globalFilterValue, setGlobalFilterValue] = useState<string>('')
     const [product, setProduct] = useState<ProductResponseDetails>()
     const [billId, setBillId] = useLocalStorage<string>('billId', '')
-    const [quantity, setQuantity] = useState<number>(0)
+    const [quantity, setQuantity] = useState<number>(1)
     const [carts, setCarts] = useState<CartResponse[]>([])
     const [products, setProducts] = useState<ProductResponse[]>([])
     const toast = useRef<Toast>(null)
+    const [orderTotals, setOrderTotals] = useState<{
+        subtotal: number
+        shippingCost: number
+        tax: number
+        total: number
+    }>({ subtotal: 0, shippingCost: 0, tax: 0, total: 0 })
     const clearFilter = () => {
         initFilters()
     }
@@ -69,16 +79,6 @@ export default function ProductListComponent() {
         setGlobalFilterValue('')
     }
 
-    const renderHeader = () => {
-        return (
-            <div className='flex justify-content-between'>
-                <Button type='button' icon='pi pi-filter-slash' label='Clear' outlined onClick={clearFilter} />
-                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder='Keyword Search' />
-            </div>
-        )
-    }
-
-    const header = renderHeader()
     const [visible, setVisible] = useState<boolean>(false)
     const [visibleQuantity, setVisibleQuantity] = useState<boolean>(false)
 
@@ -87,10 +87,29 @@ export default function ProductListComponent() {
     })
 
     useUpdateEffect(() => {
+        fetchCart()
+    }, [billId])
+
+    const fetchCart = () => {
         CartService.getCart(billId).then((res) => {
             setCarts(res)
+
+            updateTabTotalItems(billId, res.length)
+            calculateTotals(res)
         })
-    }, [billId])
+    }
+
+    const calculateTotals = (carts: CartResponse[]) => {
+        const subtotal = carts.reduce((total, cartItem) => {
+            return total + cartItem.productResponse.price * cartItem.quantity
+        }, 0)
+
+        const shippingCost = 0
+        const tax = 0
+        const total = subtotal + shippingCost + tax
+
+        setOrderTotals({ subtotal, shippingCost, tax, total })
+    }
 
     const addProductToCart = (product: ProductResponseDetails) => {
         setProduct(product)
@@ -105,8 +124,16 @@ export default function ProductListComponent() {
             customerId: 1,
             isAdmin: true
         }
+
         CartService.addProductToCart(cart, billId).then((res) => {
-            console.log(res)
+            setVisibleQuantity(false)
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Product added to cart successfully',
+                life: 1000
+            })
+            fetchCart()
         })
     }
 
@@ -126,9 +153,7 @@ export default function ProductListComponent() {
                             detail: 'Delete cart item successfully',
                             life: 1000
                         })
-                        CartService.getCart(billId).then((updatedCarts) => {
-                            setCarts(updatedCarts)
-                        })
+                        fetchCart()
                     })
                     .catch((error) => {
                         console.error('Error deleting cart item:', error)
@@ -137,9 +162,9 @@ export default function ProductListComponent() {
         })
     }
     return (
-        <div className='card'>
+        <div>
             <div className='flex justify-between'>
-                <h4>Product List</h4>
+                <h4>Product Order</h4>
                 <Button onClick={() => setVisible(true)}>Add Product</Button>
             </div>
             <Toast ref={toast} />
@@ -164,12 +189,25 @@ export default function ProductListComponent() {
                 setQuantity={setQuantity}
                 onSave={addProductToCartHandler}
             />
+            {carts.length > 0 && (
+                <div className='space-y-4 card mt-2'>
+                    {carts.map((cart) => (
+                        <CartItem
+                            key={cart.id}
+                            cart={cart}
+                            onQuantityChange={fetchCart}
+                            onDelete={(e) => handleCartItemDelete(cart, e)}
+                        />
+                    ))}
+                </div>
+            )}
 
-            <div className='space-y-4'>
-                {carts.map((cart) => (
-                    <CartItem key={cart.id} cart={cart} onDelete={(e) => handleCartItemDelete(cart, e)} />
-                ))}
-            </div>
+            {carts.length > 0 && (
+                <>
+                    <hr className='my-4 border-1 border-gray-300' />
+                    <CustommerOrder orderTotals={orderTotals} />
+                </>
+            )}
         </div>
     )
 }

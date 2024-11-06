@@ -7,6 +7,7 @@ import '../styles/layout/layout.scss'
 import '../styles/demo/Demos.scss'
 import '../styles/layout/global.css'
 import { LayoutProvider } from '@/components/layout/context/layoutcontext'
+import NextTopLoader from 'nextjs-toploader'
 interface RootLayoutProps {
     children: React.ReactNode
 }
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             </head>
             <body>
                 <PrimeReactProvider>
+                    <NextTopLoader />
                     <LayoutProvider>{children}</LayoutProvider>
                 </PrimeReactProvider>
             </body>

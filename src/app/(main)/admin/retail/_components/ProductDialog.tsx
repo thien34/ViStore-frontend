@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Dialog } from 'primereact/dialog'
@@ -7,7 +7,6 @@ import { Button } from 'primereact/button'
 import { FilterMatchMode } from 'primereact/api'
 import { FaCartPlus } from 'react-icons/fa'
 import { ProductResponse } from '@/interface/Product'
-import Image from 'next/image'
 
 interface ProductDialogProps {
     products: ProductResponse[]
@@ -46,13 +45,18 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
             </div>
         )
     }
-
     return (
-        <Dialog header='Search Product' visible={visible} style={{ width: '1300px' }} onHide={() => setVisible(false)}>
+        <Dialog
+            header='Search Product'
+            contentStyle={{ overflowY: 'visible', flexGrow: '0' }}
+            visible={visible}
+            style={{ width: '1300px' }}
+            onHide={() => setVisible(false)}
+        >
             <DataTable
                 value={products}
                 paginator
-                rows={10}
+                rows={5}
                 filters={filters}
                 header={renderHeader()}
                 emptyMessage='No products found.'
@@ -62,7 +66,7 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
                     field='imageUrl'
                     header='Image'
                     body={(rowData) => (
-                        <Image
+                        <img
                             src={
                                 rowData.imageUrl ||
                                 'https://bizweb.dktcdn.net/thumb/1024x1024/100/415/445/products/370031-black-1.jpg'

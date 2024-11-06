@@ -33,8 +33,9 @@ const QuantityDialog: React.FC<QuantityDialogProps> = ({
                 ))}
                 <div className='mt-2'>
                     <InputNumber
-                        onChange={(e) => setQuantity(e.value ?? 0)}
+                        onChange={(e) => setQuantity(e.value ?? 1)}
                         value={quantity}
+                        defaultValue={1}
                         min={1}
                         showButtons
                         buttonLayout='horizontal'

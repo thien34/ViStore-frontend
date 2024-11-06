@@ -14,7 +14,7 @@ import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import React, { useEffect, useRef, useState } from 'react'
-
+import Link from 'next/link'
 interface ProductAddFormProps {
     categories: Category[]
     manufacturers: ManufacturerName[]
@@ -165,7 +165,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     <Column
                         header='Action'
                         body={(rowData) => (
-                            <Button onClick={() => router.push(`/admin/products/details/${rowData.id}`)}>Edit</Button>
+                            <Link href={`/admin/products/details/${rowData.id}`}>
+                                <Button>Edit</Button>
+                            </Link>
                         )}
                     ></Column>
                 </DataTable>

@@ -4,7 +4,7 @@ import { Column } from 'primereact/column'
 import { ProductResponse } from '@/interface/Product'
 import { Button } from 'primereact/button'
 import { useRouter } from 'next/navigation'
-
+import Link from 'next/link'
 type Props = {
     products: ProductResponse[]
 }
@@ -34,7 +34,9 @@ function ProductList({ products }: Props) {
                 <Column
                     header='Edit'
                     body={(rowData) => (
-                        <Button label='Edit' onClick={() => router.push(`/admin/products/${rowData.id}`)} />
+                        <Link href={`/admin/products/${rowData.id}`}>
+                            <Button label='Edit' />
+                        </Link>
                     )}
                 />
             </DataTable>

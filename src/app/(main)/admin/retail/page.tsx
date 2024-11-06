@@ -11,12 +11,16 @@ import { Toast } from 'primereact/toast'
 import React, { useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import ProductListComponent from './_components/ProductList'
+import { TiShoppingCart } from 'react-icons/ti'
+import { Badge } from 'primereact/badge'
+type Props = {}
 
 type Tab = {
     id: string
     header: string
     content: JSX.Element
     billId: string
+    totalItems: number
 }
 
 export default function Retail() {
@@ -29,14 +33,17 @@ export default function Retail() {
         CartService.getBills()
             .then((res) => {
                 if (res) {
-                    const newTabs = Object.entries(res)
-                        .sort(([, quantityA], [, quantityB]) => Number(quantityA) - Number(quantityB))
-                        .map(([billId, quantity]) => ({
+                    const billData = res as unknown as Record<string, { numberBill: number; totalItems: number }>
+                    const newTabs = Object.entries(billData)
+                        .sort(([, { numberBill: a }], [, { numberBill: b }]) => a - b)
+                        .map(([billId, { numberBill, totalItems }]) => ({
                             id: billId,
-                            header: `Bill ${quantity}`,
-                            content: <ProductListComponent />,
-                            billId: billId
+                            header: `Bill ${numberBill}`,
+                            content: <ProductListComponent updateTabTotalItems={updateTabTotalItems} />,
+                            billId: billId,
+                            totalItems: totalItems
                         }))
+
                     setTabs(newTabs)
                     setBillId(newTabs[0]?.id || '')
                 }
@@ -46,13 +53,24 @@ export default function Retail() {
             })
     }, [billId])
 
-    const tabHeaderTemplate = (options: TabPanelHeaderTemplateOptions, header: string) => {
+    const tabHeaderTemplate = (options: TabPanelHeaderTemplateOptions, header: string, totalItems: number) => {
         return (
-            <div className="flex align-items-center gap-2 p-3" style={{ cursor: 'pointer' }} onClick={options.onClick}>
-                <span className="font-bold white-space-nowrap">{header}</span>
+            <div className='flex align-items-center gap-2 p-3' style={{ cursor: 'pointer' }} onClick={options.onClick}>
+                <span className='font-bold white-space-nowrap'>{header}</span>
+                <div style={{ position: 'relative' }}>
+                    {totalItems > 0 && (
+                        <Badge
+                            value={totalItems.toString()}
+                            size='normal'
+                            severity='danger'
+                            style={{ position: 'absolute', top: '-10px', right: '-13px' }}
+                        />
+                    )}
+                    <TiShoppingCart size={26} />
+                </div>
                 <Button
-                    icon="pi pi-times"
-                    className="p-button-rounded p-button-text p-button-sm ml-2"
+                    icon='pi pi-times'
+                    className='p-button-rounded p-button-text p-button-sm ml-2'
                     onClick={(e) => {
                         e.stopPropagation()
                         confirmDelete(options.index, header, e.currentTarget)
@@ -71,7 +89,16 @@ export default function Retail() {
         }
         await CartService.addBill(newId)
         setBillId(newId)
-        setTabs([...tabs, { id: newId, header: newHeader, content: <ProductListComponent />, billId: newId }])
+        setTabs([
+            ...tabs,
+            {
+                id: newId,
+                header: newHeader,
+                content: <ProductListComponent updateTabTotalItems={updateTabTotalItems} />,
+                billId: newId,
+                totalItems: 0
+            }
+        ])
         setActiveIndex(tabs.length)
     }
 
@@ -123,19 +150,25 @@ export default function Retail() {
         })
     }
 
+    const updateTabTotalItems = (billId: string, newTotalItems: number) => {
+        setTabs((prevTabs) =>
+            prevTabs.map((tab) => (tab.billId === billId ? { ...tab, totalItems: newTotalItems } : tab))
+        )
+    }
+
     return (
-        <div className="card">
-            <div className="flex justify-between items-center">
-                <h2 className="">Retail Sales</h2>
-                <Button label="Create bill" onClick={addTab} />
+        <div className='card'>
+            <div className='flex justify-between items-center'>
+                <h2 className=''>Retail Sales</h2>
+                <Button label='Create Bill' onClick={addTab} />
             </div>
 
-            <TabView className="mt-5" activeIndex={activeIndex} onTabChange={handleTabChange}>
+            <TabView className='mt-5' activeIndex={activeIndex} onTabChange={handleTabChange}>
                 {tabs.map((tab) => (
                     <TabPanel
                         key={tab.id}
                         closable
-                        headerTemplate={(options) => tabHeaderTemplate(options, tab.header)}
+                        headerTemplate={(options) => tabHeaderTemplate(options, tab.header, tab.totalItems)}
                     >
                         {tab.content}
                     </TabPanel>
