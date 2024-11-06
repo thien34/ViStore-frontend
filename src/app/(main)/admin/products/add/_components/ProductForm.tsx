@@ -330,27 +330,21 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
     const onUpload = (event: React.ChangeEvent<HTMLInputElement>, rowIndex: number) => {
         const files = event.target.files
-        const newImages: string[] = []
-        const newFiles: File[] = []
 
-        if (files) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i]
-                const imageUrl = URL.createObjectURL(file)
-                newImages.push(imageUrl)
-                newFiles.push(file)
-            }
+        if (files && files.length > 0) {
+            const file = files[0]
+            const imageUrl = URL.createObjectURL(file)
+
+            setUploadedImages((prev) => ({
+                ...prev,
+                [rowIndex]: [imageUrl]
+            }))
+
+            setUploadedFiles((prev) => ({
+                ...prev,
+                [rowIndex]: [file]
+            }))
         }
-
-        setUploadedImages((prev) => ({
-            ...prev,
-            [rowIndex]: prev[rowIndex] ? [...prev[rowIndex], ...newImages] : newImages
-        }))
-
-        setUploadedFiles((prev) => ({
-            ...prev,
-            [rowIndex]: prev[rowIndex] ? [...prev[rowIndex], ...newFiles] : newFiles
-        }))
     }
 
     const onRemoveImage = (rowIndex: number, imageIndex: number) => {
@@ -533,7 +527,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                                 <input
                                                     type='file'
                                                     onChange={(event) => onUpload(event, column.rowIndex)}
-                                                    className='absolute inset-0 opacity-0 cursor-pointer'
+                                                    className='hidden cursor-pointer'
                                                 />
                                                 <span className='text-gray-600 '>
                                                     <i className='pi pi-image text-2xl mb-2 '></i>
