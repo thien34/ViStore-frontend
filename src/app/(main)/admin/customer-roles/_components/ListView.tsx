@@ -78,7 +78,6 @@ const ListView = ({ initialData }: RoleProps) => {
                 })
             }
             setRoleDialog(false)
-            setRole(emptyRole)
             await fetchRoles()
         }
     }
