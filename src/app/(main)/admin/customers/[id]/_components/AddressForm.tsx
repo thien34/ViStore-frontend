@@ -238,7 +238,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             disabled={!address.provinceId}
                             className={classNames({ 'p-invalid': submitted && !address.districtId })}
                         />
-                        {submitted && !address.provinceId && (
+                        {submitted && !address.districtId && (
                             <small className='p-error block'>District is required.</small>
                         )}
                     </div>
