@@ -24,6 +24,12 @@ export interface AddressRequest {
     customerId?: number
 }
 
+export interface Address {
+    provinceId: string
+    districtId: string
+    wardId: string
+}
+
 export type AddressPagingResponse = PagingResponse<AddressesResponse>
 
 export interface AddressSearch extends PagingRequest {

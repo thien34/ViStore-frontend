@@ -2,7 +2,7 @@
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
-import { FileUpload } from 'primereact/fileupload'
+import { FileUpload, FileUploadUploadEvent } from 'primereact/fileupload'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { Toolbar } from 'primereact/toolbar'
@@ -13,6 +13,8 @@ import { classNames } from 'primereact/utils'
 import { TreeSelect } from 'primereact/treeselect'
 import { TreeNode } from 'primereact/treenode'
 import categoryService from '@/service/category.service'
+import Image from 'next/image'
+import { Image as PrimeImage } from 'primereact/image'
 
 interface CategoryProps {
     initialData: Category[]
@@ -21,6 +23,8 @@ interface CategoryProps {
 
 const emptyCategory: Category = {
     name: '',
+    description: '',
+    linkImg: '',
     categoryParentId: null
 }
 
@@ -55,6 +59,21 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
         setCategoryDialog(true)
     }
 
+    const onUpload = async (e: FileUploadUploadEvent) => {
+        const response = JSON.parse(e.xhr.response)
+        const imageUrl = response.data
+        setCategory({ ...category, linkImg: imageUrl })
+        if (category.id) {
+            await categoryService.update(category.id, category)
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'Category Updated',
+                life: 3000
+            })
+        }
+    }
+
     const fetchCategories = async () => {
         const { payload: data } = await categoryService.getAll()
         const { payload: newNodes } = await categoryService.getListName()
@@ -76,6 +95,16 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                     life: 3000
                 })
             } else {
+                const originalCategory = categories.find((cat) => cat.id === category.id)
+                if (
+                    category.id == originalCategory?.id &&
+                    category.name == originalCategory.name &&
+                    category.categoryParentId == originalCategory.categoryParentId &&
+                    category.linkImg == originalCategory.linkImg
+                ) {
+                    setCategoryDialog(false)
+                    return
+                }
                 await categoryService.update(category.id, category)
                 toast.current?.show({
                     severity: 'success',
@@ -117,6 +146,19 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                 />
                 <Button label='Export' icon='pi pi-upload' severity='help' onClick={exportCSV} />
             </>
+        )
+    }
+
+    const imageBodyTemplate = (rowData: Category) => {
+        return (
+            <Image
+                src={rowData.linkImg}
+                alt={rowData.linkImg}
+                className='shadow-2 border-round'
+                width={64}
+                height={45}
+                style={{ minHeight: '45px' }}
+            />
         )
     }
 
@@ -184,7 +226,17 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                         headerStyle={{
                             width: '4rem'
                         }}
-                    ></Column>
+                    />
+                    <Column
+                        className='flex justify-center h-full'
+                        field='image'
+                        align={'center'}
+                        header='Image'
+                        body={imageBodyTemplate}
+                        headerStyle={{
+                            width: '8rem'
+                        }}
+                    />
                     <Column
                         field='name'
                         header='Name'
@@ -193,52 +245,79 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                             minWidth: '15rem'
                         }}
                     />
+                    <Column field='description' header='Description' sortable />
                     <Column
                         body={actionBodyTemplate}
                         style={{
-                            maxWidth: '30px'
+                            width: '30px'
                         }}
-                    ></Column>
+                    />
                 </DataTable>
             </div>
             <Dialog
                 visible={categoryDialog}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
                 header='Product Details'
-                style={{ width: '30vw' }}
+                style={{ width: '36vw' }}
                 modal
                 className='p-fluid'
                 footer={categoryDialogFooter}
                 onHide={hideDialog}
             >
-                <div className='field'>
-                    <label htmlFor='name' className='font-bold'>
-                        Name
-                    </label>
-                    <InputText
-                        id='name'
-                        value={category.name}
-                        onChange={(e) => setCategory({ ...category, name: e.target.value })}
-                        required
-                        autoFocus
-                        className={classNames({ 'p-invalid': submitted && !category.name })}
-                    />
-                    {submitted && !category.name && <small className='p-error'>Name is required.</small>}
+                <div className='flex gap-x-7'>
+                    <PrimeImage src={category.linkImg} alt='Image' imageClassName='shadow-2 rounded-3xl' preview />
+                    <div className=''>
+                        <div className='field'>
+                            <label htmlFor='name' className='font-bold'>
+                                Name
+                            </label>
+                            <InputText
+                                id='name'
+                                value={category.name}
+                                onChange={(e) => setCategory({ ...category, name: e.target.value })}
+                                required
+                                autoFocus
+                                className={classNames({ 'p-invalid': submitted && !category.name })}
+                            />
+                            {submitted && !category.name && <small className='p-error'>Name is required.</small>}
+                        </div>
+                        <div className='field'>
+                            <label htmlFor='name' className='font-bold'>
+                                Description
+                            </label>
+                            <InputText
+                                id='description'
+                                value={category.description}
+                                onChange={(e) => setCategory({ ...category, description: e.target.value })}
+                            />
+                        </div>
+                        <div className='field'>
+                            <label htmlFor='categoryParent' className='font-bold'>
+                                Category parent
+                            </label>
+                            <TreeSelect
+                                id='categoryParent'
+                                value={category.categoryParentId?.toString() || null}
+                                onChange={(e) =>
+                                    setCategory({ ...category, categoryParentId: Number(e.value as string) })
+                                }
+                                options={nodes}
+                                filter
+                                placeholder='Select Item'
+                                showClear
+                            ></TreeSelect>
+                        </div>
+                    </div>
                 </div>
-                <div className='field'>
-                    <label htmlFor='categoryParent' className='font-bold'>
-                        Category parent
-                    </label>
-                    <TreeSelect
-                        id='categoryParent'
-                        value={category.categoryParentId?.toString() || null}
-                        onChange={(e) => setCategory({ ...category, categoryParentId: Number(e.value as string) })}
-                        options={nodes}
-                        filter
-                        placeholder='Select Item'
-                        showClear
-                    ></TreeSelect>
-                </div>
+                <FileUpload
+                    mode='basic'
+                    name='image'
+                    className='mt-4 ml-4'
+                    url='http://localhost:8080/api/admin/picture/upload-image'
+                    accept='image/*'
+                    maxFileSize={1000000}
+                    onUpload={onUpload}
+                />
             </Dialog>
         </>
     )

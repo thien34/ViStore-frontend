@@ -1,5 +1,6 @@
 import Layout from '@/components/layout/layout'
 import { Metadata } from 'next'
+import { ScrollTop } from 'primereact/scrolltop'
 import { Suspense } from 'react'
 
 interface AppLayoutProps {
@@ -7,7 +8,7 @@ interface AppLayoutProps {
 }
 
 export const metadata: Metadata = {
-    title: 'ViStore',
+    title: 'ViStore - Your Choice, Our Promise!',
     description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.',
     robots: { index: false, follow: false },
     openGraph: {
@@ -32,6 +33,7 @@ export const viewport = {
 export default function AppLayout({ children }: AppLayoutProps) {
     return (
         <Suspense fallback={<div>Loading...</div>}>
+            <ScrollTop />
             <Layout>{children}</Layout>
         </Suspense>
     )
