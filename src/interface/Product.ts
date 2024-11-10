@@ -40,6 +40,7 @@ export interface ProductResponse {
     description: string
     categoryName: number
     manufacturerName: number
+    gtin: string
 }
 
 export interface ProductResponseDetails {
@@ -55,4 +56,5 @@ export interface ProductResponseDetails {
     imageUrl: string
     gtin: string
     attributes: ProductAttributeName[]
+    weight: number
 }

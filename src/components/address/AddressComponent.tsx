@@ -4,6 +4,7 @@ import { cn } from '@/libs/utils'
 import districtService from '@/service/district.service'
 import wardService from '@/service/ward.service'
 import { Dropdown } from 'primereact/dropdown'
+import { useUpdateEffect } from 'primereact/hooks'
 import { Toast } from 'primereact/toast'
 import { classNames } from 'primereact/utils'
 import { useRef, useState } from 'react'
@@ -13,16 +14,20 @@ interface FormProps {
     submitted: boolean
     onAddressChange: (address: Address) => void
     className?: string
+    addressDetail?: Address
 }
 
 const emtyAddress: Address = {
     provinceId: '',
     districtId: '',
-    wardId: ''
+    wardId: '',
+    province: '',
+    district: '',
+    address: ''
 }
-const AddressComponent = ({ provinces, submitted, className, onAddressChange }: FormProps) => {
+const AddressComponent = ({ provinces, submitted, className, onAddressChange, addressDetail }: FormProps) => {
     const toast = useRef<Toast>(null)
-    const [address, setAddress] = useState<Address>(emtyAddress)
+    const [address, setAddress] = useState<Address>(addressDetail || emtyAddress)
     const [districts, setDistricts] = useState<Province[]>([])
     const [wards, setWards] = useState<Province[]>([])
 
@@ -30,19 +35,27 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange }: 
         const { payload: districts } = await districtService.getAll(provinceId)
         setDistricts(districts)
         setWards([])
-        setAddress((prev) => ({ ...prev, districtId: '', wardId: '' }))
     }
 
     const fetchWards = async (districtId: string) => {
         const { payload: wards } = await wardService.getAll(districtId)
         setWards(wards)
-        setAddress((prev) => ({ ...prev, wardId: '' }))
     }
 
     const handleAddressChange = (updatedAddress: Address) => {
         setAddress(updatedAddress)
         onAddressChange(updatedAddress)
     }
+    useUpdateEffect(() => {
+        if (addressDetail) {
+            setAddress(addressDetail)
+            fetchDistricts(addressDetail.provinceId).then(() => fetchWards(addressDetail.districtId))
+        } else {
+            setAddress(emtyAddress)
+            setDistricts([])
+            setWards([])
+        }
+    }, [addressDetail])
 
     return (
         <>
@@ -56,7 +69,11 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange }: 
                         <Dropdown
                             value={provinces.find((province) => province.code === address.provinceId)}
                             onChange={(e) => {
-                                const updatedAddress = { ...address, provinceId: e.target.value.code }
+                                const updatedAddress = {
+                                    ...address,
+                                    provinceId: e.target.value.code,
+                                    province: e.target.value.fullName
+                                }
                                 handleAddressChange(updatedAddress)
                                 fetchDistricts(e.target.value.code)
                             }}
@@ -77,7 +94,11 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange }: 
                         <Dropdown
                             value={districts.find((district) => district.code === address.districtId)}
                             onChange={(e) => {
-                                const updatedAddress = { ...address, districtId: e.target.value.code }
+                                const updatedAddress = {
+                                    ...address,
+                                    districtId: e.target.value.code,
+                                    district: e.target.value.fullName
+                                }
                                 handleAddressChange(updatedAddress)
                                 fetchWards(e.target.value.code)
                             }}
@@ -99,7 +120,10 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange }: 
                         <Dropdown
                             value={wards.find((ward) => ward.code === address.wardId)}
                             onChange={(e) => {
-                                const updatedAddress = { ...address, wardId: e.target.value.code }
+                                const updatedAddress = {
+                                    ...address,
+                                    wardId: e.target.value.code
+                                }
                                 handleAddressChange(updatedAddress)
                             }}
                             options={wards}
