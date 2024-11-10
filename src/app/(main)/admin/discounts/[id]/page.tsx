@@ -30,9 +30,12 @@ const DiscountUpdate = () => {
     const [loading, setLoading] = useState<boolean>(true)
     const [fetchedProducts, setFetchedProducts] = useState<ProductResponseDetails[]>([])
     const [selectedFetchedProducts, setSelectedFetchedProducts] = useState<ProductResponseDetails[]>([])
+    const [originalToDate, setOriginalToDate] = useState<Date | null>(null)
+    const [originalFromDate, setOriginalFromDate] = useState<Date | null>(null)
     const [checked, setChecked] = useState<boolean>(false)
     const [selectedProducts, setSelectedProducts] = useState<ProductResponse[]>([])
     const [comments, setComments] = useState<string>('')
+    const [searchTerm, setSearchTerm] = useState<string>('')
 
     const [errors, setErrors] = useState<{
         discountName: string | null
@@ -60,6 +63,8 @@ const DiscountUpdate = () => {
                 setFromDate(data.startDateUtc ? new Date(data.startDateUtc) : null)
                 setToDate(data.endDateUtc ? new Date(data.endDateUtc) : null)
                 setChecked(data.isActive || false)
+                setOriginalToDate(data.endDateUtc ? new Date(data.endDateUtc) : null)
+                setOriginalFromDate(data.startDateUtc ? new Date(data.startDateUtc) : null)
                 setComments(data.comment || '')
                 const appliedProducts: ProductResponse[] = data.appliedProducts || []
                 setSelectedFetchedProducts(appliedProducts)
@@ -109,8 +114,10 @@ const DiscountUpdate = () => {
     const showFailedToast = () => {
         toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to update discount' })
     }
+    const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
     const handleUpdateDiscount = async () => {
+        debugger
         if (!validateForm()) {
             showFailedToast()
             return
@@ -136,10 +143,17 @@ const DiscountUpdate = () => {
             showSuccessToast()
 
             router.push('/admin/discounts')
-        } catch (error) {
-            console.error('Failed to update discount:', error)
-
-            showFailedToast()
+        } catch (error:any) {
+            debugger
+            if (error.response && error.response.status === 409) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Conflict',
+                    detail: 'A product can have a maximum of 1 active discount.',
+                })
+            } else {
+                showFailedToast()
+            }
         } finally {
             setLoading(false)
         }
@@ -189,11 +203,28 @@ const DiscountUpdate = () => {
             isValid = false
         }
 
-        if (fromDate && toDate && fromDate > toDate) {
-            newErrors.dateError = 'The start date cannot be after the end date.'
-            isValid = false
-        }
+        if (fromDate && toDate) {
+            const durationInMs = toDate.getTime() - fromDate.getTime()
+            const durationInHours = durationInMs / (1000 * 60 * 60)
+            const durationInDays = durationInMs / (1000 * 60 * 60 * 24)
 
+            if (durationInDays > 180) {
+                newErrors.dateError = 'The duration of the program must not exceed 180 days.'
+                isValid = false
+            } else if (fromDate > toDate) {
+                newErrors.dateError = 'The start date cannot be after the end date.'
+                isValid = false
+            } else if (durationInHours < 1) {
+                newErrors.dateError = 'The program duration must be at least 1 hour.'
+                isValid = false
+            } else if (originalFromDate && fromDate < originalFromDate) {
+                newErrors.fromDate = 'Program start times can only be changed later.'
+                isValid = false
+            } else if (originalToDate && toDate > originalToDate) {
+                newErrors.dateError = 'The program end time can only be changed to an earlier time.'
+                isValid = false
+            }
+        }
         if (selectedFetchedProducts.length === 0) {
             newErrors.productError = 'At least one product must be selected.'
             isValid = false
@@ -288,6 +319,7 @@ const DiscountUpdate = () => {
                             value={fromDate}
                             onChange={(e) => setFromDate(e.value)}
                             showTime
+                            dateFormat='dd/mm/yy'
                             hourFormat='12'
                             required
                         />
@@ -301,6 +333,7 @@ const DiscountUpdate = () => {
                             value={toDate}
                             onChange={(e) => setToDate(e.value)}
                             showTime
+                            dateFormat='dd/mm/yy'
                             hourFormat='12'
                             required
                         />
@@ -332,6 +365,14 @@ const DiscountUpdate = () => {
 
                 <div className='col-12 md:col-6'>
                     <h4>Select Products</h4>
+                    <div className='field'>
+                        <InputText
+                            id='productSearch'
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder='Search by name'
+                        />
+                    </div>
                     {products.length === 0 ? (
                         <div className='card flex justify-content-center'>
                             <Image
@@ -342,7 +383,7 @@ const DiscountUpdate = () => {
                         </div>
                     ) : (
                         <DataTable
-                            value={products}
+                            value={filteredProducts}
                             paginator
                             rows={5}
                             selection={selectedProducts}
@@ -351,7 +392,7 @@ const DiscountUpdate = () => {
                         >
                             <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
                             <Column field='id' header='STT' />
-                            <Column field='name' header='Product Name' />
+                            <Column field='name' sortable header='Product Name' />
                         </DataTable>
                     )}
                 </div>
@@ -377,10 +418,26 @@ const DiscountUpdate = () => {
                             selectionMode='checkbox'
                         >
                             <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
-                            <Column field='name' header='Product Name' />
-                            <Column field='categoryName' header='Category Name' />
-                            <Column field='manufacturerName' header='Manufacturer Name' />
-                            <Column field='sku' header='SKU' />
+                            <Column sortable field='name' header='Product Name' />
+                            <Column
+                                field='imageUrl'
+                                header='Image'
+                                body={(rowData) => (
+                                    <Image
+                                        src={rowData.imageUrl}
+                                        alt={rowData.name}
+                                        width='100px'
+                                        height='100px'
+                                        className='object-cover'
+                                        preview
+                                    />
+                                )}
+                            />
+                            <Column sortable field='price' header='Price'  />
+                            <Column sortable field='quantity' header='Quantity' />
+                            <Column sortable field='categoryName' header='Category Name' />
+                            <Column sortable field='manufacturerName' header='Manufacturer Name' />
+                            <Column sortable field='sku' header='SKU' />
                         </DataTable>
                     )}
                 </div>

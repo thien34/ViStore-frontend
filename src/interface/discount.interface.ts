@@ -9,6 +9,7 @@ export interface Promotion {
     startDateUtc?: string
     endDateUtc?: string
     selectedProductVariantIds: number[]
+    status: string
 }
 
 export interface Promotions {

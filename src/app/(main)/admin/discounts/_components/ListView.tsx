@@ -7,7 +7,7 @@ import { Calendar } from 'primereact/calendar'
 import { InputText } from 'primereact/inputtext'
 import { Slider, SliderChangeEvent } from 'primereact/slider'
 import { useRef, useState, useEffect } from 'react'
-import { Column } from 'primereact/column'
+import { Column, ColumnFilterElementTemplateOptions } from 'primereact/column'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -16,6 +16,7 @@ import { Card } from 'primereact/card'
 import { Promotion } from '@/interface/discount.interface'
 import { useRouter } from 'next/navigation'
 import discountService from '@/service/discount.service'
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -43,18 +44,18 @@ const ListView = () => {
 
         fetchDiscounts()
     }, [])
-    const fetchDiscounts = async () => {
-        const response = await discountService.getAll()
-        setDiscounts(response)
-        setFilteredDiscounts(response)
-    }
-    useEffect(() => {
-        fetchDiscounts()
-        const intervalId = setInterval(() => {
-            fetchDiscounts()
-        }, 10000)
-        return () => clearInterval(intervalId)
-    }, [])
+    // const fetchDiscounts = async () => {
+    //     const response = await discountService.getAll()
+    //     setDiscounts(response)
+    //     setFilteredDiscounts(response)
+    // }
+    // useEffect(() => {
+    //     fetchDiscounts()
+    //     const intervalId = setInterval(() => {
+    //         fetchDiscounts()
+    //     }, 10000)
+    //     return () => clearInterval(intervalId)
+    // }, [])
 
     const handleSearch = () => {
         const filtered = discounts.filter((discount) => {
@@ -92,6 +93,23 @@ const ListView = () => {
 
     const statusBodyTemplate = (discount: Promotion) => {
         return <Tag value={discount.status} severity={getStatus(discount.status)} />
+    }
+    const statuses: string[] = ['UPCOMING', 'ACTIVE', 'EXPIRED']
+    const statusFilterTemplate = (options: ColumnFilterElementTemplateOptions) => {
+        return (
+            <Dropdown
+                value={options.value}
+                options={statuses}
+                onChange={(e: DropdownChangeEvent) => options.filterCallback(e.value, options.index)}
+                itemTemplate={statusItemTemplate}
+                placeholder='Select One'
+                className='p-column-filter'
+                showClear
+            />
+        )
+    }
+    const statusItemTemplate = (option: string) => {
+        return <Tag value={option} severity={getStatus(option)} />
     }
 
     const getStatus = (status: string) => {
@@ -204,7 +222,18 @@ const ListView = () => {
                         body={(rowData) => vietnamTime(rowData.endDateUtc)}
                         sortable
                     />
-                    <Column field='status' header='Status' body={statusBodyTemplate} sortable />
+                    <Column
+                        field='status'
+                        header='Status'
+                        body={statusBodyTemplate}
+                        sortable
+                        filter
+                        showClearButton={false}
+                        showAddButton={false}
+                        filterElement={statusFilterTemplate}
+                        filterMenuStyle={{ width: '14rem' }}
+                        style={{ width: '15%' }}
+                    ></Column>
                     <Column body={editButtonTemplate} header='Actions' />
                 </DataTable>
             </div>

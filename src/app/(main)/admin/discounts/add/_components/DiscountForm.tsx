@@ -29,6 +29,7 @@ const DiscountForm = () => {
     const [discountTypeId] = useState<number>(1)
     const [usePercentage] = useState<boolean>(true)
     const [comments, setComments] = useState<string>('')
+    const [searchTerm, setSearchTerm] = useState<string>('')
     const [errors, setErrors] = useState<{
         discountName: string | null
         value: string | null
@@ -44,19 +45,26 @@ const DiscountForm = () => {
         dateError: null,
         productError: null
     })
+    const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
     const showSuccessToast = () => {
         toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Discount created successfully!' })
     }
-    const showFailedToast = () => {
-        toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to create discount' })
+    const showFailedToast = (errorMessage: string) => {
+        toast.current?.show({
+            severity: 'error',
+            summary: 'Error',
+            detail: errorMessage || 'Failed to create discount',
+        })
     }
+
 
     const handleCreateDiscount = () => {
         if (!validateForm()) {
-            showFailedToast()
-            return
+            showFailedToast('Form validation failed. Please correct the fields.');
+            return;
         }
+
         const discountPayload = {
             isActive: checked,
             name: discountName,
@@ -82,10 +90,23 @@ const DiscountForm = () => {
                 setChecked(false)
                 setComments('')
             })
-            .catch(() => {
-                showFailedToast()
+            .catch((error) => {
+                if (error.response && error.response.status === 400) {
+                    const backendMessage = error.response.data.message
+                    if (backendMessage && backendMessage.includes('Discount with this name already exists')) {
+                        setErrors((prevErrors) => ({
+                            ...prevErrors,
+                            discountName: 'This discount name is already in use.'
+                        }))
+                    } else {
+                        showFailedToast(backendMessage || 'An error occurred.')
+                    }
+                } else {
+                    showFailedToast('An unexpected error occurred.')
+                }
             })
     }
+
 
     const validateForm = () => {
         let isValid = true
@@ -113,13 +134,16 @@ const DiscountForm = () => {
         if (value === null || isNaN(value) || value <= 0) {
             newErrors.value = 'Please enter a valid positive discount value.'
             isValid = false
+        } else if (value > 50) {
+            newErrors.value = 'You cannot set a discount higher than 50%.'
+            isValid = false
         }
 
         if (!fromDate) {
-            newErrors.fromDate = 'From Date is required.'
+            newErrors.fromDate = 'From date is required.'
             isValid = false
         } else if (isNaN(fromDate.getTime())) {
-            newErrors.fromDate = 'Invalid From Date.'
+            newErrors.fromDate = 'Invalid from date.'
             isValid = false
         }
 
@@ -131,9 +155,21 @@ const DiscountForm = () => {
             isValid = false
         }
 
-        if (fromDate && toDate && fromDate > toDate) {
-            newErrors.dateError = 'The start date cannot be after the end date.'
-            isValid = false
+        if (fromDate && toDate) {
+            const durationInMs = toDate.getTime() - fromDate.getTime()
+            const durationInHours = durationInMs / (1000 * 60 * 60)
+            const durationInDays = durationInMs / (1000 * 60 * 60 * 24)
+
+            if (durationInDays > 180) {
+                newErrors.dateError = 'The duration of the program must not exceed 180 days.'
+                isValid = false
+            } else if (fromDate > toDate) {
+                newErrors.dateError = 'The start date cannot be after the end date.'
+                isValid = false
+            } else if (durationInHours < 1) {
+                newErrors.dateError = 'The program duration must be at least 1 hour.'
+                isValid = false
+            }
         }
 
         if (selectedFetchedProducts.length === 0) {
@@ -214,8 +250,8 @@ const DiscountForm = () => {
                             mode='decimal'
                             onValueChange={(e) => setValue(e.value !== undefined ? e.value : null)}
                             suffix='%'
-                            min={0}
-                            max={100}
+                            min={1}
+                            max={50}
                             required
                         />
                         {errors.value && <small className='p-error'>{errors.value}</small>}
@@ -235,6 +271,7 @@ const DiscountForm = () => {
                                 showTime
                                 hourFormat='12'
                                 touchUI
+                                dateFormat='dd/mm/yy'
                                 showButtonBar
                                 required
                             />
@@ -253,6 +290,7 @@ const DiscountForm = () => {
                                 showTime
                                 touchUI
                                 showIcon
+                                dateFormat='dd/mm/yy'
                                 showButtonBar
                                 required
                                 hourFormat='12'
@@ -261,7 +299,7 @@ const DiscountForm = () => {
                             {errors.dateError && <small className='p-error'>{errors.dateError}</small>}
                         </div>
                     </div>
-                    <div className='flex justify-center gap-2 items-center space-x-2'>
+                    <div className='flex justify-start gap-2 items-center space-x-2'>
                         <label htmlFor='active' className='flex items-center justify-center'>
                             <p>Active</p>
                         </label>
@@ -290,6 +328,14 @@ const DiscountForm = () => {
 
                 <div className='col-12 md:col-6'>
                     <h4>Select Products</h4>
+                    <div className='field'>
+                        <InputText
+                            id='productSearch'
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder='Search by name'
+                        />
+                    </div>
                     {products.length === 0 ? (
                         <div className='card flex justify-content-center'>
                             <Image
@@ -300,16 +346,17 @@ const DiscountForm = () => {
                         </div>
                     ) : (
                         <DataTable
-                            value={products}
+                            value={filteredProducts}
                             paginator
-                            rows={5}
+                            rows={9}
+                            dataKey='id'
                             selection={selectedProducts}
                             onSelectionChange={onProductSelectionChange}
                             selectionMode='checkbox'
                         >
                             <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
                             <Column field='id' header='STT' />
-                            <Column field='name' header='Product Name' />
+                            <Column field='name' header='Product Name' sortable />
                         </DataTable>
                     )}
                 </div>
@@ -336,10 +383,24 @@ const DiscountForm = () => {
                         selectionMode='checkbox'
                     >
                         <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
-                        <Column field='name' header='Product Name' />
-                        <Column field='categoryName' header='Category Name' />
-                        <Column field='manufacturerName' header='Manufacturer Name' />
-                        <Column field='sku' header='SKU' />
+                        <Column field='name' header='Product Name' sortable/>
+                        <Column
+                            field='imageUrl'
+                            header='Image'
+                            body={(rowData) => (
+                                <Image
+                                    src={rowData.imageUrl}
+                                    alt={rowData.name}
+                                    width='100px'
+                                    height='100px'
+                                    className='object-cover'
+                                    preview
+                                />
+                            )}
+                        />
+                        <Column sortable field='categoryName' header='Category Name' />
+                        <Column sortable field='manufacturerName' header='Manufacturer Name' />
+                        <Column sortable field='sku' header='SKU' />
                     </DataTable>
                 )}
             </div>
