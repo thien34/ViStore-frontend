@@ -14,13 +14,14 @@ import { InputNumber } from 'primereact/inputnumber'
 import { Checkbox } from 'primereact/checkbox'
 import { InputTextarea } from 'primereact/inputtextarea'
 import discountService from '@/service/discount.service'
+import { useRouter } from 'next/navigation'
 
 const DiscountForm = () => {
     const toast = useRef<Toast>(null)
     const [discountName, setDiscountName] = useState<string>('')
     const [value, setValue] = useState<number | null>(null)
-    const [fromDate, setFromDate] = useState<Date | null>(null)
-    const [toDate, setToDate] = useState<Date | null>(null)
+    const [fromDate, setFromDate] = useState<Date | undefined>(undefined)
+    const [toDate, setToDate] = useState<Date | undefined>(undefined)
     const [selectedProducts, setSelectedProducts] = useState<ProductResponse[]>([])
     const [products, setProducts] = useState<ProductResponse[]>([])
     const [fetchedProducts, setFetchedProducts] = useState<ProductResponseDetails[]>([])
@@ -30,6 +31,8 @@ const DiscountForm = () => {
     const [usePercentage] = useState<boolean>(true)
     const [comments, setComments] = useState<string>('')
     const [searchTerm, setSearchTerm] = useState<string>('')
+    const [minStartDate, setMinStartDate] = useState<Date | undefined>(new Date())
+    const [minEndDate, setMinEndDate] = useState<Date | undefined>(undefined)
     const [errors, setErrors] = useState<{
         discountName: string | null
         value: string | null
@@ -45,28 +48,41 @@ const DiscountForm = () => {
         dateError: null,
         productError: null
     })
+    const router = useRouter()
     const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
     const showSuccessToast = () => {
         toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Discount created successfully!' })
     }
+    useEffect(() => {
+        const now = new Date()
+        setMinStartDate(now)
+
+        if (fromDate) {
+            const minEndDateTime = new Date(fromDate.getTime() + 60 * 60 * 1000)
+            setMinEndDate(minEndDateTime)
+        } else {
+            setMinEndDate(null)
+        }
+    }, [fromDate])
+    const handleProductNameClick = (productId: string) => {
+        router.push(`/admin/products/details/${productId}`)
+    }
     const showFailedToast = (errorMessage: string) => {
         toast.current?.show({
             severity: 'error',
             summary: 'Error',
-            detail: errorMessage || 'Failed to create discount',
+            detail: errorMessage || 'Failed to create discount'
         })
     }
 
-
     const handleCreateDiscount = () => {
         if (!validateForm()) {
-            showFailedToast('Form validation failed. Please correct the fields.');
-            return;
+            showFailedToast('Form validation failed. Please correct the fields.')
+            return
         }
 
         const discountPayload = {
-            isActive: checked,
             name: discountName,
             comment: comments,
             discountTypeId: discountTypeId,
@@ -89,6 +105,7 @@ const DiscountForm = () => {
                 setSelectedFetchedProducts([])
                 setChecked(false)
                 setComments('')
+                router.push('/admin/discounts')
             })
             .catch((error) => {
                 if (error.response && error.response.status === 400) {
@@ -106,7 +123,6 @@ const DiscountForm = () => {
                 }
             })
     }
-
 
     const validateForm = () => {
         let isValid = true
@@ -134,7 +150,7 @@ const DiscountForm = () => {
         if (value === null || isNaN(value) || value <= 0) {
             newErrors.value = 'Please enter a valid positive discount value.'
             isValid = false
-        } else if (value > 50) {
+        } else if (value >= 50) {
             newErrors.value = 'You cannot set a discount higher than 50%.'
             isValid = false
         }
@@ -175,14 +191,13 @@ const DiscountForm = () => {
         if (selectedFetchedProducts.length === 0) {
             newErrors.productError = 'At least one product must be selected.'
             isValid = false
+        } else if (selectedFetchedProducts.some((product) => product.quantity <= 1)) {
+            newErrors.productError = 'All selected variants must have a quantity greater than 1.'
+            isValid = false
         }
 
         setErrors(newErrors)
         return isValid
-    }
-
-    const handleChange = (e: any) => {
-        setChecked(e.checked || false)
     }
 
     const handleRowSelect = (event: DataTableRowEvent) => {
@@ -237,6 +252,9 @@ const DiscountForm = () => {
                             value={discountName}
                             onChange={(e) => setDiscountName(e.target.value)}
                             required
+                            placeholder='Enter discount name'
+                            tooltip='Enter discount name'
+                            tooltipOptions={{ position: 'top' }}
                         />
                         {errors.discountName && <small className='p-error'>{errors.discountName}</small>}
                     </div>
@@ -253,6 +271,9 @@ const DiscountForm = () => {
                             min={1}
                             max={50}
                             required
+                            placeholder='Enter discount value'
+                            tooltip='Enter discount value'
+                            tooltipOptions={{ position: 'top' }}
                         />
                         {errors.value && <small className='p-error'>{errors.value}</small>}
                     </div>
@@ -268,10 +289,14 @@ const DiscountForm = () => {
                                     const selectedDate = e.value as Date | null
                                     setFromDate(selectedDate)
                                 }}
+                                minDate={minStartDate}
                                 showTime
                                 hourFormat='12'
                                 touchUI
                                 dateFormat='dd/mm/yy'
+                                placeholder='Select start date'
+                                tooltip='Select start date'
+                                tooltipOptions={{ position: 'top' }}
                                 showButtonBar
                                 required
                             />
@@ -290,7 +315,11 @@ const DiscountForm = () => {
                                 showTime
                                 touchUI
                                 showIcon
+                                minDate={minEndDate}
                                 dateFormat='dd/mm/yy'
+                                placeholder='Select end date'
+                                tooltip='Select end date'
+                                tooltipOptions={{ position: 'top' }}
                                 showButtonBar
                                 required
                                 hourFormat='12'
@@ -299,7 +328,7 @@ const DiscountForm = () => {
                             {errors.dateError && <small className='p-error'>{errors.dateError}</small>}
                         </div>
                     </div>
-                    <div className='flex justify-start gap-2 items-center space-x-2'>
+                    {/* <div className='flex justify-start gap-2 items-center space-x-2'>
                         <label htmlFor='active' className='flex items-center justify-center'>
                             <p>Active</p>
                         </label>
@@ -308,12 +337,14 @@ const DiscountForm = () => {
                             checked={checked}
                             className='h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
                         />
-                    </div>
+                    </div> */}
                     <div className='flex justify-center gap-2 items-center space-x-2 my-3'>
                         <InputTextarea
                             value={comments}
                             onChange={(e) => setComments(e.target.value)}
                             placeholder='Comments'
+                            tooltip='Enter comments'
+                            tooltipOptions={{ position: 'top' }}
                             rows={5}
                             cols={30}
                         />
@@ -377,13 +408,25 @@ const DiscountForm = () => {
                         value={fetchedProducts}
                         paginator
                         rows={10}
+                        dataKey='id'
                         selection={selectedFetchedProducts}
                         onSelectionChange={onFetchedProductsSelectionChange}
                         onRowSelect={handleRowSelect}
                         selectionMode='checkbox'
                     >
                         <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
-                        <Column field='name' header='Product Name' sortable/>
+                        <Column
+                            field='name'
+                            header='Product Name'
+                            body={(rowData) => (
+                                <Button
+                                    label={rowData.name}
+                                    className='p-button-text'
+                                    onClick={() => handleProductNameClick(rowData.id)}
+                                />
+                            )}
+                            sortable
+                        />
                         <Column
                             field='imageUrl'
                             header='Image'
@@ -399,6 +442,7 @@ const DiscountForm = () => {
                             )}
                         />
                         <Column sortable field='categoryName' header='Category Name' />
+                        <Column sortable field='quantity' header='Quantity' />
                         <Column sortable field='manufacturerName' header='Manufacturer Name' />
                         <Column sortable field='sku' header='SKU' />
                     </DataTable>
