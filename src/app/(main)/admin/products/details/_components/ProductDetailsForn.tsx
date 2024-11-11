@@ -16,8 +16,10 @@ import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { Tooltip } from 'primereact/tooltip'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Barcode from 'react-barcode'
+import { Promotion } from '@/interface/discount.interface'
+import { Message } from 'primereact/message'
 
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
@@ -28,13 +30,12 @@ type Props = {
     product: ProductResponseDetails
     productAttributes: ProductAttributeName[]
 }
-
 const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => {
     const [formData, setFormData] = useState<ProductResponseDetails>(product)
     const [imageUrl, setImageUrl] = useState<string>(product.imageUrl)
     const [uploadedFile, setUploadedFile] = useState<File | null>(null)
     const router = useRouter()
-
+    const [discount, setDiscount] = useState(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const toast = useRef<Toast>(null)
     const [attributeRows, setAttributeRows] = useState<AttributeRow[]>(
@@ -158,6 +159,30 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
     const removeAttributeRow = (index: number) => {
         setAttributeRows((prevRows) => prevRows.filter((_, i) => i !== index))
     }
+    useEffect(() => {
+        const fetchDiscounts = async (productId: number) => {
+            try {
+                const response = await fetch(`http://localhost:8080/api/admin/discounts/by-product/${productId}`)
+                const data = await response.json()
+
+                const activeDiscounts = data.data.filter(
+                    (discount: Promotion) => discount.status === 'ACTIVE'
+                )
+                if (activeDiscounts.length > 0) {
+                    const sortedDiscounts = activeDiscounts.sort(
+                        (a: Promotion, b: Promotion) => (b.discountPercentage ?? 0) - (a.discountPercentage ?? 0)
+                    )
+                    setDiscount(sortedDiscounts[0]) // Set the highest discount
+                }
+            } catch (error) {
+                console.error('Error fetching discounts: ', error)
+            }
+        }
+
+        if (product.id) {
+            fetchDiscounts(product.id)
+        }
+    }, [product])
 
     const fetchValues = async (attribuetId: number) => {
         try {
@@ -201,6 +226,25 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
             <Toast ref={toast} />
             <h5>Edit Product Details</h5>
             <div className='flex flex-column gap-4'>
+            {discount && (
+                <div className="mb-3">
+                    <Message
+                        style={{
+                            border: 'solid #f39c12',
+                            borderWidth: '0 0 0 6px',
+                            color: '#f39c12'
+                        }}
+                        className="border-warning w-full justify-content-start"
+                        severity="warn"
+                        content={
+                            <div className="flex align-items-center">
+                                <i className="pi pi-exclamation-triangle" style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}></i>
+                                <div>Warning: This product is currently on discount and cannot be edited price until the discount ends.</div>
+                            </div>
+                        }
+                    />
+                </div>
+            )}
                 <div className='p-grid p-fluid'>
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
@@ -243,16 +287,17 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 id='price'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.price}
-                                onValueChange={(e) => {
+                                onValueChange={(e) =>
                                     handleChange(
                                         {
                                             target: { value: e.value ? e.value.toString() : '' }
                                         } as React.ChangeEvent<HTMLInputElement>,
                                         'price' as keyof ProductResponseDetails
                                     )
-                                }}
+                                }
                                 mode='currency'
-                                className={errors.price ? 'p-invalid' : ''}
+                                disabled={!!discount}
+                                className={discount ? 'p-disabled' : ''}
                                 currency='USD'
                             />
                             {errors.price && <small className='p-error'>{errors.price}</small>}

@@ -14,9 +14,11 @@ import timezone from 'dayjs/plugin/timezone'
 import { Tag } from 'primereact/tag'
 import { Card } from 'primereact/card'
 import { Promotion } from '@/interface/discount.interface'
-import { useRouter } from 'next/navigation'
 import discountService from '@/service/discount.service'
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown'
+import Link from 'next/link'
+import { classNames } from 'primereact/utils'
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -33,8 +35,6 @@ const ListView = () => {
         discountPercentage: [0, 100]
     })
     const toast = useRef<Toast>(null)
-    const router = useRouter()
-
     useEffect(() => {
         const fetchDiscounts = async () => {
             const response = await discountService.getAll()
@@ -57,6 +57,26 @@ const ListView = () => {
     //     return () => clearInterval(intervalId)
     // }, [])
 
+    const formatDiscountAndStock = (rowData: any) => {
+        const stockClassName = classNames(
+            'border-circle w-4rem h-4rem inline-flex font-bold justify-content-center align-items-center text-sm',
+            {
+                'bg-green-100 text-green-900': rowData.discountPercentage >= 1 && rowData.discountPercentage < 10,
+                'bg-yellow-100 text-yellow-900': rowData.discountPercentage >= 10 && rowData.discountPercentage < 20,
+                'bg-orange-100 text-orange-900': rowData.discountPercentage >= 20 && rowData.discountPercentage < 30,
+                'bg-teal-100 text-teal-900': rowData.discountPercentage >= 30 && rowData.discountPercentage < 40,
+                'bg-blue-100 text-blue-900': rowData.discountPercentage >= 40 && rowData.discountPercentage < 50,
+                'bg-red-100 text-red-900': rowData.discountPercentage >= 50
+            }
+        )
+
+        return (
+            <div className='flex flex-column align-items-start'>
+                <div className={stockClassName}>{rowData.discountPercentage} %</div>
+            </div>
+        )
+    }
+
     const handleSearch = () => {
         const filtered = discounts.filter((discount) => {
             const matchStartDate = searchParams.startDate
@@ -78,23 +98,18 @@ const ListView = () => {
 
     const leftToolbarTemplate = () => (
         <div className='flex flex-wrap gap-2 my-5'>
-            <Button
-                label='Add new discount'
-                icon='pi pi-plus'
-                severity='success'
-                onClick={() => router.push('/admin/discounts/add')}
-            />
+            <Link href='/admin/discounts/add'>
+                <Button label='Add new discount' icon='pi pi-plus' severity='success' />
+            </Link>
         </div>
     )
 
-    const formatDiscountValue = (rowData: Promotion) => {
-        return rowData.discountPercentage ? `${rowData.discountPercentage} %` : 'N/A'
-    }
-
     const statusBodyTemplate = (discount: Promotion) => {
-        return <Tag value={discount.status} severity={getStatus(discount.status)} />
+        const { severity, icon } = getStatus(discount.status)
+        return <Tag value={discount.status} severity={severity} icon={icon} />
     }
-    const statuses: string[] = ['UPCOMING', 'ACTIVE', 'EXPIRED']
+    const statuses: string[] = ['UPCOMING', 'ACTIVE', 'EXPIRED', 'CANCEL']
+
     const statusFilterTemplate = (options: ColumnFilterElementTemplateOptions) => {
         return (
             <Dropdown
@@ -109,37 +124,153 @@ const ListView = () => {
         )
     }
     const statusItemTemplate = (option: string) => {
-        return <Tag value={option} severity={getStatus(option)} />
+        const { severity, icon } = getStatus(option)
+        return <Tag value={option} icon={icon} severity={severity} />
     }
 
-    const getStatus = (status: string) => {
+    type SeverityType = 'success' | 'info' | 'danger' | 'warning' | null
+
+    const getStatus = (status: string): { severity: SeverityType; icon: string | null } => {
         switch (status) {
             case 'ACTIVE':
-                return 'success'
+                return { severity: 'success', icon: 'pi pi-check' }
             case 'UPCOMING':
-                return 'info'
+                return { severity: 'info', icon: 'pi pi-info-circle' }
             case 'EXPIRED':
-                return 'danger'
+                return { severity: 'danger', icon: 'pi pi-times' }
+            case 'CANCEL':
+                return { severity: 'warning', icon: 'pi pi-exclamation-triangle' }
             default:
-                return null
+                return { severity: null, icon: null }
         }
     }
 
-    const editButtonTemplate = (rowData: Promotion) => {
+    const handleCancelDiscount = async (promotionId: string) => {
+        try {
+            await discountService.cancelDiscount(promotionId)
+
+            const updatedDiscounts = discounts.map((discount) =>
+                discount.id === promotionId ? { ...discount, status: 'CANCEL' } : discount
+            )
+            setDiscounts(updatedDiscounts)
+            setFilteredDiscounts(updatedDiscounts)
+
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Status Updated',
+                detail: 'Promotion marked as cancelled successfully!',
+                life: 3000
+            })
+        } catch (error) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error cancelling promotion',
+                life: 3000
+            })
+        }
+    }
+
+    const editAndExpiredButtonTemplate = (rowData: Promotion) => {
         return (
-            <Button
-                icon='pi pi-pencil'
-                severity='info'
-                aria-label='Edit'
-                rounded
-                onClick={() => router.push(`/admin/discounts/${rowData.id}`)}
-            />
+            <div className='flex gap-2'>
+                {rowData.status !== 'CANCEL' && (
+                    <Link href={`/admin/discounts/${rowData.id}`}>
+                        <Button icon='pi pi-pencil' severity='info' aria-label='Edit' rounded />
+                    </Link>
+                )}
+                {rowData.status === 'ACTIVE' && (
+                    <Button
+                        icon='pi pi-times'
+                        severity='danger'
+                        aria-label='Expire'
+                        onClick={() => openConfirmDialog(rowData.id)}
+                        rounded
+                    />
+                )}
+                {rowData.status === 'UPCOMING' && (
+                    <Button
+                        icon='pi pi-trash'
+                        severity='warning'
+                        aria-label='Notification'
+                        onClick={() => openCancelConfirmDialog(rowData.id)}
+                        rounded
+                    />
+                )}
+            </div>
         )
+    }
+
+    const openCancelConfirmDialog = (promotionId: string) => {
+        confirmDialog({
+            message: 'Are you sure you want to cancel this promotion?',
+            header: 'Confirm Cancel',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes, Cancel',
+            rejectLabel: 'No, Keep',
+            accept: () => handleCancelDiscount(promotionId),
+            reject: () => {
+                toast.current?.show({
+                    severity: 'info',
+                    summary: 'Cancelled',
+                    detail: 'Action cancelled.',
+                    life: 3000
+                })
+            }
+        })
+    }
+
+    const handleConfirmExpired = async (promotionId: string) => {
+        try {
+            await discountService.markAsExpired(promotionId)
+
+            const updatedDiscounts = discounts.map((discount) =>
+                discount.id === promotionId
+                    ? { ...discount, status: 'EXPIRED', endDateUtc: new Date().toISOString() }
+                    : discount
+            )
+            setDiscounts(updatedDiscounts)
+            setFilteredDiscounts(updatedDiscounts)
+
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Status Updated',
+                detail: 'Promotion marked as expired and end date set to now!',
+                life: 3000
+            })
+        } catch (error) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error marking promotion as expired',
+                life: 3000
+            })
+        }
+    }
+
+    const openConfirmDialog = (promotionId: string) => {
+        confirmDialog({
+            message: 'Are you sure you want to mark this promotion as expired?',
+            header: 'Confirm',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            accept: () => handleConfirmExpired(promotionId),
+            reject: () => {
+                toast.current?.show({
+                    severity: 'info',
+                    summary: 'Cancelled',
+                    detail: 'Action cancelled.',
+                    life: 3000
+                })
+            }
+        })
     }
 
     return (
         <>
             <Toast ref={toast} />
+            <ConfirmDialog />
             <div className='card'>
                 <Card title='Search' className='mb-4'>
                     <div className='p-fluid grid formgrid'>
@@ -209,7 +340,7 @@ const ListView = () => {
                     emptyMessage='No discounts found.'
                 >
                     <Column field='name' header='Discount Name' sortable />
-                    <Column header='Discount Value' body={formatDiscountValue} />
+                    <Column header='Discount Value' body={formatDiscountAndStock} />
                     <Column
                         field='startDateUtc'
                         header='Start Date'
@@ -234,7 +365,19 @@ const ListView = () => {
                         filterMenuStyle={{ width: '14rem' }}
                         style={{ width: '15%' }}
                     ></Column>
-                    <Column body={editButtonTemplate} header='Actions' />
+                    {/* <Column
+                        field='active'
+                        header='Active'
+                        body={(rowData) =>
+                            rowData.isActive ? (
+                                <i className='pi pi-check' style={{ color: 'green' }}></i>
+                            ) : (
+                                <i className='pi pi-times' style={{ color: 'red' }}></i>
+                            )
+                        }
+                        style={{ width: '10%' }}
+                    /> */}
+                    <Column body={editAndExpiredButtonTemplate} header='Actions' />
                 </DataTable>
             </div>
         </>
