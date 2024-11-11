@@ -3,6 +3,8 @@ import { PagingRequest, PagingResponse } from './paging.interface'
 export interface Category {
     id?: number
     name: string
+    description: string
+    linkImg: string
     categoryParentId: number | null
 }
 

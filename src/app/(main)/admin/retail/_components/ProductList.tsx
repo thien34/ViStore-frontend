@@ -15,6 +15,9 @@ import CartItem from './CartItem'
 import { confirmPopup } from 'primereact/confirmpopup'
 import { Toast } from 'primereact/toast'
 import CustommerOrder from './CustommerOrder'
+import { Scanner } from '@yudiel/react-qr-scanner'
+import { Dialog } from 'primereact/dialog'
+import { BsQrCodeScan } from 'react-icons/bs'
 
 const defaultFilters: DataTableFilterMeta = {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -53,6 +56,11 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
     const [carts, setCarts] = useState<CartResponse[]>([])
     const [products, setProducts] = useState<ProductResponse[]>([])
     const toast = useRef<Toast>(null)
+    const [visibleScan, setVisibleScan] = useState<boolean>(false)
+    const [scanResult, setScanResult] = useState<string>('')
+    const [totalWeight, setTotalWeight] = useState<number>(0)
+    const [amountPaidLocal, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
+
     const [orderTotals, setOrderTotals] = useState<{
         subtotal: number
         shippingCost: number
@@ -92,8 +100,9 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
 
     const fetchCart = () => {
         CartService.getCart(billId).then((res) => {
-            setCarts(res)
+            const sortedCarts = res.sort((a, b) => a.cartUUID.localeCompare(b.cartUUID))
 
+            setCarts(sortedCarts)
             updateTabTotalItems(billId, res.length)
             calculateTotals(res)
         })
@@ -104,11 +113,19 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
             return total + cartItem.productResponse.price * cartItem.quantity
         }, 0)
 
-        const shippingCost = 0
-        const tax = 0
-        const total = subtotal + shippingCost + tax
+        const totalWeight = carts.reduce((total, cartItem) => {
+            return total + cartItem.productResponse.weight * cartItem.quantity
+        }, 0)
 
-        setOrderTotals({ subtotal, shippingCost, tax, total })
+        const orderTotals = {
+            subtotal,
+            shippingCost: 0,
+            tax: 0,
+            total: subtotal
+        }
+        setOrderTotals(orderTotals)
+        setTotalWeight(totalWeight)
+        setAmountPaidLocal(subtotal)
     }
 
     const addProductToCart = (product: ProductResponseDetails) => {
@@ -161,12 +178,46 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
             }
         })
     }
+    const handleScanResult = (result: string) => {
+        setScanResult(result)
+        const product = products.find((p) => p.gtin === result)
+        if (product) {
+            addProductToCart(product as unknown as ProductResponseDetails)
+            setVisibleScan(false)
+        } else {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'QR code not found',
+                life: 1000
+            })
+        }
+    }
+
     return (
         <div>
             <div className='flex justify-between'>
                 <h4>Product Order</h4>
-                <Button onClick={() => setVisible(true)}>Add Product</Button>
+                <div className='flex gap-2'>
+                    <Button onClick={() => setVisibleScan(true)}>
+                        <BsQrCodeScan />
+                    </Button>
+                    <Button onClick={() => setVisible(true)}>Add Product</Button>
+                </div>
             </div>
+
+            <Dialog
+                header='Scan QR'
+                visible={visibleScan}
+                style={{ width: '25vw', height: '55vh' }}
+                onHide={() => {
+                    if (!visibleScan) return
+                    setVisibleScan(false)
+                }}
+            >
+                <Scanner onScan={(result) => handleScanResult(result[0].rawValue)} />
+            </Dialog>
+
             <Toast ref={toast} />
             <ProductDialog
                 products={products}
@@ -180,7 +231,6 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
                 globalFilterValue={globalFilterValue}
                 onGlobalFilterChange={onGlobalFilterChange}
             />
-
             <QuantityDialog
                 visible={visibleQuantity}
                 setVisible={setVisibleQuantity}
@@ -201,11 +251,10 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
                     ))}
                 </div>
             )}
-
             {carts.length > 0 && (
                 <>
                     <hr className='my-4 border-1 border-gray-300' />
-                    <CustommerOrder orderTotals={orderTotals} />
+                    <CustommerOrder orderTotals={orderTotals} totalWeight={totalWeight} />
                 </>
             )}
         </div>

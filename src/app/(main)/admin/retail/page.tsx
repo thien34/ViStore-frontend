@@ -83,7 +83,7 @@ export default function Retail() {
     const addTab = async () => {
         const newId = uuidv4()
         const newHeader = `Bill ${tabs.length + 1}`
-        if (tabs.length >= 10) {
+        if (tabs.length >= 5) {
             showError()
             return
         }
@@ -124,8 +124,9 @@ export default function Retail() {
     }
 
     const handleTabChange = (e: { index: number }) => {
-        setActiveIndex(e.index)
         const currentTabId = tabs[e.index].id
+        localStorage.setItem('billIdCurrent', currentTabId)
+        setActiveIndex(e.index)
         setBillId(currentTabId)
     }
 
@@ -133,7 +134,7 @@ export default function Retail() {
         toast.current?.show({
             severity: 'error',
             summary: 'Error',
-            detail: 'You can only create up to 10 bill.',
+            detail: 'You can only create up to 5 bill.',
             life: 1000
         })
     }

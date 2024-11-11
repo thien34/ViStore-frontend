@@ -20,6 +20,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Barcode from 'react-barcode'
 import { Promotion } from '@/interface/discount.interface'
 import { Message } from 'primereact/message'
+import QRCode from 'react-qr-code'
 
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
@@ -348,12 +349,12 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                             />
                             {errors.quantity && <small className='p-error'>{errors.quantity}</small>}
                         </div>
-                        <div className='grid grid-cols-1 items-center gap-4 w-full'>
+                        <div className='grid grid-cols-1 p-2 items-center gap-6 w-full'>
                             <Tooltip target='.image' />
 
                             <img
                                 style={{ width: '100px' }}
-                                className='object-cover rounded-lg shadow-lg border border-gray-200 mb-2 image'
+                                className='object-cover rounded-lg shadow-lg border border-gray-200 mb-2 image ms-20'
                                 src={imageUrl}
                                 data-pr-tooltip='Product Image'
                                 alt='Product'
@@ -371,8 +372,14 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                             </label>
 
                             <Tooltip target='.gtin' />
-                            <span className='gtin' data-pr-tooltip='Gtin'>
-                                <Barcode value={product.gtin} />
+                            <span className='gtin' data-pr-tooltip='QR Code'>
+                                <QRCode
+                                    size={200}
+                                    style={{ height: 'auto', width: '120px' }}
+                                    value={product.gtin}
+                                    className='p-2'
+                                    viewBox={`0 0 256 256`}
+                                />
                             </span>
                         </div>
                     </div>

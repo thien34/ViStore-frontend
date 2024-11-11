@@ -8,6 +8,7 @@ export interface AddressesResponse {
     company: string
     addressDetail: string
     phoneNumber: string
+    note?: string
 }
 
 export interface AddressRequest {
@@ -22,6 +23,16 @@ export interface AddressRequest {
     addressName: string
     phoneNumber: string
     customerId?: number
+}
+
+export interface Address {
+    provinceId: string
+    districtId: string
+    wardId: string
+    province: string
+    district: string
+    address: string
+
 }
 
 export type AddressPagingResponse = PagingResponse<AddressesResponse>
@@ -43,4 +54,11 @@ export interface District {
 export interface Ward {
     code: string
     fullName: string
+}
+
+export interface ShippingFee {
+    province: string
+    district: string
+    weight: number
+    address: string
 }

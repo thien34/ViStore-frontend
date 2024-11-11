@@ -437,7 +437,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     </div>
                 </div>
 
-                <Accordion className='mt-5'>
+                <Accordion className='mt-5' activeIndex={0}>
                     <AccordionTab header='Attributes'>
                         {attributeRows.map((row, index) => (
                             <div key={index} className='mb-4 flex items-center'>
