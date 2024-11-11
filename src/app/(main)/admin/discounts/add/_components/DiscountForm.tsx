@@ -150,7 +150,7 @@ const DiscountForm = () => {
         if (value === null || isNaN(value) || value <= 0) {
             newErrors.value = 'Please enter a valid positive discount value.'
             isValid = false
-        } else if (value > 50) {
+        } else if (value >= 50) {
             newErrors.value = 'You cannot set a discount higher than 50%.'
             isValid = false
         }
@@ -190,6 +190,9 @@ const DiscountForm = () => {
 
         if (selectedFetchedProducts.length === 0) {
             newErrors.productError = 'At least one product must be selected.'
+            isValid = false
+        } else if (selectedFetchedProducts.some((product) => product.quantity <= 1)) {
+            newErrors.productError = 'All selected variants must have a quantity greater than 1.'
             isValid = false
         }
 
@@ -250,7 +253,8 @@ const DiscountForm = () => {
                             onChange={(e) => setDiscountName(e.target.value)}
                             required
                             placeholder='Enter discount name'
-                            tooltip="Enter discount name" tooltipOptions={{ position: 'top' }}
+                            tooltip='Enter discount name'
+                            tooltipOptions={{ position: 'top' }}
                         />
                         {errors.discountName && <small className='p-error'>{errors.discountName}</small>}
                     </div>
@@ -268,7 +272,8 @@ const DiscountForm = () => {
                             max={50}
                             required
                             placeholder='Enter discount value'
-                            tooltip="Enter discount value" tooltipOptions={{ position: 'top' }}
+                            tooltip='Enter discount value'
+                            tooltipOptions={{ position: 'top' }}
                         />
                         {errors.value && <small className='p-error'>{errors.value}</small>}
                     </div>
@@ -290,7 +295,8 @@ const DiscountForm = () => {
                                 touchUI
                                 dateFormat='dd/mm/yy'
                                 placeholder='Select start date'
-                                tooltip="Select start date" tooltipOptions={{ position: 'top' }}
+                                tooltip='Select start date'
+                                tooltipOptions={{ position: 'top' }}
                                 showButtonBar
                                 required
                             />
@@ -312,7 +318,8 @@ const DiscountForm = () => {
                                 minDate={minEndDate}
                                 dateFormat='dd/mm/yy'
                                 placeholder='Select end date'
-                                tooltip="Select end date" tooltipOptions={{ position: 'top' }}
+                                tooltip='Select end date'
+                                tooltipOptions={{ position: 'top' }}
                                 showButtonBar
                                 required
                                 hourFormat='12'
@@ -336,7 +343,8 @@ const DiscountForm = () => {
                             value={comments}
                             onChange={(e) => setComments(e.target.value)}
                             placeholder='Comments'
-                            tooltip="Enter comments" tooltipOptions={{ position: 'top' }}
+                            tooltip='Enter comments'
+                            tooltipOptions={{ position: 'top' }}
                             rows={5}
                             cols={30}
                         />
@@ -434,6 +442,7 @@ const DiscountForm = () => {
                             )}
                         />
                         <Column sortable field='categoryName' header='Category Name' />
+                        <Column sortable field='quantity' header='Quantity' />
                         <Column sortable field='manufacturerName' header='Manufacturer Name' />
                         <Column sortable field='sku' header='SKU' />
                     </DataTable>
