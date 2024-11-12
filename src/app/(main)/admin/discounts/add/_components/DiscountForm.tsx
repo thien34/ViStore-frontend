@@ -150,7 +150,7 @@ const DiscountForm = () => {
         if (value === null || isNaN(value) || value <= 0) {
             newErrors.value = 'Please enter a valid positive discount value.'
             isValid = false
-        } else if (value >= 50) {
+        } else if (value > 50) {
             newErrors.value = 'You cannot set a discount higher than 50%.'
             isValid = false
         }

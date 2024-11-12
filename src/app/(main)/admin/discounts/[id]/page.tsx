@@ -138,7 +138,6 @@ const DiscountUpdate = () => {
     }
     useEffect(() => {
         validateForm()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [discountName, value, fromDate, toDate, selectedFetchedProducts])
 
     const showFailedToast = () => {
@@ -214,6 +213,9 @@ const DiscountUpdate = () => {
 
         if (value === null || isNaN(value) || value <= 0) {
             newErrors.value = 'Please enter a valid positive discount value.'
+            isValid = false
+        } else if (value > 50) {
+            newErrors.value = 'You cannot set a discount higher than 50%.'
             isValid = false
         }
 
