@@ -7,6 +7,7 @@ import { Button } from 'primereact/button'
 import { FilterMatchMode } from 'primereact/api'
 import { FaCartPlus } from 'react-icons/fa'
 import { ProductResponse } from '@/interface/Product'
+import { Image } from 'primereact/image'
 
 interface ProductDialogProps {
     products: ProductResponse[]
@@ -66,13 +67,14 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
                     field='imageUrl'
                     header='Image'
                     body={(rowData) => (
-                        <img
+                        <Image
                             src={
                                 rowData.imageUrl ||
-                                'https://bizweb.dktcdn.net/thumb/1024x1024/100/415/445/products/370031-black-1.jpg'
+                                '/demo/images/default/—Pngtree—sneakers_3989154.png'
                             }
                             alt={rowData.name}
-                            style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                            width='50'
+                            height='50'
                         />
                     )}
                 />

@@ -52,13 +52,15 @@ const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange })
     return (
         <>
             <div className='p-4 rounded-lg flex items-start gap-4 border border-gray-300 shadow-md my-5'>
-                <img
+                <Image
                     src={
                         cart.productResponse.imageUrl ||
-                        'https://bizweb.dktcdn.net/thumb/1024x1024/100/415/445/products/370031-black-1.jpg'
+                        '/demo/images/default/—Pngtree—sneakers_3989154.png'
                     }
                     alt={cart.productResponse.name}
-                    className='w-24 h-24 object-cover rounded-lg'
+                    className='object-cover rounded-lg'
+                    width='50'
+                    height='50'
                 />
                 <div className='flex-1'>
                     <div className='flex justify-between items-center'>
