@@ -14,6 +14,7 @@ import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { Image } from 'primereact/image'
 interface ProductAddFormProps {
     categories: Category[]
     manufacturers: ManufacturerName[]
@@ -151,12 +152,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         header='Image'
                         body={(rowData) => (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                                src={
-                                    rowData.imageUrl ||
-                                    'https://bizweb.dktcdn.net/thumb/1024x1024/100/415/445/products/370031-black-1.jpg'
-                                }
-                                style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                            <Image
+                                src={rowData.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
+                                width='50'
+                                height='50'
                             />
                         )}
                     />
