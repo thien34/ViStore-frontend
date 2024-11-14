@@ -12,10 +12,9 @@ import { Toast } from 'primereact/toast'
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup'
 import { useRouter } from 'next/navigation'
 
-type Props = {}
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string)
 
-export default function CheckoutPage({}: Props) {
+export default function CheckoutPage() {
     const [amountPaidLocal, setAmountPaidLocal] = useLocalStorage<number>(1000, 'amountPaid')
     const [billId, setBillId] = useState<string | null>(null)
 

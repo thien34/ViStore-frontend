@@ -13,7 +13,6 @@ import { v4 as uuidv4 } from 'uuid'
 import ProductListComponent from './_components/ProductList'
 import { TiShoppingCart } from 'react-icons/ti'
 import { Badge } from 'primereact/badge'
-type Props = {}
 
 type Tab = {
     id: string

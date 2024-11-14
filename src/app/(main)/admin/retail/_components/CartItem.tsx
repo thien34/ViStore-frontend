@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { CartResponse } from '@/interface/cart.interface'
 import { InputNumber } from 'primereact/inputnumber'
 import { RiDeleteBin6Line } from 'react-icons/ri'
-import Image from 'next/image'
 import { useUpdateEffect } from 'primereact/hooks'
 import CartService from '@/service/cart.service'
 

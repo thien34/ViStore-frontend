@@ -4,7 +4,6 @@ import { Category } from '@/interface/category.interface'
 import { ManufacturerName } from '@/interface/manufacturer.interface'
 import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import { ProductAttributeName } from '@/interface/productAttribute.interface'
-import { useRouter } from 'next/navigation'
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
@@ -32,7 +31,6 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [errorMessage, setErrorMessage] = useState<string>('')
     const toast = useRef<Toast>(null)
 
-    const router = useRouter()
     useEffect(() => {
         setErrorMessage('')
         if (product) {
