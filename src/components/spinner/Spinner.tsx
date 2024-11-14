@@ -1,11 +1,12 @@
-import React from 'react';
-
-export default function Spinner() {
-    return (
+'use client';
+interface PropSpinner {
+    isLoading: boolean;
+}
+const Spinner = ({ isLoading }: PropSpinner) =>
+    isLoading ? (
         <div className="spinner-overlay">
             <div className="spinner-4"></div>
-
-            <style >{`
+            <style>{`
                 .spinner-overlay {
                     position: fixed;
                     top: 0;
@@ -71,5 +72,6 @@ export default function Spinner() {
                 }
             `}</style>
         </div>
-    );
-}
+    ) : null;
+
+export default Spinner;

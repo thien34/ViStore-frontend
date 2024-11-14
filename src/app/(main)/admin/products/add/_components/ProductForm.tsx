@@ -53,7 +53,6 @@ interface ProductAddFormProps {
     manufacturers: ManufacturerName[]
     productAttributes: ProductAttributeName[]
 }
-
 const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacturers, productAttributes }) => {
     const [attributeRows, setAttributeRows] = useState<AttributeRow[]>([])
     const [combinedRows, setCombinedRows] = useState<CombinedRow[]>([])
@@ -368,11 +367,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     return (
         <div>
             <Toast ref={toast} />
-            {isLoading && (
-                <div className='spinner-container'>
-                    <Spinner />
-                </div>
-            )}
+            <Spinner isLoading={isLoading} />
             <div className='card'>
                 <div className='flex flex-column gap-4'>
                     <div className='flex flex-row gap-4'>
