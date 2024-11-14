@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Dialog } from 'primereact/dialog'
@@ -68,10 +67,7 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
                     header='Image'
                     body={(rowData) => (
                         <Image
-                            src={
-                                rowData.imageUrl ||
-                                '/demo/images/default/—Pngtree—sneakers_3989154.png'
-                            }
+                            src={rowData.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
                             alt={rowData.name}
                             width='50'
                             height='50'

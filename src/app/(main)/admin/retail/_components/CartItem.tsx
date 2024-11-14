@@ -4,6 +4,7 @@ import { InputNumber } from 'primereact/inputnumber'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 import { useUpdateEffect } from 'primereact/hooks'
 import CartService from '@/service/cart.service'
+import Image from 'next/image'
 
 interface CartItemProps {
     cart: CartResponse
@@ -52,10 +53,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange })
         <>
             <div className='p-4 rounded-lg flex items-start gap-4 border border-gray-300 shadow-md my-5'>
                 <Image
-                    src={
-                        cart.productResponse.imageUrl ||
-                        '/demo/images/default/—Pngtree—sneakers_3989154.png'
-                    }
+                    src={cart.productResponse.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
                     alt={cart.productResponse.name}
                     className='object-cover rounded-lg'
                     width='50'
