@@ -1,9 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-type Props = {}
-
-export default function PaymentSuccess({}: Props) {
+export default function PaymentSuccess() {
     return (
         <div className='card h-screen '>
             <div className='bg-white p-6  h-full md:mx-auto'>
