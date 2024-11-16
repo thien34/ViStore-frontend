@@ -41,6 +41,8 @@ export interface ProductResponse {
     categoryName: number
     manufacturerName: number
     gtin: string
+    largestDiscountPercentage: number
+    discountPrice: number
 }
 
 export interface ProductResponseDetails {
