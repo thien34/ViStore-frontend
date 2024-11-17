@@ -43,6 +43,7 @@ export interface ProductResponse {
     gtin: string
     largestDiscountPercentage: number
     discountPrice: number
+    price: number
 }
 
 export interface ProductResponseDetails {
@@ -57,6 +58,8 @@ export interface ProductResponseDetails {
     productCost: number
     imageUrl: string
     gtin: string
+    discountPrice: number
     attributes: ProductAttributeName[]
+    largestDiscountPercentage: number
     weight: number
 }

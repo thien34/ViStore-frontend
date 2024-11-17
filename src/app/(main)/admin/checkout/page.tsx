@@ -43,12 +43,15 @@ export default function CheckoutPage() {
             const sortedCarts = res.sort((a, b) => a.cartUUID.localeCompare(b.cartUUID))
             setCarts(sortedCarts)
             setAmountPaidLocal(
-                sortedCarts.reduce((total, cart) => total + cart.productResponse.price * cart.quantity, 0)
+                sortedCarts.reduce((total, cart) => {
+                    const price = cart.productResponse.discountPrice || cart.productResponse.price
+                    return total + price * cart.quantity
+                }, 0)
             )
         })
     }
 
-    function handleCartItemDelete(cart: CartResponse, event: any): void {
+    function handleCartItemDelete(cart: CartResponse, event: React.MouseEvent<HTMLElement>): void {
         confirmPopup({
             target: event.currentTarget,
             message: 'Are you sure you want to delete this item from the cart?',
@@ -92,7 +95,7 @@ export default function CheckoutPage() {
                                 key={cart.id}
                                 cart={cart}
                                 onQuantityChange={fetchCart}
-                                onDelete={(e) => handleCartItemDelete(cart, e)}
+                                onDelete={() => handleCartItemDelete(cart, {} as React.MouseEvent<HTMLElement>)}
                             />
                         ))}
                     </div>

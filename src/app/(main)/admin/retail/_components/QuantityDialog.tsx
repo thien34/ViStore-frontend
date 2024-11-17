@@ -33,10 +33,11 @@ const QuantityDialog: React.FC<QuantityDialogProps> = ({
                 ))}
                 <div className='mt-2'>
                     <InputNumber
-                        onChange={(e) => setQuantity(e.value ?? 1)}
+                        onValueChange={(e) => setQuantity(e.value ?? 1)}
                         value={quantity}
                         defaultValue={1}
                         min={1}
+                        max={product?.quantity ?? 1}
                         showButtons
                         buttonLayout='horizontal'
                         decrementButtonClassName='p-button-secondary'

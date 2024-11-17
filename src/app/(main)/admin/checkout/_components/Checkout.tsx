@@ -1,8 +1,10 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
-import ProductService from '@/service/ProducrService'
 import { Button } from 'primereact/button'
+import { useLocalStorage } from 'primereact/hooks'
+import OrderService from '@/service/order.service'
+import CartService from '@/service/cart.service'
 type Props = {
     totalAmount: number
 }
@@ -12,6 +14,7 @@ const CheckoutPage = ({ totalAmount }: Props) => {
     const [errorMessage, setErrorMessage] = useState<string>()
     const [clientSecret, setClientSecret] = useState('')
     const [loading, setLoading] = useState(false)
+    const [orderLocal] = useLocalStorage('orderLocal', '')
 
     useEffect(() => {
         fetch('/api/create-payment-intent', {
@@ -40,6 +43,14 @@ const CheckoutPage = ({ totalAmount }: Props) => {
             setLoading(false)
             return
         }
+        const orderLocalParsed = JSON.parse(orderLocal)
+        console.log(orderLocalParsed)
+        OrderService.createOrder(orderLocalParsed).then((res) => {
+            if (res.status === 200) {
+                localStorage.removeItem('orderLocal')
+                CartService.deleteBill(orderLocalParsed.orderGuid)
+            }
+        })
 
         const { error } = await stripe.confirmPayment({
             elements,

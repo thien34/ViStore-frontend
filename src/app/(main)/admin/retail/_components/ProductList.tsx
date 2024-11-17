@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 'use client'
 import React, { useRef, useState } from 'react'
 import { FilterMatchMode, FilterOperator } from 'primereact/api'
@@ -45,21 +46,22 @@ const defaultFilters: DataTableFilterMeta = {
 
 interface ProductListComponentProps {
     updateTabTotalItems: (billId: string, newTotalItems: number) => void
+    fetchBill: () => void
 }
 
-export default function ProductListComponent({ updateTabTotalItems }: ProductListComponentProps) {
+export default function ProductListComponent({ updateTabTotalItems, fetchBill }: ProductListComponentProps) {
     const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters)
     const [globalFilterValue, setGlobalFilterValue] = useState<string>('')
     const [product, setProduct] = useState<ProductResponseDetails>()
-    const [billId, setBillId] = useLocalStorage<string>('billId', '')
+    const [billId] = useLocalStorage<string>('billId', '')
     const [quantity, setQuantity] = useState<number>(1)
     const [carts, setCarts] = useState<CartResponse[]>([])
     const [products, setProducts] = useState<ProductResponse[]>([])
     const toast = useRef<Toast>(null)
     const [visibleScan, setVisibleScan] = useState<boolean>(false)
-    const [scanResult, setScanResult] = useState<string>('')
+    const [, setScanResult] = useState<string>('')
     const [totalWeight, setTotalWeight] = useState<number>(0)
-    const [amountPaidLocal, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
+    const [, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
 
     const [orderTotals, setOrderTotals] = useState<{
         subtotal: number
@@ -67,9 +69,6 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
         tax: number
         total: number
     }>({ subtotal: 0, shippingCost: 0, tax: 0, total: 0 })
-    const clearFilter = () => {
-        initFilters()
-    }
 
     const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
@@ -82,17 +81,16 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
         setGlobalFilterValue(value)
     }
 
-    const initFilters = () => {
-        setFilters(defaultFilters)
-        setGlobalFilterValue('')
-    }
-
     const [visible, setVisible] = useState<boolean>(false)
     const [visibleQuantity, setVisibleQuantity] = useState<boolean>(false)
 
     useMountEffect(() => {
-        ProductService.getProuctsDetails().then((res) => setProducts(res))
+        fetchProducts()
     })
+
+    const fetchProducts = () => {
+        ProductService.getProuctsDetails().then((res) => setProducts(res))
+    }
 
     useUpdateEffect(() => {
         fetchCart()
@@ -110,7 +108,8 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
 
     const calculateTotals = (carts: CartResponse[]) => {
         const subtotal = carts.reduce((total, cartItem) => {
-            return total + cartItem.productResponse.price * cartItem.quantity
+            const price = cartItem.productResponse.discountPrice || cartItem.productResponse.price
+            return total + price * cartItem.quantity
         }, 0)
 
         const totalWeight = carts.reduce((total, cartItem) => {
@@ -142,19 +141,29 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
             isAdmin: true
         }
 
-        CartService.addProductToCart(cart, billId).then((res) => {
-            setVisibleQuantity(false)
-            toast.current?.show({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Product added to cart successfully',
-                life: 1000
+        CartService.addProductToCart(cart, billId)
+            .then(() => {
+                setVisibleQuantity(false)
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Product added to cart successfully',
+                    life: 1000
+                })
+                fetchCart()
             })
-            fetchCart()
-        })
+            .catch((error) => {
+                console.error('Error adding product to cart:', error)
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: error instanceof Error ? error.message : 'An error occurred',
+                    life: 3000
+                })
+            })
     }
 
-    function handleCartItemDelete(cart: CartResponse, event: any): void {
+    function handleCartItemDelete(cart: CartResponse, event: React.MouseEvent<HTMLElement>): void {
         confirmPopup({
             target: event.currentTarget,
             message: 'Are you sure you want to delete this item from the cart?',
@@ -194,6 +203,12 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
         }
     }
 
+    const onOpenProductDialog = () => {
+        fetchProducts()
+        setVisible(true)
+        setVisibleScan(false)
+    }
+
     return (
         <div>
             <div className='flex justify-between'>
@@ -202,7 +217,7 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
                     <Button onClick={() => setVisibleScan(true)}>
                         <BsQrCodeScan />
                     </Button>
-                    <Button onClick={() => setVisible(true)}>Add Product</Button>
+                    <Button onClick={() => onOpenProductDialog()}>Add Product</Button>
                 </div>
             </div>
 
@@ -246,7 +261,7 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
                             key={cart.id}
                             cart={cart}
                             onQuantityChange={fetchCart}
-                            onDelete={(e) => handleCartItemDelete(cart, e)}
+                            onDelete={() => handleCartItemDelete(cart, {} as React.MouseEvent<HTMLElement>)}
                         />
                     ))}
                 </div>
@@ -254,7 +269,7 @@ export default function ProductListComponent({ updateTabTotalItems }: ProductLis
             {carts.length > 0 && (
                 <>
                     <hr className='my-4 border-1 border-gray-300' />
-                    <CustommerOrder orderTotals={orderTotals} totalWeight={totalWeight} />
+                    <CustommerOrder orderTotals={orderTotals} totalWeight={totalWeight} fetchBill={fetchBill} />
                 </>
             )}
         </div>
