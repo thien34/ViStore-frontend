@@ -47,9 +47,14 @@ const defaultFilters: DataTableFilterMeta = {
 interface ProductListComponentProps {
     updateTabTotalItems: (billId: string, newTotalItems: number) => void
     fetchBill: () => void
+    numberBill: number
 }
 
-export default function ProductListComponent({ updateTabTotalItems, fetchBill }: ProductListComponentProps) {
+export default function ProductListComponent({
+    updateTabTotalItems,
+    fetchBill,
+    numberBill
+}: ProductListComponentProps) {
     const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters)
     const [globalFilterValue, setGlobalFilterValue] = useState<string>('')
     const [product, setProduct] = useState<ProductResponseDetails>()
@@ -269,7 +274,12 @@ export default function ProductListComponent({ updateTabTotalItems, fetchBill }:
             {carts.length > 0 && (
                 <>
                     <hr className='my-4 border-1 border-gray-300' />
-                    <CustommerOrder orderTotals={orderTotals} totalWeight={totalWeight} fetchBill={fetchBill} />
+                    <CustommerOrder
+                        orderTotals={orderTotals}
+                        totalWeight={totalWeight}
+                        fetchBill={fetchBill}
+                        numberBill={numberBill}
+                    />
                 </>
             )}
         </div>

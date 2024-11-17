@@ -43,7 +43,11 @@ export default function Retail() {
                             id: billId,
                             header: `Bill ${numberBill}`,
                             content: (
-                                <ProductListComponent updateTabTotalItems={updateTabTotalItems} fetchBill={fetchBill} />
+                                <ProductListComponent
+                                    updateTabTotalItems={updateTabTotalItems}
+                                    fetchBill={fetchBill}
+                                    numberBill={numberBill}
+                                />
                             ),
                             billId: billId,
                             totalItems: totalItems
@@ -100,7 +104,13 @@ export default function Retail() {
             {
                 id: newId,
                 header: newHeader,
-                content: <ProductListComponent updateTabTotalItems={updateTabTotalItems} fetchBill={fetchBill} />,
+                content: (
+                    <ProductListComponent
+                        updateTabTotalItems={updateTabTotalItems}
+                        fetchBill={fetchBill}
+                        numberBill={tabs.length + 1}
+                    />
+                ),
                 billId: newId,
                 totalItems: 0
             }

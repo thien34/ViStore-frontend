@@ -17,7 +17,7 @@ import CustomerAddressDialog from './CustomerAddressDialog'
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
 import { Toast } from 'primereact/toast'
 import CartService from '@/service/cart.service'
-import { OrderRequest, PaymentMethodType, PaymentStatusType } from '@/interface/order.interface'
+import { OrderRequest, PaymentMethodType, PaymentModeType, PaymentStatusType } from '@/interface/order.interface'
 import { CartResponse } from '@/interface/cart.interface'
 import OrderService from '@/service/order.service'
 
@@ -30,9 +30,10 @@ interface CustommerOrderProps {
     }
     totalWeight: number
     fetchBill: () => void
+    numberBill: number
 }
 
-export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrderProps) {
+export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: CustommerOrderProps) {
     const [checked, setChecked] = useState<boolean>(true)
     const [provinces, setProvinces] = useState<Province[]>([])
     const [visible, setVisible] = useState<boolean>(false)
@@ -79,9 +80,10 @@ export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrde
                 addressType: checked ? 2 : -1,
                 orderId: '',
                 pickupInStore: false,
-                orderStatusId: checked ? 0 : 7,
+                orderStatusId: checked ? 0 : 8,
                 paymentStatusId: PaymentStatusType.Paid,
-                paymentMethodId: PaymentMethodType.Cash,
+                paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
+                paymentMode: PaymentModeType.IN_STORE,
                 orderSubtotal: orderTotals.subtotal,
                 orderSubtotalDiscount: 0,
                 orderShipping: orderTotals.shippingCost,
@@ -89,6 +91,8 @@ export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrde
                 orderTotal: orderTotals.total,
                 refundedAmount: 0,
                 paidDateUtc: '',
+                billCode: 'Bill' + numberBill,
+                deliveryMode: checked ? 0 : 1,
                 orderItems: res.map((item) => ({
                     productId: item.productResponse.id,
                     orderItemGuid: '',
@@ -99,20 +103,19 @@ export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrde
                     originalProductCost: item.productResponse.price,
                     attributeDescription: ''
                 })),
-                addressRequest:
-                    checked && customer?.id && customer?.id > 1
-                        ? {
-                              customerId: customer?.id || 1,
-                              firstName: address.firstName,
-                              lastName: address.lastName,
-                              email: address.email,
-                              addressName: addressDetailGenerated,
-                              provinceId: addressDetail?.provinceId || '',
-                              districtId: addressDetail?.districtId || '',
-                              wardId: addressDetail?.wardId || '',
-                              phoneNumber: address.phoneNumber
-                          }
-                        : null
+                addressRequest: checked
+                    ? {
+                          customerId: customer?.id || 1,
+                          firstName: address.firstName,
+                          lastName: address.lastName,
+                          email: address.email,
+                          addressName: addressDetailGenerated,
+                          provinceId: addressDetail?.provinceId || '',
+                          districtId: addressDetail?.districtId || '',
+                          wardId: addressDetail?.wardId || '',
+                          phoneNumber: address.phoneNumber
+                      }
+                    : null
             }
             setOrderLocal(JSON.stringify(order))
         })
@@ -121,11 +124,10 @@ export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrde
     const validateAddress = () => {
         if (checked) {
             if (
-                !address.addressDetail ||
-                !address.firstName ||
-                !address.lastName ||
-                !address.phoneNumber ||
-                !addressDetail
+                (address && !address.firstName) ||
+                (address && !address.lastName) ||
+                (address && !address.phoneNumber) ||
+                !addressDetailGenerated
             ) {
                 toast.current?.show({
                     severity: 'error',
@@ -139,7 +141,7 @@ export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrde
     }
 
     const validatePayment = () => {
-        if (amountPaid < orderTotals.total) {
+        if (!checked && amountPaid < orderTotals.total) {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
@@ -182,7 +184,18 @@ export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrde
     const fetchAddressesCustomer = async () => {
         if (!customer?.id) return
         const { payload: data } = await addressService.getAll(customer.id)
-        setAddresses(data.items)
+        const uniqueAddresses = data.items.filter(
+            (value, index, self) =>
+                index ===
+                self.findIndex(
+                    (t) =>
+                        t.addressDetail === value.addressDetail &&
+                        t.phoneNumber === value.phoneNumber &&
+                        t.firstName === value.firstName &&
+                        t.lastName === value.lastName
+                )
+        )
+        setAddresses(uniqueAddresses)
     }
 
     const onOpenCustomerAddressDialog = () => {
@@ -211,9 +224,10 @@ export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrde
                 addressType: checked ? 2 : -1,
                 orderId: '',
                 pickupInStore: false,
-                orderStatusId: checked ? 0 : 7,
+                orderStatusId: checked ? 1 : 7,
                 paymentStatusId: PaymentStatusType.Paid,
-                paymentMethodId: PaymentMethodType.Cash,
+                paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
+                paymentMode: PaymentModeType.IN_STORE,
                 orderSubtotal: orderTotals.subtotal,
                 orderSubtotalDiscount: 0,
                 orderShipping: orderTotals.shippingCost,
@@ -221,6 +235,8 @@ export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrde
                 orderTotal: orderTotals.total,
                 refundedAmount: 0,
                 paidDateUtc: '',
+                billCode: 'Bill' + numberBill,
+                deliveryMode: checked ? 0 : 1,
                 orderItems: res.map((item) => ({
                     productId: item.productResponse.id,
                     orderItemGuid: '',
@@ -231,20 +247,19 @@ export default function CustommerOrder({ orderTotals, fetchBill }: CustommerOrde
                     originalProductCost: item.productResponse.price,
                     attributeDescription: ''
                 })),
-                addressRequest:
-                    checked && customer?.id && customer?.id > 1
-                        ? {
-                              customerId: customer?.id || 1,
-                              firstName: address.firstName,
-                              lastName: address.lastName,
-                              email: address.email,
-                              addressName: addressDetailGenerated,
-                              provinceId: addressDetail?.provinceId || '',
-                              districtId: addressDetail?.districtId || '',
-                              wardId: addressDetail?.wardId || '',
-                              phoneNumber: address.phoneNumber
-                          }
-                        : null
+                addressRequest: checked
+                    ? {
+                          customerId: customer?.id || 1,
+                          firstName: address.firstName,
+                          lastName: address.lastName,
+                          email: address.email,
+                          addressName: addressDetailGenerated,
+                          provinceId: addressDetail?.provinceId || '',
+                          districtId: addressDetail?.districtId || '',
+                          wardId: addressDetail?.wardId || '',
+                          phoneNumber: address.phoneNumber
+                      }
+                    : null
             }
 
             OrderService.createOrder(order).then(async (res) => {
