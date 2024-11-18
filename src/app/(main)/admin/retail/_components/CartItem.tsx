@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { CartResponse } from '@/interface/cart.interface'
-import { InputNumber } from 'primereact/inputnumber'
+import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 import { useUpdateEffect } from 'primereact/hooks'
 import CartService from '@/service/cart.service'
 import Image from 'next/image'
+import { Toast } from 'primereact/toast'
 
 interface CartItemProps {
     cart: CartResponse
@@ -14,51 +15,76 @@ interface CartItemProps {
 
 const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange }) => {
     const [quantity, setQuantity] = useState(cart.quantity)
+    const toast = useRef<Toast>(null)
+
     useUpdateEffect(() => {
         setQuantity(cart.quantity)
     }, [cart.quantity])
 
-    const handleIncrement = () => {
-        setQuantity((prev) => prev + 1)
-        updateCartQuantity(quantity + 1)
-    }
-
-    const handleDecrement = () => {
-        if (quantity > 1) {
-            setQuantity((prev) => prev - 1)
-            updateCartQuantity(quantity - 1)
+    const handleIncrement = async () => {
+        if (await updateCartQuantity(quantity + 1)) {
+            setQuantity((prev) => prev + 1)
         }
     }
 
-    const handleChange = (e: any) => {
+    const handleDecrement = async () => {
+        if (quantity > 1) {
+            if (await updateCartQuantity(quantity - 1)) {
+                setQuantity((prev) => prev - 1)
+            }
+        }
+    }
+
+    const handleChange = (e: InputNumberValueChangeEvent) => {
         const value = e.value
-        if (value >= 1) {
+        if (value && value >= 1) {
             setQuantity(value)
             updateCartQuantity(value)
         }
     }
 
-    const updateCartQuantity = (newQuantity: number) => {
-        CartService.updateCartQuantity(cart.id, newQuantity)
-            .then(() => {
-                console.log('Quantity updated successfully!')
-                onQuantityChange()
+    const updateCartQuantity = async (newQuantity: number): Promise<boolean> => {
+        try {
+            await CartService.updateCartQuantity(cart.id, newQuantity)
+            console.log('Quantity updated successfully!')
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Quantity updated successfully!',
+                life: 3000
             })
-            .catch((error) => {
-                console.error('Error updating quantity:', error)
+            onQuantityChange()
+            return true
+        } catch (error) {
+            console.error('Error updating quantity:', error)
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: error instanceof Error ? error.message : 'An error occurred',
+                life: 3000
             })
+            return false
+        }
     }
 
     return (
         <>
             <div className='p-4 rounded-lg flex items-start gap-4 border border-gray-300 shadow-md my-5'>
-                <Image
-                    src={cart.productResponse.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
-                    alt={cart.productResponse.name}
-                    className='object-cover rounded-lg'
-                    width='50'
-                    height='50'
-                />
+                <Toast ref={toast} />
+                <div className='relative'>
+                    <Image
+                        src={cart.productResponse.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
+                        alt={cart.productResponse.name}
+                        className='object-cover rounded-lg'
+                        width='50'
+                        height='50'
+                    />
+                    {cart.productResponse.largestDiscountPercentage > 0 && (
+                        <div className='absolute -top-2 -right-4 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center'>
+                            -{cart.productResponse.largestDiscountPercentage}%
+                        </div>
+                    )}
+                </div>
                 <div className='flex-1'>
                     <div className='flex justify-between items-center'>
                         <div className='font-semibold text-lg flex-grow flex-shrink-0 w-2/5 max-w-xs overflow-hidden text-ellipsis whitespace-nowrap'>
@@ -92,7 +118,18 @@ const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange })
                             </button>
                         </div>
                         <div className='text-gray-600 text-sm flex-shrink-0 w-1/4'>
-                            ${cart.productResponse.price * quantity}
+                            {cart.productResponse.discountPrice ? (
+                                <div>
+                                    <span className='line-through text-gray-400'>
+                                        ${cart.productResponse.price * quantity}
+                                    </span>
+                                    <span className='ml-2 text-red-500 font-semibold'>
+                                        ${cart.productResponse.discountPrice * quantity}
+                                    </span>
+                                </div>
+                            ) : (
+                                <span>${cart.productResponse.price * quantity}</span>
+                            )}
                         </div>
                         <RiDeleteBin6Line
                             onClick={() => onDelete(cart.cartUUID)}

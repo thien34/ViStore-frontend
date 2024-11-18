@@ -29,6 +29,10 @@ export default function Retail() {
     const toast = useRef<Toast>(null)
 
     useUpdateEffect(() => {
+        fetchBill()
+    }, [billId])
+
+    const fetchBill = () => {
         CartService.getBills()
             .then((res) => {
                 if (res) {
@@ -38,19 +42,26 @@ export default function Retail() {
                         .map(([billId, { numberBill, totalItems }]) => ({
                             id: billId,
                             header: `Bill ${numberBill}`,
-                            content: <ProductListComponent updateTabTotalItems={updateTabTotalItems} />,
+                            content: (
+                                <ProductListComponent
+                                    updateTabTotalItems={updateTabTotalItems}
+                                    fetchBill={fetchBill}
+                                    numberBill={numberBill}
+                                />
+                            ),
                             billId: billId,
                             totalItems: totalItems
                         }))
 
                     setTabs(newTabs)
                     setBillId(newTabs[0]?.id || '')
+                    localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
                 }
             })
             .catch((error) => {
                 console.error('Error fetching bills:', error)
             })
-    }, [billId])
+    }
 
     const tabHeaderTemplate = (options: TabPanelHeaderTemplateOptions, header: string, totalItems: number) => {
         return (
@@ -93,7 +104,13 @@ export default function Retail() {
             {
                 id: newId,
                 header: newHeader,
-                content: <ProductListComponent updateTabTotalItems={updateTabTotalItems} />,
+                content: (
+                    <ProductListComponent
+                        updateTabTotalItems={updateTabTotalItems}
+                        fetchBill={fetchBill}
+                        numberBill={tabs.length + 1}
+                    />
+                ),
                 billId: newId,
                 totalItems: 0
             }

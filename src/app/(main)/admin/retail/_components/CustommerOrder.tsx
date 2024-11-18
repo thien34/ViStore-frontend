@@ -6,7 +6,7 @@ import { FaIdCard, FaUserPlus } from 'react-icons/fa'
 import AddressComponent from '@/components/address/AddressComponent'
 import provinceService from '@/service/province.service'
 import { Address, AddressesResponse, Province } from '@/interface/address.interface'
-import { useMountEffect, useUpdateEffect } from 'primereact/hooks'
+import { useLocalStorage, useMountEffect, useUpdateEffect } from 'primereact/hooks'
 import { IoLocationSharp } from 'react-icons/io5'
 import PaymentDialog from './PaymentDialog'
 import { Tooltip } from 'primereact/tooltip'
@@ -17,6 +17,9 @@ import CustomerAddressDialog from './CustomerAddressDialog'
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
 import { Toast } from 'primereact/toast'
 import CartService from '@/service/cart.service'
+import { OrderRequest, PaymentMethodType, PaymentModeType, PaymentStatusType } from '@/interface/order.interface'
+import { CartResponse } from '@/interface/cart.interface'
+import OrderService from '@/service/order.service'
 
 interface CustommerOrderProps {
     orderTotals: {
@@ -26,12 +29,13 @@ interface CustommerOrderProps {
         total: number
     }
     totalWeight: number
+    fetchBill: () => void
+    numberBill: number
 }
 
-export default function CustommerOrder({ orderTotals, totalWeight }: CustommerOrderProps) {
+export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: CustommerOrderProps) {
     const [checked, setChecked] = useState<boolean>(true)
     const [provinces, setProvinces] = useState<Province[]>([])
-    const [retail, setRetail] = useState<boolean>(true)
     const [visible, setVisible] = useState<boolean>(false)
     const [amountPaid, setAmountPaid] = useState<number>(0)
     const [customerDialogVisible, setCustomerDialogVisible] = useState<boolean>(false)
@@ -50,6 +54,7 @@ export default function CustommerOrder({ orderTotals, totalWeight }: CustommerOr
     const [addresses, setAddresses] = useState<AddressesResponse[]>([])
     const [selectedAddress, setSelectedAddress] = useState<AddressesResponse | null>(null)
     const toast = useRef<Toast>(null)
+    const [, setOrderLocal] = useLocalStorage('orderLocal', '')
     const fetchProvinces = async () => {
         const { payload: provinces } = await provinceService.getAll()
         setProvinces(provinces)
@@ -58,28 +63,93 @@ export default function CustommerOrder({ orderTotals, totalWeight }: CustommerOr
         fetchProvinces()
     })
 
-    const handleGetAddress = async (address: Address) => {
-        setAddressDetail(address)
+    const handleGetAddress = async (addressRequest: Address) => {
+        setAddressDetail(addressRequest)
     }
 
     const handlePayment = () => {
+        if (!validateAddress()) return
+        setVisible(true)
+        const billId = localStorage.getItem('billIdCurrent')
+        if (!billId) return
+
+        CartService.getCart(billId).then(async (res: CartResponse[]) => {
+            const order: OrderRequest = {
+                customerId: customer?.id || 1,
+                orderGuid: billId,
+                addressType: checked ? 2 : -1,
+                orderId: '',
+                pickupInStore: false,
+                orderStatusId: checked ? 0 : 8,
+                paymentStatusId: PaymentStatusType.Paid,
+                paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
+                paymentMode: PaymentModeType.IN_STORE,
+                orderSubtotal: orderTotals.subtotal,
+                orderSubtotalDiscount: 0,
+                orderShipping: orderTotals.shippingCost,
+                orderDiscount: 0,
+                orderTotal: orderTotals.total,
+                refundedAmount: 0,
+                paidDateUtc: '',
+                billCode: 'Bill' + numberBill,
+                deliveryMode: checked ? 0 : 1,
+                orderItems: res.map((item) => ({
+                    productId: item.productResponse.id,
+                    orderItemGuid: '',
+                    quantity: item.quantity,
+                    unitPrice: item.productResponse.price,
+                    priceTotal: item.quantity * item.productResponse.price,
+                    discountAmount: 0,
+                    originalProductCost: item.productResponse.price,
+                    attributeDescription: ''
+                })),
+                addressRequest: checked
+                    ? {
+                          customerId: customer?.id || 1,
+                          firstName: address.firstName,
+                          lastName: address.lastName,
+                          email: address.email,
+                          addressName: addressDetailGenerated,
+                          provinceId: addressDetail?.provinceId || '',
+                          districtId: addressDetail?.districtId || '',
+                          wardId: addressDetail?.wardId || '',
+                          phoneNumber: address.phoneNumber
+                      }
+                    : null
+            }
+            setOrderLocal(JSON.stringify(order))
+        })
+    }
+
+    const validateAddress = () => {
         if (checked) {
             if (
-                !address.addressDetail ||
-                !address.firstName ||
-                !address.lastName ||
-                !address.phoneNumber ||
-                !addressDetail
+                (address && !address.firstName) ||
+                (address && !address.lastName) ||
+                (address && !address.phoneNumber) ||
+                !addressDetailGenerated
             ) {
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
                     detail: 'Please select an address'
                 })
-                return
+                return false
             }
         }
-        setVisible(true)
+        return true
+    }
+
+    const validatePayment = () => {
+        if (!checked && amountPaid < orderTotals.total) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Please enter the correct amount'
+            })
+            return false
+        }
+        return true
     }
 
     useUpdateEffect(() => {
@@ -114,7 +184,18 @@ export default function CustommerOrder({ orderTotals, totalWeight }: CustommerOr
     const fetchAddressesCustomer = async () => {
         if (!customer?.id) return
         const { payload: data } = await addressService.getAll(customer.id)
-        setAddresses(data.items)
+        const uniqueAddresses = data.items.filter(
+            (value, index, self) =>
+                index ===
+                self.findIndex(
+                    (t) =>
+                        t.addressDetail === value.addressDetail &&
+                        t.phoneNumber === value.phoneNumber &&
+                        t.firstName === value.firstName &&
+                        t.lastName === value.lastName
+                )
+        )
+        setAddresses(uniqueAddresses)
     }
 
     const onOpenCustomerAddressDialog = () => {
@@ -128,6 +209,75 @@ export default function CustommerOrder({ orderTotals, totalWeight }: CustommerOr
             getAddress(address.id)
             setAddressDetailGenerated(address.addressDetail)
         }
+    }
+
+    const handleOrder = async () => {
+        const billId = localStorage.getItem('billIdCurrent')
+        if (!billId) return
+
+        if (!validateAddress()) return
+        if (!validatePayment()) return
+        CartService.getCart(billId).then(async (res: CartResponse[]) => {
+            const order: OrderRequest = {
+                customerId: customer?.id || 1,
+                orderGuid: billId,
+                addressType: checked ? 2 : -1,
+                orderId: '',
+                pickupInStore: false,
+                orderStatusId: checked ? 1 : 7,
+                paymentStatusId: PaymentStatusType.Paid,
+                paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
+                paymentMode: PaymentModeType.IN_STORE,
+                orderSubtotal: orderTotals.subtotal,
+                orderSubtotalDiscount: 0,
+                orderShipping: orderTotals.shippingCost,
+                orderDiscount: 0,
+                orderTotal: orderTotals.total,
+                refundedAmount: 0,
+                paidDateUtc: '',
+                billCode: 'Bill' + numberBill,
+                deliveryMode: checked ? 0 : 1,
+                orderItems: res.map((item) => ({
+                    productId: item.productResponse.id,
+                    orderItemGuid: '',
+                    quantity: item.quantity,
+                    unitPrice: item.productResponse.price,
+                    priceTotal: item.quantity * item.productResponse.price,
+                    discountAmount: 0,
+                    originalProductCost: item.productResponse.price,
+                    attributeDescription: ''
+                })),
+                addressRequest: checked
+                    ? {
+                          customerId: customer?.id || 1,
+                          firstName: address.firstName,
+                          lastName: address.lastName,
+                          email: address.email,
+                          addressName: addressDetailGenerated,
+                          provinceId: addressDetail?.provinceId || '',
+                          districtId: addressDetail?.districtId || '',
+                          wardId: addressDetail?.wardId || '',
+                          phoneNumber: address.phoneNumber
+                      }
+                    : null
+            }
+
+            OrderService.createOrder(order).then(async (res) => {
+                if (res.status === 200) {
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'Order created successfully'
+                    })
+                    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+                    localStorage.removeItem('billIdCurrent')
+                    setCustomer(null)
+                    await CartService.deleteBill(billId)
+                    await fetchBill()
+                }
+            })
+        })
     }
 
     const onCheckRetail = () => {
@@ -155,10 +305,6 @@ export default function CustommerOrder({ orderTotals, totalWeight }: CustommerOr
         }
     }
 
-    const handleOrder = () => {
-        alert('Chưa có hàm xử lý đơn hàng đâu !!!!!!!!!!!')
-    }
-
     return (
         <div className='space-y-4 w-full'>
             <div className='card'>
@@ -177,10 +323,7 @@ export default function CustommerOrder({ orderTotals, totalWeight }: CustommerOr
                                     <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
                                         Retail
                                     </label>
-                                    <InputSwitch
-                                        checked={!customer ? true : false}
-                                        onChange={(e: InputSwitchChangeEvent) => onCheckRetail()}
-                                    />
+                                    <InputSwitch checked={!customer ? true : false} onChange={() => onCheckRetail()} />
                                 </div>
                                 <div className='flex items-center gap-2'>
                                     <Tooltip target='.customer-tooltip' mouseTrack mouseTrackLeft={10} />
