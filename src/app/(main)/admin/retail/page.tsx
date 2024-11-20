@@ -14,6 +14,8 @@ import ProductListComponent from './_components/ProductList'
 import { TiShoppingCart } from 'react-icons/ti'
 import { Badge } from 'primereact/badge'
 
+import Spinner from '@/components/spinner/Spinner'
+
 type Tab = {
     id: string
     header: string
@@ -27,12 +29,14 @@ export default function Retail() {
     const [activeIndex, setActiveIndex] = useState(0)
     const [billId, setBillId] = useLocalStorage<string>('billId', '')
     const toast = useRef<Toast>(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     useUpdateEffect(() => {
         fetchBill()
     }, [billId])
 
     const fetchBill = () => {
+        setIsLoading(true)
         CartService.getBills()
             .then((res) => {
                 if (res) {
@@ -61,6 +65,8 @@ export default function Retail() {
             .catch((error) => {
                 console.error('Error fetching bills:', error)
             })
+            .finally(() => setIsLoading(false))
+    }, [billId])
     }
 
     const tabHeaderTemplate = (options: TabPanelHeaderTemplateOptions, header: string, totalItems: number) => {
@@ -93,6 +99,10 @@ export default function Retail() {
     const addTab = async () => {
         const newId = uuidv4()
         const newHeader = `Bill ${tabs.length + 1}`
+        try {
+            if (tabs.length >= 5) {
+                showError()
+                return
         if (tabs.length >= 5) {
             showError()
             return
@@ -114,28 +124,54 @@ export default function Retail() {
                 billId: newId,
                 totalItems: 0
             }
-        ])
-        setActiveIndex(tabs.length)
+            setIsLoading(true)
+            await CartService.addBill(newId)
+            setIsLoading(false)
+            setBillId(newId)
+            setTabs([
+                ...tabs,
+                {
+                    id: newId,
+                    header: newHeader,
+                    content: <ProductListComponent updateTabTotalItems={updateTabTotalItems} />,
+                    billId: newId,
+                    totalItems: 0
+                }
+            ])
+            setActiveIndex(tabs.length)
+        } catch (error) {
+            console.error('Error adding bill:', error)
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     const removeTab = (tabIndex: number, billId: string) => {
-        const newTabs = tabs.filter((_, index) => index !== tabIndex)
+        setIsLoading(true)
+        try {
+            const newTabs = tabs.filter((_, index) => index !== tabIndex)
 
-        CartService.deleteBill(billId)
-        setTabs(newTabs)
+            CartService.deleteBill(billId)
+            setTabs(newTabs)
 
-        if (newTabs.length > 0) {
-            if (tabIndex === activeIndex) {
-                const newActiveIndex = tabIndex === newTabs.length ? activeIndex - 1 : activeIndex
-                setActiveIndex(newActiveIndex)
-                setBillId(newTabs[newActiveIndex].billId)
+            if (newTabs.length > 0) {
+                if (tabIndex === activeIndex) {
+                    const newActiveIndex = tabIndex === newTabs.length ? activeIndex - 1 : activeIndex
+                    setActiveIndex(newActiveIndex)
+                    setBillId(newTabs[newActiveIndex].billId)
+                } else {
+                    setActiveIndex(activeIndex > tabIndex ? activeIndex - 1 : activeIndex)
+                    setBillId(newTabs[activeIndex > tabIndex ? activeIndex - 1 : activeIndex].billId)
+                }
             } else {
-                setActiveIndex(activeIndex > tabIndex ? activeIndex - 1 : activeIndex)
-                setBillId(newTabs[activeIndex > tabIndex ? activeIndex - 1 : activeIndex].billId)
+                setActiveIndex(0)
+                setBillId('')
             }
-        } else {
-            setActiveIndex(0)
-            setBillId('')
+            setIsLoading(false)
+        } catch (error) {
+            console.error('Error deleting bill:', error)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -179,7 +215,11 @@ export default function Retail() {
                 <h2 className=''>Retail Sales</h2>
                 <Button label='Create Bill' onClick={addTab} />
             </div>
-
+            {isLoading && (
+                <div className="spinner-container">
+                    <Spinner />
+                </div>
+            )}
             <TabView className='mt-5' activeIndex={activeIndex} onTabChange={handleTabChange}>
                 {tabs.map((tab) => (
                     <TabPanel

@@ -37,7 +37,7 @@ class DiscountService {
     async getById(id: number) {
         return await http.get<Promotion>(`${this.basePath}/${id}`)
     }
-    async markAsExpired(id: string) {
+    async markAsExpired(id: number | undefined) {
         const response = await fetch(`http://localhost:8080/api/admin/discounts/${id}/end-date-now`, {
             method: 'PUT',
             headers: {
@@ -52,7 +52,7 @@ class DiscountService {
 
         return response.json()
     }
-    async cancelDiscount(id: number) {
+    async cancelDiscount(id: number | undefined) {
         const response = await fetch(`http://localhost:8080/api/admin/discounts/${id}/cancel`, {
             method: 'PUT',
             headers: {
