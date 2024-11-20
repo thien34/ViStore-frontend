@@ -17,7 +17,7 @@ interface FormProps {
     addressDetail?: Address
 }
 
-const emtyAddress: Address = {
+const emptyAddress: Address = {
     provinceId: '',
     districtId: '',
     wardId: '',
@@ -27,7 +27,7 @@ const emtyAddress: Address = {
 }
 const AddressComponent = ({ provinces, submitted, className, onAddressChange, addressDetail }: FormProps) => {
     const toast = useRef<Toast>(null)
-    const [address, setAddress] = useState<Address>(addressDetail || emtyAddress)
+    const [address, setAddress] = useState<Address>(addressDetail || emptyAddress)
     const [districts, setDistricts] = useState<Province[]>([])
     const [wards, setWards] = useState<Province[]>([])
 
@@ -38,8 +38,10 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
     }
 
     const fetchWards = async (districtId: string) => {
-        const { payload: wards } = await wardService.getAll(districtId)
-        setWards(wards)
+        if (districtId) {
+            const { payload: wards } = await wardService.getAll(districtId)
+            setWards(wards)
+        }
     }
 
     const handleAddressChange = (updatedAddress: Address) => {
@@ -51,7 +53,7 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
             setAddress(addressDetail)
             fetchDistricts(addressDetail.provinceId).then(() => fetchWards(addressDetail.districtId))
         } else {
-            setAddress(emtyAddress)
+            setAddress(emptyAddress)
             setDistricts([])
             setWards([])
         }
@@ -70,9 +72,13 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                             value={provinces.find((province) => province.code === address.provinceId)}
                             onChange={(e) => {
                                 const updatedAddress = {
-                                    ...address,
                                     provinceId: e.target.value.code,
-                                    province: e.target.value.fullName
+                                    province: e.target.value.fullName,
+                                    districtId: '',
+                                    district: '',
+                                    wardId: '',
+                                    ward: '',
+                                    address: ''
                                 }
                                 handleAddressChange(updatedAddress)
                                 fetchDistricts(e.target.value.code)
@@ -122,7 +128,8 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                             onChange={(e) => {
                                 const updatedAddress = {
                                     ...address,
-                                    wardId: e.target.value.code
+                                    wardId: e.target.value.code,
+                                    ward: e.target.value.fullName
                                 }
                                 handleAddressChange(updatedAddress)
                             }}

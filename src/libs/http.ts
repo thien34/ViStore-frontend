@@ -19,7 +19,7 @@ const httpInstance = async function <Response>(path: string, method: Method, dat
         const res = await fetch(fullUrl, requestOptions)
         const payload = await res.json()
         if (!res.ok) {
-            throw new Error('Error in fetching data')
+            throw new Error(payload.message, { cause: payload })
         }
         return {
             payload: payload.data as Response,
@@ -54,7 +54,7 @@ const http = {
             const res = await fetch(fullUrl, requestOptions)
             const payload = await res.json()
             if (!res.ok) {
-                throw new Error('Error in fetching data')
+                throw new Error(payload.message, { cause: payload })
             }
             return {
                 payload: payload.data as Response,

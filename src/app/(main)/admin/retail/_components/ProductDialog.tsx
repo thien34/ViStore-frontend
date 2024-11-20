@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { DataTable } from 'primereact/datatable'
+import { DataTable, DataTableFilterEvent, DataTableFilterMeta } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Dialog } from 'primereact/dialog'
 import { InputText } from 'primereact/inputtext'
@@ -13,9 +12,9 @@ interface ProductDialogProps {
     products: ProductResponse[]
     visible: boolean
     setVisible: (visible: boolean) => void
-    filters: any
-    setFilters: (filters: any) => void
-    onFilter?: (e: any) => void
+    filters: DataTableFilterMeta
+    setFilters: (filters: DataTableFilterMeta) => void
+    onFilter?: (e: DataTableFilterEvent) => void
     addProductToCart: (product: ProductResponse) => void
     globalFilterValue: string
     onGlobalFilterChange: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -67,22 +66,43 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
                     field='imageUrl'
                     header='Image'
                     body={(rowData) => (
-                        <Image
-                            src={
-                                rowData.imageUrl ||
-                                '/demo/images/default/—Pngtree—sneakers_3989154.png'
-                            }
-                            alt={rowData.name}
-                            width='50'
-                            height='50'
-                        />
+                        <div className='relative'>
+                            <Image
+                                src={rowData.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
+                                alt={rowData.name}
+                                width='50'
+                                height='50'
+                            />
+                            {rowData.largestDiscountPercentage > 0 && (
+                                <div className='absolute -top-2 right-6 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center'>
+                                    -{rowData.largestDiscountPercentage}%
+                                </div>
+                            )}
+                        </div>
                     )}
                 />
                 <Column field='name' header='Product Name' />
                 <Column field='sku' header='SKU' />
                 <Column field='categoryName' header='Category' />
                 <Column field='manufacturerName' header='Manufacturer' />
-                <Column field='price' header='Price' body={(rowData) => `$${rowData.price}`} />
+                <Column
+                    field='price'
+                    header='Price'
+                    body={(rowData: ProductResponse) => (
+                        <div className='flex gap-2 items-center'>
+                            {rowData.discountPrice ? (
+                                <>
+                                    <span className='line-through text-gray-500'>$ {rowData.price}</span>
+                                    <span className='text-red-500'>$ {rowData.discountPrice}</span>
+                                </>
+                            ) : (
+                                <span>$ {rowData.price}</span>
+                            )}
+                        </div>
+                    )}
+                />
+                <Column field='quantity' header='Quantity' />
+
                 <Column
                     header='Action'
                     body={(rowData) => (

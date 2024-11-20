@@ -159,7 +159,6 @@ const CustomerForm = ({ roles }: FormProps) => {
                         <div className='text-xl font-medium mb-6'>Role</div>
                         <div className='field'>
                             <label htmlFor='roleName' className='font-medium w-full'>
-                                {customer.customerRoles}
                                 Role name
                             </label>
                             <Dropdown

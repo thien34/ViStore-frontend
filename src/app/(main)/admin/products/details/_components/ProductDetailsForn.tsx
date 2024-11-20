@@ -1,12 +1,9 @@
 'use client'
-import ManagerPath from '@/constants/ManagerPath'
 import { ProductResponseDetails } from '@/interface/Product'
 import { ProductAttributeName } from '@/interface/productAttribute.interface'
 import AttributeValueService from '@/service/AttributeValueService'
 import PictureService from '@/service/PictureService'
 import ProductService from '@/service/ProducrService'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { PrimeIcons } from 'primereact/api'
 import { AutoComplete, AutoCompleteChangeEvent, AutoCompleteCompleteEvent } from 'primereact/autocomplete'
@@ -17,10 +14,10 @@ import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { Tooltip } from 'primereact/tooltip'
 import React, { useEffect, useRef, useState } from 'react'
-import Barcode from 'react-barcode'
 import { Promotion } from '@/interface/discount.interface'
 import { Message } from 'primereact/message'
 import QRCode from 'react-qr-code'
+import Image from 'next/image'
 
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
@@ -35,7 +32,6 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
     const [formData, setFormData] = useState<ProductResponseDetails>(product)
     const [imageUrl, setImageUrl] = useState<string>(product.imageUrl)
     const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-    const router = useRouter()
     const [discount, setDiscount] = useState(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const toast = useRef<Toast>(null)
@@ -166,9 +162,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                 const response = await fetch(`http://localhost:8080/api/admin/discounts/by-product/${productId}`)
                 const data = await response.json()
 
-                const activeDiscounts = data.data.filter(
-                    (discount: Promotion) => discount.status === 'ACTIVE'
-                )
+                const activeDiscounts = data.data.filter((discount: Promotion) => discount.status === 'ACTIVE')
                 if (activeDiscounts.length > 0) {
                     const sortedDiscounts = activeDiscounts.sort(
                         (a: Promotion, b: Promotion) => (b.discountPercentage ?? 0) - (a.discountPercentage ?? 0)
@@ -195,6 +189,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
 
             return uniqueNames
         } catch (error) {
+            console.error('Error fetching attribute values:', error)
             return []
         }
     }
@@ -227,25 +222,31 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
             <Toast ref={toast} />
             <h5>Edit Product Details</h5>
             <div className='flex flex-column gap-4'>
-            {discount && (
-                <div className="mb-3">
-                    <Message
-                        style={{
-                            border: 'solid #f39c12',
-                            borderWidth: '0 0 0 6px',
-                            color: '#f39c12'
-                        }}
-                        className="border-warning w-full justify-content-start"
-                        severity="warn"
-                        content={
-                            <div className="flex align-items-center">
-                                <i className="pi pi-exclamation-triangle" style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}></i>
-                                <div>Warning: This product is currently on discount and cannot be edited price until the discount ends.</div>
-                            </div>
-                        }
-                    />
-                </div>
-            )}
+                {discount && (
+                    <div className='mb-3'>
+                        <Message
+                            style={{
+                                border: 'solid #f39c12',
+                                borderWidth: '0 0 0 6px',
+                                color: '#f39c12'
+                            }}
+                            className='border-warning w-full justify-content-start'
+                            severity='warn'
+                            content={
+                                <div className='flex align-items-center'>
+                                    <i
+                                        className='pi pi-exclamation-triangle'
+                                        style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}
+                                    ></i>
+                                    <div>
+                                        Warning: This product is currently on discount and cannot be edited price until
+                                        the discount ends.
+                                    </div>
+                                </div>
+                            }
+                        />
+                    </div>
+                )}
                 <div className='p-grid p-fluid'>
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
@@ -352,10 +353,11 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                         <div className='grid grid-cols-1 p-2 items-center gap-6 w-full'>
                             <Tooltip target='.image' />
 
-                            <img
-                                style={{ width: '100px' }}
+                            <Image
+                                width={100}
+                                height={100}
                                 className='object-cover rounded-lg shadow-lg border border-gray-200 mb-2 image ms-20'
-                                src={imageUrl}
+                                src={imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
                                 data-pr-tooltip='Product Image'
                                 alt='Product'
                             />

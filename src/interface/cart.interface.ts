@@ -16,3 +16,5 @@ export interface CartResponse {
     quantity: number
     productResponse: ProductResponseDetails
 }
+
+

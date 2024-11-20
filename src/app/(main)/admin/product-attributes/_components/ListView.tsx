@@ -77,7 +77,6 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
                 })
             }
             setProductAttributeDialog(false)
-            setProductAttribute(emptyProductAttribute)
             await fetchProductAttributes()
         }
     }

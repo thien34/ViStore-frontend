@@ -77,7 +77,6 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                 })
             }
             setManufacturerDialog(false)
-            setManufacturer(emptyManufacturer)
             await fetchManufacturers()
         }
     }

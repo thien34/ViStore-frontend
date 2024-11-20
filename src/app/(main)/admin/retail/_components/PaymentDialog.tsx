@@ -29,7 +29,7 @@ export default function PaymentDialog({
     const toast = useRef<Toast>(null)
     const [amountPaidState, setAmountPaidState] = useState(0)
     const router = useRouter()
-    const [amountPaidLocal, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
+    const [, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
     const onSetAmountPaid = (e: InputNumberValueChangeEvent) => {
         setAmountPaidState(e.value ?? 0)
     }

@@ -19,6 +19,10 @@ const AppMenu = () => {
             items: [{ label: 'Retail Sales', icon: 'pi pi-fw pi-shop', to: '/admin/retail' }]
         },
         {
+            label: 'Orders',
+            items: [{ label: 'Orders', icon: 'pi pi-fw pi-table', to: '/admin/orders' }]
+        },
+        {
             label: 'Catalog',
             items: [
                 { label: 'Products', icon: 'pi pi-fw pi-box', to: '/admin/products' },
@@ -31,6 +35,7 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-mobile',
                     to: '/uikit/button'
                 },
+                { label: 'Discounts', icon: 'pi pi-fw pi-users', to: '/admin/discounts' },
                 { label: 'Customers', icon: 'pi pi-fw pi-users', to: '/admin/customers' },
                 { label: 'Customer roles', icon: 'pi pi-fw pi-key', to: '/admin/customer-roles' }
             ]

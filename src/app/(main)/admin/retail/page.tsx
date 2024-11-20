@@ -13,8 +13,8 @@ import { v4 as uuidv4 } from 'uuid'
 import ProductListComponent from './_components/ProductList'
 import { TiShoppingCart } from 'react-icons/ti'
 import { Badge } from 'primereact/badge'
+
 import Spinner from '@/components/spinner/Spinner'
-type Props = {}
 
 type Tab = {
     id: string
@@ -32,6 +32,10 @@ export default function Retail() {
     const [isLoading, setIsLoading] = useState(false)
 
     useUpdateEffect(() => {
+        fetchBill()
+    }, [billId])
+
+    const fetchBill = () => {
         setIsLoading(true)
         CartService.getBills()
             .then((res) => {
@@ -42,13 +46,20 @@ export default function Retail() {
                         .map(([billId, { numberBill, totalItems }]) => ({
                             id: billId,
                             header: `Bill ${numberBill}`,
-                            content: <ProductListComponent updateTabTotalItems={updateTabTotalItems} />,
+                            content: (
+                                <ProductListComponent
+                                    updateTabTotalItems={updateTabTotalItems}
+                                    fetchBill={fetchBill}
+                                    numberBill={numberBill}
+                                />
+                            ),
                             billId: billId,
                             totalItems: totalItems
                         }))
 
                     setTabs(newTabs)
                     setBillId(newTabs[0]?.id || '')
+                    localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
                 }
             })
             .catch((error) => {
@@ -56,6 +67,7 @@ export default function Retail() {
             })
             .finally(() => setIsLoading(false))
     }, [billId])
+    }
 
     const tabHeaderTemplate = (options: TabPanelHeaderTemplateOptions, header: string, totalItems: number) => {
         return (
@@ -91,6 +103,26 @@ export default function Retail() {
             if (tabs.length >= 5) {
                 showError()
                 return
+        if (tabs.length >= 5) {
+            showError()
+            return
+        }
+        await CartService.addBill(newId)
+        setBillId(newId)
+        setTabs([
+            ...tabs,
+            {
+                id: newId,
+                header: newHeader,
+                content: (
+                    <ProductListComponent
+                        updateTabTotalItems={updateTabTotalItems}
+                        fetchBill={fetchBill}
+                        numberBill={tabs.length + 1}
+                    />
+                ),
+                billId: newId,
+                totalItems: 0
             }
             setIsLoading(true)
             await CartService.addBill(newId)
