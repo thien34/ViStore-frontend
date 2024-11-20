@@ -1,3 +1,4 @@
+import ListView from "../page"
 
 const VoucherPage = async () => {
     return (

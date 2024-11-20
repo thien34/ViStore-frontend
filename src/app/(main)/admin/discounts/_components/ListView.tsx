@@ -44,18 +44,6 @@ const ListView = () => {
 
         fetchDiscounts()
     }, [])
-    // const fetchDiscounts = async () => {
-    //     const response = await discountService.getAll()
-    //     setDiscounts(response)
-    //     setFilteredDiscounts(response)
-    // }
-    // useEffect(() => {
-    //     fetchDiscounts()
-    //     const intervalId = setInterval(() => {
-    //         fetchDiscounts()
-    //     }, 10000)
-    //     return () => clearInterval(intervalId)
-    // }, [])
 
     const formatDiscountAndStock = (rowData: any) => {
         const stockClassName = classNames(
@@ -365,18 +353,6 @@ const ListView = () => {
                         filterMenuStyle={{ width: '14rem' }}
                         style={{ width: '15%' }}
                     ></Column>
-                    {/* <Column
-                        field='active'
-                        header='Active'
-                        body={(rowData) =>
-                            rowData.isActive ? (
-                                <i className='pi pi-check' style={{ color: 'green' }}></i>
-                            ) : (
-                                <i className='pi pi-times' style={{ color: 'red' }}></i>
-                            )
-                        }
-                        style={{ width: '10%' }}
-                    /> */}
                     <Column body={editAndExpiredButtonTemplate} header='Actions' />
                 </DataTable>
             </div>

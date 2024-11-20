@@ -363,7 +363,6 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             return updatedImages
         })
     }
-
     return (
         <div>
             <Toast ref={toast} />
