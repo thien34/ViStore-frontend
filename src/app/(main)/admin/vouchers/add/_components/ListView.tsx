@@ -18,6 +18,7 @@ import { Checkbox } from 'primereact/checkbox'
 import { ToggleButton } from 'primereact/togglebutton'
 import voucherService from '@/service/voucher.service'
 import { Dropdown } from 'primereact/dropdown'
+import { InputMask, InputMaskChangeEvent } from 'primereact/inputmask'
 
 const DiscountForm = () => {
     const toast = useRef<Toast>(null)
@@ -27,8 +28,7 @@ const DiscountForm = () => {
     const [toDate, setToDate] = useState<Date | undefined>(undefined)
     const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([])
     const [customers, setCustomers] = useState<Customer[]>([])
-    const [discountTypeId] = useState<number>(2)
-    const [checked, setChecked] = useState<boolean>(false)
+    const [discountTypeId] = useState<number>(0)
     const [isPublished, setIsPublished] = useState<boolean>(false)
     const [comments, setComments] = useState<string>('')
     const [usePercentage, setUsePercentage] = useState<boolean>(false)
@@ -39,8 +39,8 @@ const DiscountForm = () => {
     const [minEndDate, setMinEndDate] = useState<Date | undefined>(undefined)
     const [maxDiscountAmount, setMaxDiscountAmount] = useState<number | null>(null)
     const [enableMaxDiscount, setEnableMaxDiscount] = useState<boolean>(true)
-    const [requiresCouponCode, setRequiresCouponCode] = useState<boolean>(false)
-    const [couponCode, setCouponCode] = useState<string>('')
+    const [requiresCouponCode, setRequiresCouponCode] = useState<boolean>(true)
+    const [couponCode, setCouponCode] = useState<string | undefined>()
     const [discountLimitationType, setDiscountLimitationType] = useState(0)
     const [limitationTimes, setLimitationTimes] = useState(null)
     const [perCustomerLimit, setPerCustomerLimit] = useState(null)
@@ -77,7 +77,7 @@ const DiscountForm = () => {
         `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
     )
     const discountLimitationTypes = [
-        { id: 0, label: 'None' },
+        // { id: 0, label: 'None' },
         { id: 1, label: 'Limited Vouchers' },
         { id: 2, label: 'Limited Per Customer' },
         { id: 3, label: 'Limited Vouchers and Per Customer' }
@@ -114,6 +114,7 @@ const DiscountForm = () => {
             showFailedToast('Form validation failed. Please correct the fields.')
             return
         }
+        const formattedCouponCode = requiresCouponCode ? `VI${couponCode?.replace(/^VI/, '')}` : undefined
         const discountPayload = {
             name: discountName,
             comment: comments,
@@ -127,7 +128,7 @@ const DiscountForm = () => {
             maxDiscountedQuantity: maxDiscountedQuantity,
             minOderAmount: minOrderAmount,
             requiresCouponCode: requiresCouponCode,
-            couponCode: requiresCouponCode ? couponCode : undefined,
+            couponCode: formattedCouponCode,
             selectedCustomerIds: selectedCustomers.map((customer) => customer.id),
             isPublished: isPublished,
             discountLimitationType: discountLimitationType,
@@ -170,6 +171,7 @@ const DiscountForm = () => {
     }
 
     const validateForm = () => {
+        debugger
         let isValid = true
         const newErrors: {
             discountName: string | null
@@ -181,6 +183,9 @@ const DiscountForm = () => {
             maxDiscountAmount: string | null
             maxDiscountedQuantity: string | null
             minOrderAmount: string | null
+            couponCode: string | null
+            limitationTimes: string | null
+            perCustomerLimit: string | null
         } = {
             discountName: null,
             value: null,
@@ -190,14 +195,22 @@ const DiscountForm = () => {
             productError: null,
             maxDiscountAmount: null,
             maxDiscountedQuantity: null,
-            minOrderAmount: null
+            minOrderAmount: null,
+            couponCode: null,
+            limitationTimes: null,
+            perCustomerLimit: null
         }
 
         if (!discountName.trim()) {
             newErrors.discountName = 'Discount name is required.'
             isValid = false
         }
-
+        if (requiresCouponCode) {
+            if (!couponCode || !couponCode.trim()) {
+                newErrors.couponCode = 'Coupon code is required.'
+                isValid = false
+            }
+        }
         if (value === null || isNaN(value) || value <= 0) {
             newErrors.value = 'Please enter a valid positive discount value.'
             isValid = false
@@ -250,12 +263,34 @@ const DiscountForm = () => {
                 isValid = false
             }
         }
+        const validDiscountPercentage = !usePercentage && value != null ? value : 0
+
+        if (minOrderAmount >= 0 && validDiscountPercentage > 0.69 * minOrderAmount) {
+            newErrors.value = 'Voucher value cannot exceed 69% of the minimum order amount.'
+            isValid = false
+        }
+        const limitationTimeValid = limitationTimes != null ? limitationTimes : 0
+        if (limitationTimeValid <= 0 || limitationTimeValid > 1000000) {
+            newErrors.limitationTimes = 'Limitation times must be between 1 and 1000000.'
+            isValid = false
+        }
+        const perCustomerLimitValid = perCustomerLimit !== null ? perCustomerLimit : 0
+        if(perCustomerLimitValid <= 0 || perCustomerLimitValid > 5) {
+            newErrors.perCustomerLimit = 'Per customer limit must be between 1 and 5.'
+            isValid = false
+        }
 
         if (selectedCustomers.length === 0) {
             newErrors.productError = 'At least one product must be selected.'
             isValid = false
         }
+        const validValue = value !== null ? value : 0
+        const validMinOrderAmount = minOrderAmount !== null ? minOrderAmount : 0
 
+        if (validValue > validMinOrderAmount) {
+            newErrors.value = 'Voucher value cannot exceed the minimum order amount.'
+            isValid = false
+        }
         setErrors(newErrors)
         return isValid
     }
@@ -280,6 +315,25 @@ const DiscountForm = () => {
             <div className='p-fluid grid'>
                 <div className='col-12 md:col-6'>
                     <h3>Create Voucher</h3>
+                    <p>{isPublished ? 'Published vouchers' : 'Private vouchers'}</p>
+                    <ToggleButton
+                        onLabel='Public'
+                        offLabel='Private'
+                        onIcon='pi pi-lock-open'
+                        offIcon='pi pi-lock'
+                        checked={isPublished}
+                        onChange={(e) => {
+                            const newIsPublished = e.value
+                            setIsPublished(newIsPublished)
+                            if (newIsPublished) {
+                                setSelectedCustomers([])
+                            } else {
+                                setRequiresCouponCode(true)
+                            }
+                        }}
+                        className='w-9rem mt-1 mb-5'
+                    />
+
                     <div className='field'>
                         <label htmlFor='voucherName'>Voucher Name</label>
                         <InputText
@@ -299,7 +353,13 @@ const DiscountForm = () => {
                             <InputSwitch
                                 id='discountTypeSwitch'
                                 checked={usePercentage}
-                                onChange={(e) => setUsePercentage(e.value)}
+                                onChange={(e) => {
+                                    const newValue = e.value
+                                    setUsePercentage(newValue)
+                                    if (!newValue) {
+                                        setMaxDiscountAmount(null)
+                                    }
+                                }}
                                 tooltip='Switch between Percentage or Fixed discount type'
                                 tooltipOptions={{ position: 'top' }}
                             />
@@ -318,10 +378,10 @@ const DiscountForm = () => {
                                         <InputNumber
                                             id='maxDiscountAmount'
                                             value={maxDiscountAmount}
-                                            suffix='$'
+                                            prefix='$'
                                             onValueChange={(e) => setMaxDiscountAmount(e.value)}
-                                            min={0}
-                                            max={1000}
+                                            min={1}
+                                            max={5000}
                                             showButtons
                                             className={errors.maxDiscountAmount ? 'p-invalid' : ''}
                                         />
@@ -408,6 +468,8 @@ const DiscountForm = () => {
                             onValueChange={(e) => setMaxDiscountedQuantity(e.value)}
                             min={1}
                             max={1000}
+                            prefix='A total of '
+                            suffix=' products are applicable for this voucher'
                             showButtons
                             className={errors.maxDiscountedQuantity ? 'p-invalid' : ''}
                         />
@@ -421,8 +483,8 @@ const DiscountForm = () => {
                             id='minOrderAmount'
                             value={minOrderAmount}
                             onValueChange={(e) => setMinOrderAmount(e.value)}
-                            suffix='$'
-                            min={0}
+                            prefix='$'
+                            min={1}
                             max={1000000}
                             showButtons
                             className={errors.minOrderAmount ? 'p-invalid' : ''}
@@ -435,34 +497,32 @@ const DiscountForm = () => {
                             id='requiresCouponCode'
                             checked={requiresCouponCode}
                             onChange={(e: InputSwitchChangeEvent) => setRequiresCouponCode(e.value)}
+                            disabled={!isPublished}
                         />
                     </div>
                     {requiresCouponCode && (
                         <div className='field'>
                             <label htmlFor='couponCode'>Coupon Code</label>
-                            <InputText
-                                id='couponCode'
+                            <InputMask
+                                className='uppercase'
                                 value={couponCode}
-                                onChange={(e) => setCouponCode(e.target.value)}
-                                placeholder='Enter coupon code'
+                                onChange={(e: InputMaskChangeEvent) => setCouponCode(e.target.value)}
+                                mask='VI-*******'
+                                placeholder='VI-'
                             />
+                            {errors.couponCode && <small className='p-error'>{errors.couponCode}</small>}
                         </div>
                     )}
                     <div className='my-4'>
-                        <Checkbox id='ingredient' onChange={(e) => setIsCumulative(e.checked ?? false)} checked={isCumulative} />
+                        <Checkbox
+                            id='ingredient'
+                            onChange={(e) => setIsCumulative(e.checked ?? false)}
+                            checked={isCumulative}
+                        />
                         <label htmlFor='ingredient' className='ml-2'>
                             Cumulative with other discounts
                         </label>
                     </div>
-                    <ToggleButton
-                        onLabel='Public'
-                        offLabel='Private'
-                        onIcon='pi pi-lock-open'
-                        offIcon='pi pi-lock'
-                        checked={isPublished}
-                        onChange={(e) => setIsPublished(e.value)}
-                        className='w-9rem'
-                    />
                     <div className='field my-4'>
                         <label htmlFor='discountLimitationType'>Discount Limitation Type</label>
                         <Dropdown
@@ -478,15 +538,13 @@ const DiscountForm = () => {
                         />
                     </div>
 
-                    {discountLimitationType !== 0 && discountLimitationType !== 3 && (
+                    {discountLimitationType !== 0 && discountLimitationType !== 2 && (
                         <div className='field'>
                             <label htmlFor='limitationTimes'>Limitation Times</label>
                             <InputNumber
                                 id='limitationTimes'
                                 value={limitationTimes}
                                 onValueChange={(e) => setLimitationTimes(e.value)}
-                                min={1}
-                                max={1000}
                                 placeholder='Enter limitation times'
                                 tooltip='Enter the maximum times this discount can be used'
                                 tooltipOptions={{ position: 'top' }}
@@ -496,9 +554,9 @@ const DiscountForm = () => {
                         </div>
                     )}
 
-                    {discountLimitationType === 3 && (
+                    {discountLimitationType !== 0 && discountLimitationType !== 1 && (
                         <>
-                            <div className='field'>
+                            {/* <div className='field'>
                                 <label htmlFor='totalLimit'>Total Limit</label>
                                 <InputNumber
                                     id='totalLimit'
@@ -512,7 +570,7 @@ const DiscountForm = () => {
                                     className={errors.limitationTimes ? 'p-invalid' : ''}
                                 />
                                 {errors.limitationTimes && <small className='p-error'>{errors.limitationTimes}</small>}
-                            </div>
+                            </div> */}
 
                             <div className='field'>
                                 <label htmlFor='perCustomerLimit'>Per Customer Limit</label>
@@ -520,8 +578,6 @@ const DiscountForm = () => {
                                     id='perCustomerLimit'
                                     value={perCustomerLimit}
                                     onValueChange={(e) => setPerCustomerLimit(e.value)}
-                                    min={1}
-                                    max={1000}
                                     placeholder='Enter per customer limit'
                                     tooltip='Enter the maximum times each customer can use this discount'
                                     tooltipOptions={{ position: 'top' }}
@@ -563,6 +619,7 @@ const DiscountForm = () => {
                             placeholder='Search by name'
                         />
                     </div>
+                    {errors.productError && <small className='p-error'>{errors.productError}</small>}
                     {customers.length === 0 ? (
                         <div className='card flex justify-content-center'>
                             <Image
@@ -578,6 +635,7 @@ const DiscountForm = () => {
                             rows={9}
                             dataKey='id'
                             selection={selectedCustomers}
+                            isDataSelectable={() => !isPublished}
                             onSelectionChange={onCustomerSelectionChange}
                             selectionMode='checkbox'
                         >
