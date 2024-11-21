@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 'use client'
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { FilterMatchMode, FilterOperator } from 'primereact/api'
 import { DataTableFilterMeta } from 'primereact/datatable'
 import { Button } from 'primereact/button'

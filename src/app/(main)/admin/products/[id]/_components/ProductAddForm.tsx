@@ -12,7 +12,7 @@ import { Editor } from 'primereact/editor'
 import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Image } from 'primereact/image'
 interface ProductAddFormProps {

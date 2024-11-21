@@ -3,11 +3,9 @@ import CartService from '@/service/cart.service'
 import { Button } from 'primereact/button'
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup'
 import { useLocalStorage, useUpdateEffect } from 'primereact/hooks'
-
 import { TabPanel, TabPanelHeaderTemplateOptions, TabView } from 'primereact/tabview'
 import { Toast } from 'primereact/toast'
-
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { TiShoppingCart } from 'react-icons/ti'
 import { Badge } from 'primereact/badge'
@@ -30,7 +28,10 @@ export default function Retail() {
     const [isLoading, setIsLoading] = useState(false)
 
     useUpdateEffect(() => {
-        setIsLoading(true)
+        fetchBill()
+    }, [billId])
+
+    const fetchBill = () => {
         CartService.getBills()
             .then((res) => {
                 if (res) {
@@ -40,20 +41,26 @@ export default function Retail() {
                         .map(([billId, { numberBill, totalItems }]) => ({
                             id: billId,
                             header: `Bill ${numberBill}`,
-                            content: <ProductListComponent updateTabTotalItems={updateTabTotalItems} />,
+                            content: (
+                                <ProductListComponent
+                                    updateTabTotalItems={updateTabTotalItems}
+                                    fetchBill={fetchBill}
+                                    numberBill={numberBill}
+                                />
+                            ),
                             billId: billId,
                             totalItems: totalItems
                         }))
 
                     setTabs(newTabs)
                     setBillId(newTabs[0]?.id || '')
+                    localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
                 }
             })
             .catch((error) => {
                 console.error('Error fetching bills:', error)
             })
-            .finally(() => setIsLoading(false))
-    }, [billId])
+    }
 
     const tabHeaderTemplate = (options: TabPanelHeaderTemplateOptions, header: string, totalItems: number) => {
         return (
@@ -99,7 +106,13 @@ export default function Retail() {
                 {
                     id: newId,
                     header: newHeader,
-                    content: <ProductListComponent updateTabTotalItems={updateTabTotalItems} />,
+                    content: (
+                        <ProductListComponent
+                            updateTabTotalItems={updateTabTotalItems}
+                            fetchBill={fetchBill}
+                            numberBill={tabs.length + 1}
+                        />
+                    ),
                     billId: newId,
                     totalItems: 0
                 }
@@ -182,7 +195,7 @@ export default function Retail() {
                 <Button label='Create Bill' onClick={addTab} />
             </div>
             {isLoading && (
-                <div className="spinner-container">
+                <div className='spinner-container'>
                     <Spinner isLoading={isLoading} />
                 </div>
             )}

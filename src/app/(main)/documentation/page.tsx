@@ -202,7 +202,7 @@ export default function FullPageLayout({ children }: FullPageLayoutProps) {
                         <pre className='app-code'>
                             <code>
                                 {`"use client";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Head from 'next/head';
 export const LayoutContext = React.createContext();
 

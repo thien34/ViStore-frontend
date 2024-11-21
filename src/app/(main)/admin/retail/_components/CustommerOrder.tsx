@@ -1,7 +1,7 @@
 import { Button } from 'primereact/button'
 import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch'
 import { InputText } from 'primereact/inputtext'
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { FaIdCard, FaUserPlus } from 'react-icons/fa'
 import AddressComponent from '@/components/address/AddressComponent'
 import provinceService from '@/service/province.service'

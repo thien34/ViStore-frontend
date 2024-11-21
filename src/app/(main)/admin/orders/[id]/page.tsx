@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import OrderItemList from './_components/OrderItemList'
 import { OrderItemsResponse, OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
 import OrderService from '@/service/order.service'
