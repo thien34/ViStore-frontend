@@ -93,7 +93,7 @@ export default function OrderList({ orders }: Props) {
     }
 
     return (
-        <div>
+        <div className='card'>
             <DataTable value={orders} paginator rows={10} rowsPerPageOptions={[10, 20, 50]}>
                 <Column body={(_, { rowIndex }) => rowIndex + 1} header='#' />
                 <Column align='center' field='billCode' header='Bill Code' />

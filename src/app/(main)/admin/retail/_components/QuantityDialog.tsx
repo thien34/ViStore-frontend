@@ -36,7 +36,7 @@ const QuantityDialog: React.FC<QuantityDialogProps> = ({
                         onValueChange={(e) => setQuantity(e.value ?? 1)}
                         value={quantity}
                         defaultValue={1}
-                        min={1}
+                        min={quantity === 1 ? 1 : 0}
                         max={product?.quantity ?? 1}
                         showButtons
                         buttonLayout='horizontal'

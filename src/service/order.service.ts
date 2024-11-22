@@ -18,6 +18,9 @@ class OrderService {
     static async getOrderStatusHistory(orderId: string) {
         return await http.get<OrderStatusHistoryResponse[]>(`${this.basePath}/${orderId}/order-status-history`)
     }
+    static async updateOrderItem(orderId: number, quantity: number) {
+        return await http.put(`${this.basePath}/updateQuantity/${orderId}?quantity=${quantity}`, {})
+    }
 }
 
 export default OrderService

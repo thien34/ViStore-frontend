@@ -217,66 +217,76 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
 
         if (!validateAddress()) return
         if (!validatePayment()) return
-        CartService.getCart(billId).then(async (res: CartResponse[]) => {
-            const order: OrderRequest = {
-                customerId: customer?.id || 1,
-                orderGuid: billId,
-                addressType: checked ? 2 : -1,
-                orderId: '',
-                pickupInStore: false,
-                orderStatusId: checked ? 1 : 7,
-                paymentStatusId: PaymentStatusType.Paid,
-                paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
-                paymentMode: PaymentModeType.IN_STORE,
-                orderSubtotal: orderTotals.subtotal,
-                orderSubtotalDiscount: 0,
-                orderShipping: orderTotals.shippingCost,
-                orderDiscount: 0,
-                orderTotal: orderTotals.total,
-                refundedAmount: 0,
-                paidDateUtc: '',
-                billCode: 'Bill' + numberBill,
-                deliveryMode: checked ? 0 : 1,
-                orderItems: res.map((item) => ({
-                    productId: item.productResponse.id,
-                    orderItemGuid: '',
-                    quantity: item.quantity,
-                    unitPrice: item.productResponse.price,
-                    priceTotal: item.quantity * item.productResponse.price,
-                    discountAmount: 0,
-                    originalProductCost: item.productResponse.price,
-                    attributeDescription: ''
-                })),
-                addressRequest: checked
-                    ? {
-                          customerId: customer?.id || 1,
-                          firstName: address.firstName,
-                          lastName: address.lastName,
-                          email: address.email,
-                          addressName: addressDetailGenerated,
-                          provinceId: addressDetail?.provinceId || '',
-                          districtId: addressDetail?.districtId || '',
-                          wardId: addressDetail?.wardId || '',
-                          phoneNumber: address.phoneNumber
-                      }
-                    : null
-            }
 
-            OrderService.createOrder(order).then(async (res) => {
-                if (res.status === 200) {
-                    toast.current?.show({
-                        severity: 'success',
-                        summary: 'Success',
-                        detail: 'Order created successfully'
+        confirmDialog({
+            message: 'Are you sure you want to proceed with this order?',
+            header: 'Order Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            defaultFocus: 'reject',
+            accept: () => {
+                CartService.getCart(billId).then(async (res: CartResponse[]) => {
+                    const order: OrderRequest = {
+                        customerId: customer?.id || 1,
+                        orderGuid: billId,
+                        addressType: checked ? 2 : -1,
+                        orderId: '',
+                        pickupInStore: false,
+                        orderStatusId: checked ? 1 : 7,
+                        paymentStatusId: PaymentStatusType.Paid,
+                        paymentMethodId:
+                            amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
+                        paymentMode: PaymentModeType.IN_STORE,
+                        orderSubtotal: orderTotals.subtotal,
+                        orderSubtotalDiscount: 0,
+                        orderShipping: orderTotals.shippingCost,
+                        orderDiscount: 0,
+                        orderTotal: orderTotals.total,
+                        refundedAmount: 0,
+                        paidDateUtc: '',
+                        billCode: 'Bill' + numberBill,
+                        deliveryMode: checked ? 0 : 1,
+                        orderItems: res.map((item) => ({
+                            productId: item.productResponse.id,
+                            orderItemGuid: '',
+                            quantity: item.quantity,
+                            unitPrice: item.productResponse.price,
+                            priceTotal: item.quantity * item.productResponse.price,
+                            discountAmount: 0,
+                            originalProductCost: item.productResponse.price,
+                            attributeDescription: ''
+                        })),
+                        addressRequest: checked
+                            ? {
+                                  customerId: customer?.id || 1,
+                                  firstName: address.firstName,
+                                  lastName: address.lastName,
+                                  email: address.email,
+                                  addressName: addressDetailGenerated,
+                                  provinceId: addressDetail?.provinceId || '',
+                                  districtId: addressDetail?.districtId || '',
+                                  wardId: addressDetail?.wardId || '',
+                                  phoneNumber: address.phoneNumber
+                              }
+                            : null
+                    }
+
+                    OrderService.createOrder(order).then(async (res) => {
+                        if (res.status === 200) {
+                            toast.current?.show({
+                                severity: 'success',
+                                summary: 'Success',
+                                detail: 'Order created successfully'
+                            })
+                            await new Promise((resolve) => setTimeout(resolve, 1000))
+
+                            localStorage.removeItem('billIdCurrent')
+                            setCustomer(null)
+                            await CartService.deleteBill(billId)
+                            await fetchBill()
+                        }
                     })
-                    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-                    localStorage.removeItem('billIdCurrent')
-                    setCustomer(null)
-                    await CartService.deleteBill(billId)
-                    await fetchBill()
-                }
-            })
+                })
+            }
         })
     }
 
@@ -316,6 +326,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 <div className='space-y-4  mt-2 flex justify-between'>
                     <div className='w-2/3'>
                         {/* TODO: Add customer details */}
+                        <ConfirmDialog />
 
                         <>
                             <div className='flex justify-between'>
@@ -543,7 +554,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 setVisible={setCustomerDialogVisible}
             />
             <Toast ref={toast} />
-            <ConfirmDialog />
             <CustomerAddressDialog
                 visible={customerAddressDialogVisible}
                 setVisible={setCustomerAddressDialogVisible}

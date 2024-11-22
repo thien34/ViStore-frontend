@@ -4,6 +4,7 @@ import { FaBug, FaRegCalendarCheck, FaTimesCircle, FaTruck, FaRegCheckCircle, Fa
 import { OrderStatusType } from '@/interface/order.interface'
 import '@reactuiutils/horizontal-timeline/timeline.css'
 import { OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
+import ProductOrderList from './ProductOrderList'
 
 const statusConfig = {
     [OrderStatusType.CREATED]: { label: 'Created', icon: FaRegCalendarCheck, color: 'blue' },
@@ -20,38 +21,56 @@ const statusConfig = {
 
 interface Props {
     orderStatusHistoryResponses: OrderStatusHistoryResponse[]
+    orderId: number
+    onUpdateQuantity: (id: number, quantity: number) => void
+    id: string
 }
 
-export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
+export default function HistoryOrder({ orderStatusHistoryResponses, onUpdateQuantity, id }: Props) {
+    const latestStatus = orderStatusHistoryResponses[orderStatusHistoryResponses.length - 1]
+
     return (
-        <div className='card'>
-            <h4>Order History</h4>
-            <Timeline minEvents={6}>
-                {orderStatusHistoryResponses.map((status) => {
-                    const config = statusConfig[status.status as keyof typeof statusConfig] || {
-                        label: 'Unknown Status',
-                        icon: FaBug,
-                        color: 'gray'
-                    }
-                    return (
-                        <Event key={status.id} color={config.color} icon={config.icon}>
-                            <Title>{config.label}</Title>
-                            <Subtitle>
-                                {new Date(status.paidDate).toLocaleString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                })}
-                            </Subtitle>
-                            {status.notes && (
-                                <Action onClick={() => alert(`Details: ${status.notes}`)}>View Notes</Action>
-                            )}
-                        </Event>
-                    )
-                })}
-            </Timeline>
-        </div>
+        <>
+            <div className='card'>
+                <h4>Order History</h4>
+                <Timeline minEvents={6}>
+                    {orderStatusHistoryResponses.map((status) => {
+                        const config = statusConfig[status.status as keyof typeof statusConfig] || {
+                            label: 'Unknown Status',
+                            icon: FaBug,
+                            color: 'gray'
+                        }
+                        return (
+                            <Event key={status.id} color={config.color} icon={config.icon}>
+                                <Title>{config.label}</Title>
+                                <Subtitle>
+                                    {new Date(status.paidDate).toLocaleString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </Subtitle>
+                                {status.notes && (
+                                    <Action onClick={() => alert(`Details: ${status.notes}`)}>View Notes</Action>
+                                )}
+                            </Event>
+                        )
+                    })}
+                </Timeline>
+            </div>
+
+            <div className='card'>
+                {orderStatusHistoryResponses.length > 0 && (
+                    <ProductOrderList
+                        onDelete={() => {}}
+                        onUpdateQuantity={onUpdateQuantity}
+                        id={id}
+                        status={latestStatus.status as OrderStatusType}
+                    />
+                )}
+            </div>
+        </>
     )
 }
