@@ -46,7 +46,6 @@ const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange })
     const updateCartQuantity = async (newQuantity: number): Promise<boolean> => {
         try {
             await CartService.updateCartQuantity(cart.id, newQuantity)
-            console.log('Quantity updated successfully!')
             toast.current?.show({
                 severity: 'success',
                 summary: 'Success',
@@ -56,7 +55,6 @@ const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange })
             onQuantityChange()
             return true
         } catch (error) {
-            console.error('Error updating quantity:', error)
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
