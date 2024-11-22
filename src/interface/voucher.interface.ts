@@ -14,9 +14,8 @@ export interface Voucher {
     requiresCouponCode: boolean
     isCumulative : boolean
     couponCode: string
-    discountLimitationType: number
+    discountLimitationId: number
     maxDiscountAmount: number //số tiền được giảm tối đa khi sử dụng mã giảm giá này
-    maxDiscountedQuantity: number // nghĩa là ai mua cũng được nhưng voucher chỉ có 10 cái
     minOderAmount: number //số tiền tối thiểu mà mã giảm giá này được áp dụng
     isPublished: boolean
     perCustomerLimit: number
