@@ -5,7 +5,7 @@ import { Dialog } from 'primereact/dialog'
 import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber'
 import { Toast } from 'primereact/toast'
 import { ToggleButton } from 'primereact/togglebutton'
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 import { useLocalStorage } from 'primereact/hooks'

@@ -6,7 +6,7 @@ import { DataTable } from 'primereact/datatable'
 import { Dialog } from 'primereact/dialog'
 import { useUpdateEffect } from 'primereact/hooks'
 import { InputText } from 'primereact/inputtext'
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 type Props = {
     visible: boolean
