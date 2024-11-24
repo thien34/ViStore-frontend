@@ -344,7 +344,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                         data-pr-tooltip='Pick Customer'
                                         className='text-primary-700 text-5xl cursor-pointer customer-tooltip '
                                     />
-                                    {customer != null && (
+                                    {customer != null && checked && (
                                         <>
                                             <Tooltip target='.location-tooltip' mouseTrack mouseTrackLeft={10} />
 
@@ -438,12 +438,14 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 </div>
                             </div>
                             <div className='flex flex-wrap justify-content-between w-full gap-2'>
-                                <AddressComponent
-                                    provinces={provinces || []}
-                                    submitted={false}
-                                    onAddressChange={handleGetAddress}
-                                    addressDetail={addressDetail || undefined}
-                                />
+                                {checked && (
+                                    <AddressComponent
+                                        provinces={provinces || []}
+                                        submitted={false}
+                                        onAddressChange={handleGetAddress}
+                                        addressDetail={addressDetail || undefined}
+                                    />
+                                )}
                             </div>
                             <div className='field w-full'>
                                 <label htmlFor='addressName' className='font-medium block'>
