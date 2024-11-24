@@ -11,7 +11,6 @@ import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import ProductService from '@/service/ProducrService'
 import { Image } from 'primereact/image'
 import { InputNumber } from 'primereact/inputnumber'
-import { Checkbox } from 'primereact/checkbox'
 import { InputTextarea } from 'primereact/inputtextarea'
 import discountService from '@/service/discount.service'
 import { useRouter } from 'next/navigation'
@@ -26,7 +25,6 @@ const DiscountForm = () => {
     const [products, setProducts] = useState<ProductResponse[]>([])
     const [fetchedProducts, setFetchedProducts] = useState<ProductResponseDetails[]>([])
     const [selectedFetchedProducts, setSelectedFetchedProducts] = useState<ProductResponseDetails[]>([])
-    const [checked, setChecked] = useState<boolean>(false)
     const [discountTypeId] = useState<number>(1)
     const [usePercentage] = useState<boolean>(true)
     const [comments, setComments] = useState<string>('')
@@ -103,7 +101,6 @@ const DiscountForm = () => {
                 setToDate(null)
                 setSelectedProducts([])
                 setSelectedFetchedProducts([])
-                setChecked(false)
                 setComments('')
                 router.push('/admin/discounts')
             })

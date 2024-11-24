@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, HTMLAttributeAnchorTarget, ReactNode } from 'react'
+import { Dispatch, SetStateAction, HTMLAttributeAnchorTarget, ReactNode } from 'react'
 
 /* Breadcrumb Types */
 export interface AppBreadcrumbProps {

@@ -2,7 +2,7 @@
 import Checkout from './_components/Checkout'
 
 import { loadStripe } from '@stripe/stripe-js'
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useLocalStorage, useMountEffect, useUpdateEffect } from 'primereact/hooks'
 import { Elements } from '@stripe/react-stripe-js'
 import CartService from '@/service/cart.service'

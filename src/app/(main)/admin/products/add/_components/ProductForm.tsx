@@ -20,6 +20,7 @@ import { useRef, useState } from 'react'
 import { Toast } from 'primereact/toast'
 import { useRouter } from 'next/navigation'
 import ManagerPath from '@/constants/ManagerPath'
+import Spinner from '@/components/spinner/Spinner'
 
 export interface AttributeRow {
     selectedAttribute: ProductAttributeName | null
@@ -52,7 +53,6 @@ interface ProductAddFormProps {
     manufacturers: ManufacturerName[]
     productAttributes: ProductAttributeName[]
 }
-
 const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacturers, productAttributes }) => {
     const [attributeRows, setAttributeRows] = useState<AttributeRow[]>([])
     const [combinedRows, setCombinedRows] = useState<CombinedRow[]>([])
@@ -74,6 +74,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const toast = useRef<Toast>(null)
 
     const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
 
     const addCustomTag = (tag: string, index: number) => {
         setAttributeRows((prevRows) => {
@@ -270,78 +271,86 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         return productAttributes.filter((attr) => !selectedAttributeCodes.has(attr.id))
     }
     const handleAddProduct = async () => {
-        const errors = validateFields()
-        setNameError(errors.name || '')
-        setCategoryError(errors.category || '')
-        setManufactureError(errors.manufacture || '')
-        if (Object.keys(errors).length > 0) {
-            return
-        }
-
-        const commonProductInfo: Omit<
-            ProductRequest,
-            'id' | 'name' | 'sku' | 'gtin' | 'quantity' | 'unitPrice' | 'productCost' | 'attributes'
-        > = {
-            fullDescription: text,
-            weight: 12,
-            published: true,
-            deleted: false,
-            categoryId: selectedCategory?.id !== undefined ? selectedCategory.id : undefined,
-            manufacturerId: selectedManufacture?.id !== undefined ? selectedManufacture.id : undefined
-        }
-
-        const productsData: ProductRequest[] = combinedRows.map((combinedRow) => {
-            const attributes: ProductAttribute[] = attributeRows
-                .map((row) => {
-                    const [attributeValue] = combinedRow.name
-                        .split(' - ')
-                        .filter((value) => row.selectedValues.includes(value))
-                    if (attributeValue) {
-                        return {
-                            id: row.selectedAttribute?.id || null,
-                            productId: undefined,
-                            value: attributeValue
-                        } as ProductAttribute
-                    }
-                    return undefined
-                })
-                .filter(Boolean) as ProductAttribute[]
-
-            return {
-                ...commonProductInfo,
-                id: undefined,
-                name: name,
-                sku: combinedRow.sku,
-                gtin: combinedRow.gtin,
-                quantity: combinedRow.quantity,
-                unitPrice: combinedRow.unitPrice,
-                productCost: combinedRow.productCost,
-                attributes: attributes,
-                weight: weight
-            }
-        })
-
         try {
-            const uploadedFilesObj: { [key: number]: File[] } = uploadedFiles
-            const uploadedFilesArray: File[][] = Object.values(uploadedFilesObj)
+            setIsLoading(true)
+            const errors = validateFields()
+            setNameError(errors.name || '')
+            setCategoryError(errors.category || '')
+            setManufactureError(errors.manufacture || '')
+            if (Object.keys(errors).length > 0) {
+                return
+            }
 
-            const data = await ProductService.addProducts(productsData, uploadedFilesArray)
-            console.log('Products added successfully:', data)
-            toast.current?.show({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Products added successfully!',
-                life: 3000
+            const commonProductInfo: Omit<
+                ProductRequest,
+                'id' | 'name' | 'sku' | 'gtin' | 'quantity' | 'unitPrice' | 'productCost' | 'attributes'
+            > = {
+                fullDescription: text,
+                weight: 12,
+                published: true,
+                deleted: false,
+                categoryId: selectedCategory?.id !== undefined ? selectedCategory.id : undefined,
+                manufacturerId: selectedManufacture?.id !== undefined ? selectedManufacture.id : undefined
+            }
+
+            const productsData: ProductRequest[] = combinedRows.map((combinedRow) => {
+                const attributes: ProductAttribute[] = attributeRows
+                    .map((row) => {
+                        const [attributeValue] = combinedRow.name
+                            .split(' - ')
+                            .filter((value) => row.selectedValues.includes(value))
+                        if (attributeValue) {
+                            return {
+                                id: row.selectedAttribute?.id || null,
+                                productId: undefined,
+                                value: attributeValue
+                            } as ProductAttribute
+                        }
+                        return undefined
+                    })
+                    .filter(Boolean) as ProductAttribute[]
+
+                return {
+                    ...commonProductInfo,
+                    id: undefined,
+                    name: name,
+                    sku: combinedRow.sku,
+                    gtin: combinedRow.gtin,
+                    quantity: combinedRow.quantity,
+                    unitPrice: combinedRow.unitPrice,
+                    productCost: combinedRow.productCost,
+                    attributes: attributes,
+                    weight: weight
+                }
             })
-            router.push(ManagerPath.PRODUCT)
+
+            try {
+                const uploadedFilesObj: { [key: number]: File[] } = uploadedFiles
+                const uploadedFilesArray: File[][] = Object.values(uploadedFilesObj)
+
+                const data = await ProductService.addProducts(productsData, uploadedFilesArray)
+                setIsLoading(false)
+                console.log('Products added successfully:', data)
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Products added successfully!',
+                    life: 3000
+                })
+                router.push(ManagerPath.PRODUCT)
+            } catch (error) {
+                console.error('Error:', error)
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to add products.',
+                    life: 3000
+                })
+            }
         } catch (error) {
-            console.error('Error:', error)
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Failed to add products.',
-                life: 3000
-            })
+            console.error('Error deleting bill:', error)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -391,6 +400,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     return (
         <div>
             <Toast ref={toast} />
+            <Spinner isLoading={isLoading} />
             <div className='card'>
                 <div className='flex flex-column gap-4'>
                     <div className='flex flex-row gap-4'>
