@@ -15,6 +15,7 @@ import { Toast } from 'primereact/toast'
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Image } from 'primereact/image'
+import ProductService from '@/service/ProducrService'
 interface ProductAddFormProps {
     categories: Category[]
     manufacturers: ManufacturerName[]
@@ -31,6 +32,13 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [text, setText] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
     const toast = useRef<Toast>(null)
+    const [productsData, setProductsData] = useState<ProductResponseDetails[]>(products)
+    const [, setErrors] = useState({
+        name: false,
+        selectedCategory: false,
+        selectedManufacture: false,
+        weight: false
+    })
 
     useEffect(() => {
         setErrorMessage('')
@@ -44,15 +52,76 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     }, [product, categories, manufacturers])
 
     const handleSave = async () => {
-        if (!name || !selectedCategory || !selectedManufacture) {
+        let hasError = false
+        const newErrors = {
+            name: false,
+            selectedCategory: false,
+            selectedManufacture: false,
+            weight: false
+        }
+
+        if (!name) {
+            newErrors.name = true
+            hasError = true
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Please fill all required fields: Name, Category, and Manufacturer.',
+                detail: 'Name is required.',
                 life: 3000
             })
-            return
         }
+
+        if (!selectedCategory) {
+            newErrors.selectedCategory = true
+            hasError = true
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Category is required.',
+                life: 3000
+            })
+        }
+
+        if (!selectedManufacture) {
+            newErrors.selectedManufacture = true
+            hasError = true
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Manufacturer is required.',
+                life: 3000
+            })
+        }
+
+        if (!weight) {
+            newErrors.weight = true
+            hasError = true
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Weight is required.',
+                life: 3000
+            })
+        }
+
+        setErrors(newErrors)
+
+        if (hasError) return
+
+        await ProductService.updateProductParent(
+            { name, weight, categoryId: selectedCategory?.id || 0, manufacturerId: selectedManufacture?.id || 0 },
+            product.id
+        ).then(() => {
+            ProductService.getProductsByParentId(+product.id).then((res) => {
+                setProductsData(res)
+            })
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Product updated successfully',
+                life: 3000
+            })
+        })
     }
 
     return (
@@ -76,7 +145,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         <InputNumber
                             inputId='weight'
                             value={weight}
-                            onChange={(e) => setWeight(e.value || 0)}
+                            onValueChange={(e) => setWeight(e.value || 0)}
                             placeholder='Enter weight'
                             mode='decimal'
                             showButtons
@@ -130,8 +199,13 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
                 {errorMessage && <small className='p-error'>{errorMessage}</small>}
 
+                <div>
+                    <Link href={`/admin/products/product-add/${product.id}`}>
+                        <Button label='Add Product Details' className='float-right' />
+                    </Link>
+                </div>
                 <DataTable
-                    value={products}
+                    value={productsData}
                     tableStyle={{ minWidth: '50rem' }}
                     paginator
                     rows={5}

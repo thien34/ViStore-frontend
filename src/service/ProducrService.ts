@@ -1,4 +1,4 @@
-import { ProductRequest, ProductResponse, ProductResponseDetails } from '@/interface/Product'
+import { ProductParentRequest, ProductRequest, ProductResponse, ProductResponseDetails } from '@/interface/Product'
 
 class ProductService {
     static async addProducts(productsData: ProductRequest[], uploadedFiles: File[][]) {
@@ -122,6 +122,38 @@ class ProductService {
 
         const result = await response.json()
         return result.data
+    }
+
+    static async updateProductParent(productParent: ProductParentRequest, id: number) {
+        const response = await fetch(`http://localhost:8080/api/admin/products/parent-update/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productParent)
+        })
+
+        if (!response.ok) {
+            const errorResponse = await response.json()
+            throw new Error(`Failed to update product parent: ${errorResponse.message || 'Unknown error'}`)
+        }
+    }
+
+    static async addChildProduct(id: number, productData: Partial<ProductRequest>) {
+        const response = await fetch(`http://localhost:8080/api/admin/products/add-child/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productData)
+        })
+
+        if (!response.ok) {
+            const errorResponse = await response.json()
+            throw new Error(`Failed to update product: ${errorResponse.message || 'Unknown error'}`)
+        }
+
+        return response.json()
     }
 }
 

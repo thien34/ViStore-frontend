@@ -1,7 +1,7 @@
 import { ProductAttributeName } from './productAttribute.interface'
 
 export interface ProductRequest {
-    id?: number
+    id?: number | null
     name: string
     sku?: string
     gtin?: string
@@ -62,4 +62,11 @@ export interface ProductResponseDetails {
     attributes: ProductAttributeName[]
     largestDiscountPercentage: number
     weight: number
+}
+
+export interface ProductParentRequest {
+    name: string
+    weight: number
+    categoryId: number
+    manufacturerId: number
 }
