@@ -4,7 +4,6 @@ import { FaBug, FaRegCalendarCheck, FaTimesCircle, FaTruck, FaRegCheckCircle, Fa
 import { OrderStatusType } from '@/interface/order.interface'
 import '@reactuiutils/horizontal-timeline/timeline.css'
 import { OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
-import ProductOrderList from './ProductOrderList'
 
 const statusConfig = {
     [OrderStatusType.CREATED]: { label: 'Created', icon: FaRegCalendarCheck, color: 'blue' },
@@ -22,13 +21,9 @@ const statusConfig = {
 interface Props {
     orderStatusHistoryResponses: OrderStatusHistoryResponse[]
     orderId: number
-    onUpdateQuantity: (id: number, quantity: number) => void
-    id: string
 }
 
-export default function HistoryOrder({ orderStatusHistoryResponses, onUpdateQuantity, id }: Props) {
-    const latestStatus = orderStatusHistoryResponses[orderStatusHistoryResponses.length - 1]
-
+export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
     return (
         <>
             <div className='card'>
@@ -59,17 +54,6 @@ export default function HistoryOrder({ orderStatusHistoryResponses, onUpdateQuan
                         )
                     })}
                 </Timeline>
-            </div>
-
-            <div className='card'>
-                {orderStatusHistoryResponses.length > 0 && (
-                    <ProductOrderList
-                        onDelete={() => {}}
-                        onUpdateQuantity={onUpdateQuantity}
-                        id={id}
-                        status={latestStatus.status as OrderStatusType}
-                    />
-                )}
             </div>
         </>
     )

@@ -87,7 +87,7 @@ export default function ProductOrderList({ onDelete, id, status }: Props) {
         const currentItem = orderItemsResponse.find((item) => item.id === id)
         if (currentItem && currentItem.quantity > 1) {
             const newQuantity = currentItem.quantity - 1
-            handleQuantityChange(id, newQuantity, currentItem.id)
+            handleQuantityChange(id, newQuantity)
         }
     }
 
@@ -95,11 +95,11 @@ export default function ProductOrderList({ onDelete, id, status }: Props) {
         const currentItem = orderItemsResponse.find((item) => item.id === id)
         if (currentItem) {
             const newQuantity = currentItem.quantity + 1
-            handleQuantityChange(id, newQuantity, currentItem.id)
+            handleQuantityChange(id, newQuantity)
         }
     }
 
-    const handleQuantityChange = async (id: number, value: number, productId: number) => {
+    const handleQuantityChange = async (id: number, value: number) => {
         try {
             await OrderService.updateOrderItem(id, value)
                 .then(() => {
@@ -132,7 +132,7 @@ export default function ProductOrderList({ onDelete, id, status }: Props) {
     ].includes(status as OrderStatusType)
 
     return (
-        <div>
+        <div className='card'>
             <h4>Order Items</h4>
             <div className='flex justify-end'>
                 <Button type='button' label='Add Item' onClick={() => setVisible(true)} />
@@ -188,7 +188,7 @@ export default function ProductOrderList({ onDelete, id, status }: Props) {
                                         const itemId =
                                             orderItemsResponse.find((item) => item.orderItemGuid === product.cartUUID)
                                                 ?.id || 0
-                                        handleQuantityChange(itemId, newQuantity, product.id)
+                                        handleQuantityChange(itemId, newQuantity)
                                     }}
                                     inputStyle={{
                                         width: '55px',
