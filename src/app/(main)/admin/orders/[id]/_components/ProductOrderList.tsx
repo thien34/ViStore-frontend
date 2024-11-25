@@ -31,6 +31,7 @@ interface Product {
     largestDiscountPercentage: number
     cartUUID: string
     imageUrl: string
+    idOderItem: number
 }
 
 type Props = {
@@ -65,7 +66,6 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
                 ])
                 setOrderItemsResponse(orderResponse.payload)
                 setProductsDialog(productsResponse)
-                console.log(orderResponse.payload)
                 setCustomerInfo(
                     orderResponse.payload?.[0].customerOrder || {
                         id: 0,
@@ -106,11 +106,11 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
                     })) || [],
                 largestDiscountPercentage: product.largestDiscountPercentage || 0,
                 cartUUID: item.orderItemGuid,
-                imageUrl: product.image || ''
+                imageUrl: product.image || '',
+                idOderItem: item.id
             }
         })
         setProducts(data)
-        console.log(data)
     }, [orderItemsResponse])
 
     const handleDecrement = (id: number) => {
@@ -205,13 +205,7 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
                                     </div>
                                     <div className='flex items-center space-x-2 bg-gray-200 p-2 rounded-lg h-8'>
                                         <button
-                                            onClick={() =>
-                                                handleDecrement(
-                                                    orderItemsResponse.find(
-                                                        (item) => item.orderItemGuid === product.cartUUID
-                                                    )?.id || 0
-                                                )
-                                            }
+                                            onClick={() => handleDecrement(product.idOderItem)}
                                             className='p-1 w-8 h-8 rounded bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50'
                                             disabled={!isEditable}
                                         >
@@ -239,13 +233,7 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
                                             disabled={!isEditable}
                                         />
                                         <button
-                                            onClick={() =>
-                                                handleIncrement(
-                                                    orderItemsResponse.find(
-                                                        (item) => item.orderItemGuid === product.cartUUID
-                                                    )?.id || 0
-                                                )
-                                            }
+                                            onClick={() => handleIncrement(product.idOderItem)}
                                             className='p-1 w-8 h-8 rounded bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50'
                                             disabled={!isEditable}
                                         >
