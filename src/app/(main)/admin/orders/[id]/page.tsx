@@ -36,7 +36,7 @@ export default function OrderDetail({ params }: Props) {
                 <ProductOrderList
                     onDelete={() => {}}
                     onUpdateQuantity={handleUpdateQuantity}
-                    id={id}
+                    idOrder={id}
                     status={latestStatus.status as OrderStatusType}
                 />
             )}
