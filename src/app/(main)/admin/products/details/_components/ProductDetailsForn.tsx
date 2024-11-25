@@ -1,12 +1,9 @@
 'use client'
-import ManagerPath from '@/constants/ManagerPath'
 import { ProductResponseDetails } from '@/interface/Product'
 import { ProductAttributeName } from '@/interface/productAttribute.interface'
 import AttributeValueService from '@/service/AttributeValueService'
 import PictureService from '@/service/PictureService'
 import ProductService from '@/service/ProducrService'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { Accordion, AccordionTab } from 'primereact/accordion'
 import { PrimeIcons } from 'primereact/api'
 import { AutoComplete, AutoCompleteChangeEvent, AutoCompleteCompleteEvent } from 'primereact/autocomplete'
@@ -16,8 +13,11 @@ import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { Tooltip } from 'primereact/tooltip'
-import React, { useRef, useState } from 'react'
-import Barcode from 'react-barcode'
+import { useEffect, useRef, useState } from 'react'
+import { Promotion } from '@/interface/discount.interface'
+import { Message } from 'primereact/message'
+import QRCode from 'react-qr-code'
+import Image from 'next/image'
 
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
@@ -28,13 +28,11 @@ type Props = {
     product: ProductResponseDetails
     productAttributes: ProductAttributeName[]
 }
-
 const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => {
     const [formData, setFormData] = useState<ProductResponseDetails>(product)
     const [imageUrl, setImageUrl] = useState<string>(product.imageUrl)
     const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-    const router = useRouter()
-
+    const [discount, setDiscount] = useState(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const toast = useRef<Toast>(null)
     const [attributeRows, setAttributeRows] = useState<AttributeRow[]>(
@@ -158,6 +156,28 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
     const removeAttributeRow = (index: number) => {
         setAttributeRows((prevRows) => prevRows.filter((_, i) => i !== index))
     }
+    useEffect(() => {
+        const fetchDiscounts = async (productId: number) => {
+            try {
+                const response = await fetch(`http://localhost:8080/api/admin/discounts/by-product/${productId}`)
+                const data = await response.json()
+
+                const activeDiscounts = data.data.filter((discount: Promotion) => discount.status === 'ACTIVE')
+                if (activeDiscounts.length > 0) {
+                    const sortedDiscounts = activeDiscounts.sort(
+                        (a: Promotion, b: Promotion) => (b.discountPercentage ?? 0) - (a.discountPercentage ?? 0)
+                    )
+                    setDiscount(sortedDiscounts[0]) // Set the highest discount
+                }
+            } catch (error) {
+                console.error('Error fetching discounts: ', error)
+            }
+        }
+
+        if (product.id) {
+            fetchDiscounts(product.id)
+        }
+    }, [product])
 
     const fetchValues = async (attribuetId: number) => {
         try {
@@ -169,6 +189,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
 
             return uniqueNames
         } catch (error) {
+            console.error('Error fetching attribute values:', error)
             return []
         }
     }
@@ -201,6 +222,31 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
             <Toast ref={toast} />
             <h5>Edit Product Details</h5>
             <div className='flex flex-column gap-4'>
+                {discount && (
+                    <div className='mb-3'>
+                        <Message
+                            style={{
+                                border: 'solid #f39c12',
+                                borderWidth: '0 0 0 6px',
+                                color: '#f39c12'
+                            }}
+                            className='border-warning w-full justify-content-start'
+                            severity='warn'
+                            content={
+                                <div className='flex align-items-center'>
+                                    <i
+                                        className='pi pi-exclamation-triangle'
+                                        style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}
+                                    ></i>
+                                    <div>
+                                        Warning: This product is currently on discount and cannot be edited price until
+                                        the discount ends.
+                                    </div>
+                                </div>
+                            }
+                        />
+                    </div>
+                )}
                 <div className='p-grid p-fluid'>
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
@@ -243,16 +289,17 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 id='price'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.price}
-                                onValueChange={(e) => {
+                                onValueChange={(e) =>
                                     handleChange(
                                         {
                                             target: { value: e.value ? e.value.toString() : '' }
                                         } as React.ChangeEvent<HTMLInputElement>,
                                         'price' as keyof ProductResponseDetails
                                     )
-                                }}
+                                }
                                 mode='currency'
-                                className={errors.price ? 'p-invalid' : ''}
+                                disabled={!!discount}
+                                className={discount ? 'p-disabled' : ''}
                                 currency='USD'
                             />
                             {errors.price && <small className='p-error'>{errors.price}</small>}
@@ -303,13 +350,14 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                             />
                             {errors.quantity && <small className='p-error'>{errors.quantity}</small>}
                         </div>
-                        <div className='grid grid-cols-1 items-center gap-4 w-full'>
+                        <div className='grid grid-cols-1 p-2 items-center gap-6 w-full'>
                             <Tooltip target='.image' />
 
-                            <img
-                                style={{ width: '100px' }}
-                                className='object-cover rounded-lg shadow-lg border border-gray-200 mb-2 image'
-                                src={imageUrl}
+                            <Image
+                                width={100}
+                                height={100}
+                                className='object-cover rounded-lg shadow-lg border border-gray-200 mb-2 image ms-20'
+                                src={imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
                                 data-pr-tooltip='Product Image'
                                 alt='Product'
                             />
@@ -326,8 +374,14 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                             </label>
 
                             <Tooltip target='.gtin' />
-                            <span className='gtin' data-pr-tooltip='Gtin'>
-                                <Barcode value={product.gtin} />
+                            <span className='gtin' data-pr-tooltip='QR Code'>
+                                <QRCode
+                                    size={200}
+                                    style={{ height: 'auto', width: '120px' }}
+                                    value={product.gtin}
+                                    className='p-2'
+                                    viewBox={`0 0 256 256`}
+                                />
                             </span>
                         </div>
                     </div>

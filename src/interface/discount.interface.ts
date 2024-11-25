@@ -1,11 +1,10 @@
 export interface Promotion {
     id?: number
-    isActive: boolean
     name: string
     comment: string
     discountTypeId: number
     usePercentage: boolean
-    discountPercentage?: number | null
+    discountPercentage: number | null
     startDateUtc?: string
     endDateUtc?: string
     selectedProductVariantIds: number[]

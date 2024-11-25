@@ -25,8 +25,6 @@ class ManagerPath {
     // product video mapping
     static readonly PRODUCT_VIDEO_MAPPING = '/admin/product-video-mappings'
 
-    // product picture mapping
-    static readonly PRODUCT_PICTURE_MAPPING = '/admin/product-picture-mapping'
     // discount
     static readonly DISCOUNT = '/admin/discounts'
     static readonly DISCOUNT_ADD = '/admin/discounts/add'
@@ -61,8 +59,6 @@ class ManagerPath {
 
     static readonly PRODUCT_SPECIFICATION_ATTRIBUTE_MAPPING_UPDATE =
         '/admin/products/product-spec-attribute-mapping/edit/:productId/:id'
-
-    static readonly PREDEFINED_PRODUCT_ATTRIBUTE_VALUE = '/admin/predefined-product-attribute-values'
 
     static readonly PICTURE = '/admin/picture'
     static readonly ORDER = '/admin/orders'

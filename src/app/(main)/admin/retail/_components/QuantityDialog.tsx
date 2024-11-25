@@ -13,14 +13,7 @@ interface QuantityDialogProps {
     onSave: () => void
 }
 
-const QuantityDialog: React.FC<QuantityDialogProps> = ({
-    visible,
-    setVisible,
-    product,
-    quantity,
-    setQuantity,
-    onSave
-}) => {
+const QuantityDialog = ({ visible, setVisible, product, quantity, setQuantity, onSave }: QuantityDialogProps) => {
     return (
         <Dialog header={product?.name} visible={visible} style={{ width: '50vw' }} onHide={() => setVisible(false)}>
             <div>
@@ -33,10 +26,11 @@ const QuantityDialog: React.FC<QuantityDialogProps> = ({
                 ))}
                 <div className='mt-2'>
                     <InputNumber
-                        onChange={(e) => setQuantity(e.value ?? 1)}
+                        onValueChange={(e) => setQuantity(e.value ?? 1)}
                         value={quantity}
                         defaultValue={1}
-                        min={1}
+                        min={quantity === 1 ? 1 : 0}
+                        max={product?.quantity ?? 1}
                         showButtons
                         buttonLayout='horizontal'
                         decrementButtonClassName='p-button-secondary'

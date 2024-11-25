@@ -257,7 +257,7 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
             <Dialog
                 visible={categoryDialog}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                header='Product Details'
+                header='Category Details'
                 style={{ width: '36vw' }}
                 modal
                 className='p-fluid'

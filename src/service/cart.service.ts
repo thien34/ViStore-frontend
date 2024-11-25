@@ -28,8 +28,8 @@ class CartService {
         return response.payload
     }
     static async updateCartQuantity(id: number, newQuantity: number): Promise<void> {
-        const response = await http.put<void>(`${this.basePath}/updateQuantity/${id}?quantity=${newQuantity}`, {});
-        return response.payload;
+        const response = await http.put<void>(`${this.basePath}/updateQuantity/${id}?quantity=${newQuantity}`, {})
+        return response.payload
     }
 }
 
