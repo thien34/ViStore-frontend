@@ -1,4 +1,3 @@
-import React from 'react'
 import { Action, Event, Subtitle, Timeline, Title } from '@reactuiutils/horizontal-timeline'
 import { FaBug, FaRegCalendarCheck, FaTimesCircle, FaTruck, FaRegCheckCircle, FaRegClock } from 'react-icons/fa'
 import { OrderStatusType } from '@/interface/order.interface'

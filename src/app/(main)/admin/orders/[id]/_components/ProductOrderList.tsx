@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { OrderItemsResponse } from '@/interface/orderItem.interface'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 import { InputNumber } from 'primereact/inputnumber'
 import Image from 'next/image'
 import OrderService from '@/service/order.service'
-import { useMountEffect } from 'primereact/hooks'
 import { Toast } from 'primereact/toast'
 import { OrderStatusType } from '@/interface/order.interface'
 import { Button } from 'primereact/button'
 import { ProductResponse } from '@/interface/Product'
 import ProductDialog from '../../../retail/_components/ProductDialog'
 import ProductService from '@/service/ProducrService'
+
 interface ProductAttribute {
     productAttribute: {
         name: string
@@ -48,18 +48,31 @@ export default function ProductOrderList({ onDelete, id, status }: Props) {
     const [productsDialog, setProductsDialog] = useState<ProductResponse[]>([])
 
     const toast = useRef<Toast>(null)
-    const fetchProducts = async () => {
-        OrderService.getOrderItems(id).then((response) => {
-            setOrderItemsResponse(response.payload)
-        })
-    }
-    const fetchProductsDialog = () => {
-        ProductService.getProuctsDetails().then((res) => setProductsDialog(res))
-    }
-    useMountEffect(() => {
-        fetchProducts()
-        fetchProductsDialog()
-    })
+
+    // Combine both fetch functions into one useEffect
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [orderResponse, productsResponse] = await Promise.all([
+                    OrderService.getOrderItems(id),
+                    ProductService.getProuctsDetails()
+                ])
+                setOrderItemsResponse(orderResponse.payload)
+                console.log(orderResponse.payload)
+                setProductsDialog(productsResponse)
+            } catch (error) {
+                console.error('Error fetching data:', error)
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Failed to fetch data',
+                    life: 3000
+                })
+            }
+        }
+
+        fetchData()
+    }, [id]) // Only re-run if id changes
 
     useEffect(() => {
         const data: Product[] = orderItemsResponse.map((item) => {
@@ -70,11 +83,12 @@ export default function ProductOrderList({ onDelete, id, status }: Props) {
                 unitPrice: product.unitPrice,
                 discountPrice: product.discountPrice,
                 quantity: item.quantity,
-                attributes: product.productAttributeValues.map((attr: ProductAttribute) => ({
-                    id: attr.id,
-                    name: attr.productAttribute.name,
-                    value: attr.value
-                })),
+                attributes:
+                    product.productAttributeValues?.map((attr: ProductAttribute) => ({
+                        id: attr.id,
+                        name: attr.productAttribute.name,
+                        value: attr.value
+                    })) || [],
                 largestDiscountPercentage: product.largestDiscountPercentage || 0,
                 cartUUID: item.orderItemGuid,
                 imageUrl: product.imageUrl || ''
@@ -102,25 +116,23 @@ export default function ProductOrderList({ onDelete, id, status }: Props) {
     const handleQuantityChange = async (id: number, value: number) => {
         try {
             await OrderService.updateOrderItem(id, value)
-                .then(() => {
-                    toast.current?.show({
-                        severity: 'success',
-                        summary: 'Success',
-                        detail: 'Quantity updated successfully!',
-                        life: 3000
-                    })
-                    fetchProducts()
-                })
-                .catch((error) => {
-                    toast.current?.show({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: error.message,
-                        life: 3000
-                    })
-                })
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Quantity updated successfully!',
+                life: 3000
+            })
+
+            // Fetch updated data
+            const response = await OrderService.getOrderItems(String(id))
+            setOrderItemsResponse(response.payload)
         } catch (error) {
-            console.error('Failed to update order item:', error)
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: error instanceof Error ? error.message : 'Failed to update quantity',
+                life: 3000
+            })
         }
     }
 
@@ -135,7 +147,7 @@ export default function ProductOrderList({ onDelete, id, status }: Props) {
         <div className='card'>
             <h4>Order Items</h4>
             <div className='flex justify-end'>
-                <Button type='button' label='Add Item' onClick={() => setVisible(true)} />
+                <Button type='button' label='Add Item' onClick={() => setVisible(true)} disabled={!isEditable} />
             </div>
 
             <Toast ref={toast} />
@@ -144,6 +156,7 @@ export default function ProductOrderList({ onDelete, id, status }: Props) {
                     key={product.id}
                     className='p-4 rounded-lg flex items-start gap-4 border border-gray-300 shadow-md my-5'
                 >
+                    {/* Rest of your product rendering code remains the same */}
                     <div className='relative'>
                         <Image
                             src={product.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
