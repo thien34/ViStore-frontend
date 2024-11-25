@@ -23,6 +23,13 @@ class VoucherService {
         const response = await http.put<Voucher>(`${this.basePath}/${id}`, voucher)
         return response.payload
     }
+    async validateCoupons(couponCodes: string[], subTotal: number, email: string) {
+        const path = `/validate-coupons?subTotal=${subTotal}&email=${email}`;
+        const data = { couponCodes };
+        const response = await http.post(path, data);
+        return response.payload;
+    }
+
 }
 
 const voucherService = new VoucherService()

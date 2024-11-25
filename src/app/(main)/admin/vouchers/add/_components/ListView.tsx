@@ -40,7 +40,7 @@ const DiscountForm = () => {
     const [enableMaxDiscount, setEnableMaxDiscount] = useState<boolean>(true)
     const [requiresCouponCode, setRequiresCouponCode] = useState<boolean>(true)
     const [couponCode, setCouponCode] = useState<string | undefined>()
-    const [discountLimitationType, setDiscountLimitationType] = useState(1)
+    const [discountLimitationType, setDiscountLimitationType] = useState(3)
     const [limitationTimes, setLimitationTimes] = useState(null)
     const [perCustomerLimit, setPerCustomerLimit] = useState(null)
     const [isCumulative, setIsCumulative] = useState<boolean>(false)
@@ -75,8 +75,8 @@ const DiscountForm = () => {
     )
     const discountLimitationTypes = [
         // { id: 0, label: 'None' },
-        { id: 1, label: 'Limited Vouchers' },
-        { id: 2, label: 'Limited Per Customer' },
+        // { id: 1, label: 'Limited Vouchers' },
+        // { id: 2, label: 'Limited Per Customer' },
         { id: 3, label: 'Limited Vouchers and Per Customer' }
     ]
 
@@ -169,6 +169,7 @@ const DiscountForm = () => {
     }
 
     const validateForm = () => {
+        debugger
         let isValid = true
         const newErrors: {
             discountName: string | null
@@ -267,8 +268,7 @@ const DiscountForm = () => {
         }
         const perCustomerLimitValid = perCustomerLimit !== null ? perCustomerLimit : 0
         if (
-            discountLimitationType !== 2 &&
-            discountLimitationType !== 3 &&
+            discountLimitationType === 3 &&
             (perCustomerLimitValid <= 0 || perCustomerLimitValid > 5)
         ) {
             newErrors.perCustomerLimit = 'Per customer limit must be between 1 and 5.'
@@ -498,22 +498,6 @@ const DiscountForm = () => {
                             Cumulative with other discounts
                         </label>
                     </div>
-                    <div className='field my-4'>
-                        <label htmlFor='discountLimitationType'>Discount Limitation Type</label>
-                        <Dropdown
-                            id='discountLimitationType'
-                            value={discountLimitationType}
-                            onChange={(e) => setDiscountLimitationType(e.value)}
-                            options={discountLimitationTypes}
-                            optionLabel='label'
-                            optionValue='id'
-                            placeholder='Select Limitation Type'
-                            tooltip='Choose how this discount is limited'
-                            tooltipOptions={{ position: 'top' }}
-                        />
-                    </div>
-
-                    {discountLimitationType !== 0 && discountLimitationType !== 2 && (
                         <div className='field'>
                             <label htmlFor='limitationTimes'>Limitation Times</label>
                             <InputNumber
@@ -527,26 +511,7 @@ const DiscountForm = () => {
                             />
                             {errors.limitationTimes && <small className='p-error'>{errors.limitationTimes}</small>}
                         </div>
-                    )}
-
-                    {discountLimitationType !== 0 && discountLimitationType !== 1 && (
                         <>
-                            {/* <div className='field'>
-                                <label htmlFor='totalLimit'>Total Limit</label>
-                                <InputNumber
-                                    id='totalLimit'
-                                    value={limitationTimes}
-                                    onValueChange={(e) => setLimitationTimes(e.value)}
-                                    min={1}
-                                    max={1000}
-                                    placeholder='Enter total limit'
-                                    tooltip='Enter the maximum total times this discount can be used'
-                                    tooltipOptions={{ position: 'top' }}
-                                    className={errors.limitationTimes ? 'p-invalid' : ''}
-                                />
-                                {errors.limitationTimes && <small className='p-error'>{errors.limitationTimes}</small>}
-                            </div> */}
-
                             <div className='field'>
                                 <label htmlFor='perCustomerLimit'>Per Customer Limit</label>
                                 <InputNumber
@@ -563,8 +528,6 @@ const DiscountForm = () => {
                                 )}
                             </div>
                         </>
-                    )}
-
                     <div className='flex justify-center gap-2 items-center space-x-2 my-3'>
                         <InputTextarea
                             value={comments}

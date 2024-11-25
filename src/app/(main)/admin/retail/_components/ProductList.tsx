@@ -67,6 +67,7 @@ export default function ProductListComponent({
     const [, setScanResult] = useState<string>('')
     const [totalWeight, setTotalWeight] = useState<number>(0)
     const [, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const [orderTotals, setOrderTotals] = useState<{
         subtotal: number
@@ -138,6 +139,16 @@ export default function ProductListComponent({
     }
 
     const addProductToCartHandler = () => {
+        setIsLoading(true)
+        if (quantity === 0) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Quantity cannot be 0',
+                life: 1000
+            })
+            return
+        }
         const cart: ShoppingCart = {
             cartUUID: uuidv4(),
             productId: product?.id ?? null,
@@ -165,6 +176,9 @@ export default function ProductListComponent({
                     detail: error instanceof Error ? error.message : 'An error occurred',
                     life: 3000
                 })
+            })
+            .finally(() => {
+                setIsLoading(false)
             })
     }
 
@@ -239,6 +253,7 @@ export default function ProductListComponent({
             </Dialog>
 
             <Toast ref={toast} />
+
             <ProductDialog
                 products={products}
                 visible={visible}
