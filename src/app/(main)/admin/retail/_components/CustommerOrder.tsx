@@ -178,6 +178,12 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             district: '',
             address: payload.addressName
         }
+        setAddress((prev) => ({
+            ...prev,
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            phoneNumber: payload.phoneNumber
+        }))
         setAddressDetail(fullAddress)
     }
 

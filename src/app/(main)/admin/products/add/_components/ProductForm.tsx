@@ -66,7 +66,13 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [nameError, setNameError] = useState<string>('')
     const [categoryError, setCategoryError] = useState<string>('')
     const [manufactureError, setManufactureError] = useState<string>('')
+    const [bulkValues, setBulkValues] = useState({
+        unitPrice: 0,
+        productCost: 0,
+        quantity: 0
+    })
     const toast = useRef<Toast>(null)
+
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
 
@@ -123,9 +129,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         newCombinations.push({
                             name: name,
                             sku: '',
-                            productCost: 0,
-                            unitPrice: 0,
-                            quantity: 0,
+                            productCost: 100,
+                            unitPrice: 100,
+                            quantity: 10,
                             gtin: '',
                             images: []
                         })
@@ -200,8 +206,15 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             case 'quantity':
             case 'unitPrice':
             case 'productCost':
-                if (isPositiveInteger(newValue)) rowData[field] = newValue
-                else event.preventDefault()
+                if (isPositiveInteger(newValue)) {
+                    if (field === 'unitPrice' && Number(newValue) < Number(rowData.productCost)) {
+                        event.preventDefault()
+                    } else {
+                        rowData[field] = newValue
+                    }
+                } else {
+                    event.preventDefault()
+                }
                 break
 
             case 'sku':
@@ -213,11 +226,15 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 break
 
             default:
-                if (newValue.trim().length > 0) rowData[field] = newValue
-                else event.preventDefault()
+                if (newValue.trim().length > 0) {
+                    rowData[field] = newValue
+                } else {
+                    event.preventDefault()
+                }
                 break
         }
     }
+
     const validateFields = () => {
         const errors: { name?: string; category?: string; manufacture?: string; attribute?: string } = {}
 
@@ -363,6 +380,23 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             return updatedImages
         })
     }
+
+    const handleBulkUpdate = (field: 'unitPrice' | 'productCost' | 'quantity', value: number) => {
+        setBulkValues((prev) => ({ ...prev, [field]: value }))
+    }
+
+    const applyBulkUpdate = (field: 'unitPrice' | 'productCost' | 'quantity') => {
+        const value = bulkValues[field]
+        if (value >= 0) {
+            setCombinedRows((prevRows) =>
+                prevRows.map((row) => ({
+                    ...row,
+                    [field]: value
+                }))
+            )
+        }
+    }
+
     return (
         <div>
             <Toast ref={toast} />
@@ -489,6 +523,56 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             <span className='ml-2'>Add attribute</span>
                         </Button>
 
+                        {combinedRows.length > 0 && (
+                            <div className='flex flex-row gap-4 mb-4 mt-4'>
+                                <div className='flex-1'>
+                                    <label htmlFor='bulkUnitPrice' className='block mb-2'>
+                                        Bulk Unit Price
+                                    </label>
+                                    <div className='flex gap-2'>
+                                        <InputNumber
+                                            id='bulkUnitPrice'
+                                            value={bulkValues.unitPrice}
+                                            onValueChange={(e) => handleBulkUpdate('unitPrice', e.value || 0)}
+                                            mode='currency'
+                                            currency='USD'
+                                            min={0}
+                                        />
+                                        <Button onClick={() => applyBulkUpdate('unitPrice')} label='Apply' />
+                                    </div>
+                                </div>
+                                <div className='flex-1'>
+                                    <label htmlFor='bulkProductCost' className='block mb-2'>
+                                        Bulk Product Cost
+                                    </label>
+                                    <div className='flex gap-2'>
+                                        <InputNumber
+                                            id='bulkProductCost'
+                                            value={bulkValues.productCost}
+                                            onValueChange={(e) => handleBulkUpdate('productCost', e.value || 0)}
+                                            mode='currency'
+                                            currency='USD'
+                                            min={0}
+                                        />
+                                        <Button onClick={() => applyBulkUpdate('productCost')} label='Apply' />
+                                    </div>
+                                </div>
+                                <div className='flex-1'>
+                                    <label htmlFor='bulkQuantity' className='block mb-2'>
+                                        Bulk Quantity
+                                    </label>
+                                    <div className='flex gap-2'>
+                                        <InputNumber
+                                            id='bulkQuantity'
+                                            value={bulkValues.quantity}
+                                            onValueChange={(e) => handleBulkUpdate('quantity', e.value || 0)}
+                                            min={0}
+                                        />
+                                        <Button onClick={() => applyBulkUpdate('quantity')} label='Apply' />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {combinedRows.length > 0 && (
                             <DataTable
                                 value={combinedRows}

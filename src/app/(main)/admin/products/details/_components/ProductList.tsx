@@ -3,20 +3,19 @@ import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { ProductResponse } from '@/interface/Product'
 import { Button } from 'primereact/button'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 type Props = {
     products: ProductResponse[]
 }
 
 function ProductList({ products }: Props) {
-    const router = useRouter()
-
     return (
         <div className='card '>
             <div className='flex justify-content-between mb-5'>
                 <h2>Product List</h2>
-                <Button label='Add New Product' onClick={() => router.push('/admin/products/add')} />
+                <Link href='/admin/products/add'>
+                    <Button label='Add New Product' />
+                </Link>
             </div>
             <DataTable
                 value={products}
