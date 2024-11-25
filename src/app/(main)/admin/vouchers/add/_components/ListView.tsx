@@ -32,7 +32,6 @@ const DiscountForm = () => {
     const [isPublished, setIsPublished] = useState<boolean>(false)
     const [comments, setComments] = useState<string>('')
     const [usePercentage, setUsePercentage] = useState<boolean>(false)
-    const [maxDiscountedQuantity, setMaxDiscountedQuantity] = useState<number>(0)
     const [minOrderAmount, setMinOrderAmount] = useState<number>(0)
     const [searchTerm, setSearchTerm] = useState<string>('')
     const [minStartDate, setMinStartDate] = useState<Date | undefined>(new Date())
@@ -41,7 +40,7 @@ const DiscountForm = () => {
     const [enableMaxDiscount, setEnableMaxDiscount] = useState<boolean>(true)
     const [requiresCouponCode, setRequiresCouponCode] = useState<boolean>(true)
     const [couponCode, setCouponCode] = useState<string | undefined>()
-    const [discountLimitationType, setDiscountLimitationType] = useState(0)
+    const [discountLimitationType, setDiscountLimitationType] = useState(3)
     const [limitationTimes, setLimitationTimes] = useState(null)
     const [perCustomerLimit, setPerCustomerLimit] = useState(null)
     const [isCumulative, setIsCumulative] = useState<boolean>(false)
@@ -53,7 +52,6 @@ const DiscountForm = () => {
         dateError: string | null
         productError: string | null
         maxDiscountAmount: string | null
-        maxDiscountedQuantity: string | null
         minOrderAmount: string | null
         couponCode: string | null
         limitationTimes: string | null
@@ -66,7 +64,6 @@ const DiscountForm = () => {
         dateError: null,
         productError: null,
         maxDiscountAmount: null,
-        maxDiscountedQuantity: null,
         minOrderAmount: null,
         couponCode: null,
         limitationTimes: null,
@@ -78,8 +75,8 @@ const DiscountForm = () => {
     )
     const discountLimitationTypes = [
         // { id: 0, label: 'None' },
-        { id: 1, label: 'Limited Vouchers' },
-        { id: 2, label: 'Limited Per Customer' },
+        // { id: 1, label: 'Limited Vouchers' },
+        // { id: 2, label: 'Limited Per Customer' },
         { id: 3, label: 'Limited Vouchers and Per Customer' }
     ]
 
@@ -114,7 +111,9 @@ const DiscountForm = () => {
             showFailedToast('Form validation failed. Please correct the fields.')
             return
         }
-        const formattedCouponCode = requiresCouponCode ? `VI${couponCode?.replace(/^VI/, '')}` : undefined
+        const formattedCouponCode = requiresCouponCode
+            ? `VI${couponCode?.toUpperCase()?.replace(/^VI/, '').replace(/-/g, '')}`
+            : undefined
         const discountPayload = {
             name: discountName,
             comment: comments,
@@ -125,13 +124,12 @@ const DiscountForm = () => {
             startDateUtc: fromDate?.toISOString(),
             endDateUtc: toDate?.toISOString(),
             maxDiscountAmount: maxDiscountAmount,
-            maxDiscountedQuantity: maxDiscountedQuantity,
             minOderAmount: minOrderAmount,
             requiresCouponCode: requiresCouponCode,
             couponCode: formattedCouponCode,
             selectedCustomerIds: selectedCustomers.map((customer) => customer.id),
             isPublished: isPublished,
-            discountLimitationType: discountLimitationType,
+            discountLimitationId: discountLimitationType,
             limitationTimes: limitationTimes,
             perCustomerLimit: perCustomerLimit,
             isCumulative: isCumulative
@@ -181,7 +179,6 @@ const DiscountForm = () => {
             dateError: string | null
             productError: string | null
             maxDiscountAmount: string | null
-            maxDiscountedQuantity: string | null
             minOrderAmount: string | null
             couponCode: string | null
             limitationTimes: string | null
@@ -194,7 +191,6 @@ const DiscountForm = () => {
             dateError: null,
             productError: null,
             maxDiscountAmount: null,
-            maxDiscountedQuantity: null,
             minOrderAmount: null,
             couponCode: null,
             limitationTimes: null,
@@ -220,10 +216,6 @@ const DiscountForm = () => {
         }
         if (usePercentage && (maxDiscountAmount === null || isNaN(maxDiscountAmount) || maxDiscountAmount <= 0)) {
             newErrors.maxDiscountAmount = 'Please enter a valid maximum discount amount.'
-            isValid = false
-        }
-        if (maxDiscountedQuantity <= 0) {
-            newErrors.maxDiscountedQuantity = 'Please enter a valid quantity greater than 0.'
             isValid = false
         }
 
@@ -270,18 +262,21 @@ const DiscountForm = () => {
             isValid = false
         }
         const limitationTimeValid = limitationTimes != null ? limitationTimes : 0
-        if (limitationTimeValid <= 0 || limitationTimeValid > 1000000) {
+        if (discountLimitationType !== 2 && (limitationTimeValid <= 0 || limitationTimeValid > 1000000)) {
             newErrors.limitationTimes = 'Limitation times must be between 1 and 1000000.'
             isValid = false
         }
         const perCustomerLimitValid = perCustomerLimit !== null ? perCustomerLimit : 0
-        if(perCustomerLimitValid <= 0 || perCustomerLimitValid > 5) {
+        if (
+            discountLimitationType === 3 &&
+            (perCustomerLimitValid <= 0 || perCustomerLimitValid > 5)
+        ) {
             newErrors.perCustomerLimit = 'Per customer limit must be between 1 and 5.'
             isValid = false
         }
 
-        if (selectedCustomers.length === 0) {
-            newErrors.productError = 'At least one product must be selected.'
+        if (!isPublished && selectedCustomers.length === 0) {
+            newErrors.productError = 'At least one customer must be selected.'
             isValid = false
         }
         const validValue = value !== null ? value : 0
@@ -294,18 +289,12 @@ const DiscountForm = () => {
         setErrors(newErrors)
         return isValid
     }
-
+    const fetchCustomers = async () => {
+        const customerData = await customerService.getAll()
+            setCustomers(customerData.payload.items)
+            console.log('Items', customerData.payload.items)
+    }
     useEffect(() => {
-        const fetchCustomers = async () => {
-            const customerData = await customerService.getAll()
-            if (Array.isArray(customerData.payload.items)) {
-                setCustomers(customerData.payload.items)
-                console.log('Items', customerData.payload.items)
-            } else {
-                console.error('Expected payload to be an array:', customerData.payload)
-                setCustomers([])
-            }
-        }
         fetchCustomers()
     }, [])
 
@@ -411,6 +400,20 @@ const DiscountForm = () => {
                         />
                         {errors.value && <small className='p-error'>{errors.value}</small>}
                     </div>
+                    <div className='field'>
+                        <label htmlFor='minOrderAmount'>Min Order Amount</label>
+                        <InputNumber
+                            id='minOrderAmount'
+                            value={minOrderAmount}
+                            onValueChange={(e) => setMinOrderAmount(e.value)}
+                            prefix='$'
+                            min={1}
+                            max={1000000}
+                            showButtons
+                            className={errors.minOrderAmount ? 'p-invalid' : ''}
+                        />
+                        {errors.minOrderAmount && <small className='p-error'>{errors.minOrderAmount}</small>}
+                    </div>
                     <div className='flex flex-direction-column gap-6'>
                         <div className='field'>
                             <label htmlFor='fromDate'>From Date</label>
@@ -460,37 +463,6 @@ const DiscountForm = () => {
                             {errors.dateError && <small className='p-error'>{errors.dateError}</small>}
                         </div>
                     </div>
-                    <div className='field'>
-                        <label htmlFor='maxDiscountedQuantity'>Max Discounted Quantity</label>
-                        <InputNumber
-                            id='maxDiscountedQuantity'
-                            value={maxDiscountedQuantity}
-                            onValueChange={(e) => setMaxDiscountedQuantity(e.value)}
-                            min={1}
-                            max={1000}
-                            prefix='A total of '
-                            suffix=' products are applicable for this voucher'
-                            showButtons
-                            className={errors.maxDiscountedQuantity ? 'p-invalid' : ''}
-                        />
-                        {errors.maxDiscountedQuantity && (
-                            <small className='p-error'>{errors.maxDiscountedQuantity}</small>
-                        )}
-                    </div>
-                    <div className='field'>
-                        <label htmlFor='minOrderAmount'>Min Order Amount</label>
-                        <InputNumber
-                            id='minOrderAmount'
-                            value={minOrderAmount}
-                            onValueChange={(e) => setMinOrderAmount(e.value)}
-                            prefix='$'
-                            min={1}
-                            max={1000000}
-                            showButtons
-                            className={errors.minOrderAmount ? 'p-invalid' : ''}
-                        />
-                        {errors.minOrderAmount && <small className='p-error'>{errors.minOrderAmount}</small>}
-                    </div>
                     <div className='field flex gap-2'>
                         <label htmlFor='requiresCouponCode'>Requires Coupon Code</label>
                         <InputSwitch
@@ -510,6 +482,9 @@ const DiscountForm = () => {
                                 mask='VI-*******'
                                 placeholder='VI-'
                             />
+                            <p className='py-2'>
+                                Coupon code must be in the format {couponCode?.toUpperCase().replaceAll('-', '')}
+                            </p>
                             {errors.couponCode && <small className='p-error'>{errors.couponCode}</small>}
                         </div>
                     )}
@@ -523,22 +498,6 @@ const DiscountForm = () => {
                             Cumulative with other discounts
                         </label>
                     </div>
-                    <div className='field my-4'>
-                        <label htmlFor='discountLimitationType'>Discount Limitation Type</label>
-                        <Dropdown
-                            id='discountLimitationType'
-                            value={discountLimitationType}
-                            onChange={(e) => setDiscountLimitationType(e.value)}
-                            options={discountLimitationTypes}
-                            optionLabel='label'
-                            optionValue='id'
-                            placeholder='Select Limitation Type'
-                            tooltip='Choose how this discount is limited'
-                            tooltipOptions={{ position: 'top' }}
-                        />
-                    </div>
-
-                    {discountLimitationType !== 0 && discountLimitationType !== 2 && (
                         <div className='field'>
                             <label htmlFor='limitationTimes'>Limitation Times</label>
                             <InputNumber
@@ -552,26 +511,7 @@ const DiscountForm = () => {
                             />
                             {errors.limitationTimes && <small className='p-error'>{errors.limitationTimes}</small>}
                         </div>
-                    )}
-
-                    {discountLimitationType !== 0 && discountLimitationType !== 1 && (
                         <>
-                            {/* <div className='field'>
-                                <label htmlFor='totalLimit'>Total Limit</label>
-                                <InputNumber
-                                    id='totalLimit'
-                                    value={limitationTimes}
-                                    onValueChange={(e) => setLimitationTimes(e.value)}
-                                    min={1}
-                                    max={1000}
-                                    placeholder='Enter total limit'
-                                    tooltip='Enter the maximum total times this discount can be used'
-                                    tooltipOptions={{ position: 'top' }}
-                                    className={errors.limitationTimes ? 'p-invalid' : ''}
-                                />
-                                {errors.limitationTimes && <small className='p-error'>{errors.limitationTimes}</small>}
-                            </div> */}
-
                             <div className='field'>
                                 <label htmlFor='perCustomerLimit'>Per Customer Limit</label>
                                 <InputNumber
@@ -588,8 +528,6 @@ const DiscountForm = () => {
                                 )}
                             </div>
                         </>
-                    )}
-
                     <div className='flex justify-center gap-2 items-center space-x-2 my-3'>
                         <InputTextarea
                             value={comments}
