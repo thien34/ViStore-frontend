@@ -39,7 +39,7 @@ const AppMenu = () => {
             label: 'Orders',
             items: [
                 { label: 'Orders', icon: 'pi pi-fw pi-table', to: '/uikit/table' },
-                { label: 'Return requests', icon: 'pi pi-fw pi-list', to: '/uikit/list' },
+                { label: 'Return Goods', icon: 'pi pi-fw pi-list', to: '/admin/return-product' },
                 { label: 'Recurring payments', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
                 { label: 'Carts & Wishlists', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' }
             ]

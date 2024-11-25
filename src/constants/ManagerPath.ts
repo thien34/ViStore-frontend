@@ -88,6 +88,12 @@ class ManagerPath {
     static readonly RELATED_PRODUCT_UPDATE = '/admin/related-product/:id/update'
 
     static readonly RETAIL_SALE_CREATE = '/admin/retail-sales'
+
+    //Return Product
+    static readonly RETURN_REQUEST = '/admin/return-request'
+    static readonly RETURN_INVOICE = '/admin/return-invoice'
+    static readonly RETURN_ITEM = '/admin/return-item'
+
 }
 
 export default ManagerPath
