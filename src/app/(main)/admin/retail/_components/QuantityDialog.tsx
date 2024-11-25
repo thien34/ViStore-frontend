@@ -13,14 +13,7 @@ interface QuantityDialogProps {
     onSave: () => void
 }
 
-const QuantityDialog: React.FC<QuantityDialogProps> = ({
-    visible,
-    setVisible,
-    product,
-    quantity,
-    setQuantity,
-    onSave
-}) => {
+const QuantityDialog = ({ visible, setVisible, product, quantity, setQuantity, onSave }: QuantityDialogProps) => {
     return (
         <Dialog header={product?.name} visible={visible} style={{ width: '50vw' }} onHide={() => setVisible(false)}>
             <div>

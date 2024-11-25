@@ -7,10 +7,11 @@ import OrderService from '@/service/order.service'
 import { Toast } from 'primereact/toast'
 import { OrderStatusType } from '@/interface/order.interface'
 import { Button } from 'primereact/button'
-import { ProductResponse } from '@/interface/Product'
+import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import ProductDialog from '../../../retail/_components/ProductDialog'
 import ProductService from '@/service/ProducrService'
 import CustomerOrderInfo from './CustomerOrder'
+import QuantityDialog from '../../../retail/_components/QuantityDialog'
 
 interface ProductAttribute {
     productAttribute: {
@@ -56,40 +57,38 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
     const [globalFilterValue, setGlobalFilterValue] = useState('')
     const [productsDialog, setProductsDialog] = useState<ProductResponse[]>([])
     const toast = useRef<Toast>(null)
+    const [visibleQuantity, setVisibleQuantity] = useState<boolean>(false)
+    const [product, setProduct] = useState<ProductResponseDetails>()
+    const [quantity, setQuantity] = useState<number>(1)
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [orderResponse, productsResponse] = await Promise.all([
-                    OrderService.getOrderItems(idOrder),
-                    ProductService.getProuctsDetails()
-                ])
-                setOrderItemsResponse(orderResponse.payload)
-                setProductsDialog(productsResponse)
-                setCustomerInfo(
-                    orderResponse.payload?.[0].customerOrder || {
-                        id: 0,
-                        addressId: 0,
-                        addressOrder: '',
-                        customerName: '',
-                        customerPhone: ''
-                    }
-                )
-            } catch (error) {
-                console.error('Error fetching data:', error)
-                toast.current?.show({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Failed to fetch data',
-                    life: 3000
-                })
-            }
+    const fetchData = async () => {
+        try {
+            const [orderResponse, productsResponse] = await Promise.all([
+                OrderService.getOrderItems(idOrder),
+                ProductService.getProuctsDetails()
+            ])
+            setOrderItemsResponse(orderResponse.payload)
+            setProductsDialog(productsResponse)
+            setCustomerInfo(
+                orderResponse.payload?.[0].customerOrder || {
+                    id: 0,
+                    addressId: 0,
+                    addressOrder: '',
+                    customerName: '',
+                    customerPhone: ''
+                }
+            )
+        } catch (error) {
+            console.error('Error fetching data:', error)
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to fetch data',
+                life: 3000
+            })
         }
-
-        fetchData()
-    }, [idOrder]) // Only re-run if id changes
-
-    useEffect(() => {
+    }
+    const fetchItem = () => {
         const data: Product[] = orderItemsResponse.map((item) => {
             const product = JSON.parse(item.productJson)
             return {
@@ -111,7 +110,12 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
             }
         })
         setProducts(data)
-    }, [orderItemsResponse])
+    }
+
+    useEffect(() => {
+        fetchData()
+        fetchItem()
+    }, [fetchItem])
 
     const handleDecrement = (id: number) => {
         const currentItem = orderItemsResponse.find((item) => item.id === id)
@@ -158,6 +162,28 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
         OrderStatusType.CONFIRMED,
         OrderStatusType.SHIPPING_PENDING
     ].includes(status as OrderStatusType)
+
+    const addProductToCart = (product: ProductResponseDetails) => {
+        setProduct(product)
+        setVisibleQuantity(true)
+    }
+
+    const addProductToCartHandler = () => {
+        OrderService.addProductToOrder(idOrder, {
+            productId: product?.id ?? 0,
+            orderItemGuid: '',
+            quantity: quantity,
+            unitPrice: product?.price ?? 0,
+            priceTotal: quantity * (product?.price ?? 0),
+            discountAmount: 0,
+            originalProductCost: product?.price ?? 0,
+            attributeDescription: ''
+        }).then(() => {
+            fetchData()
+            fetchItem()
+        })
+        setVisibleQuantity(false)
+    }
 
     return (
         <>
@@ -292,12 +318,20 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
                         filters={filters}
                         setFilters={setFilters}
                         addProductToCart={(product: ProductResponse) => {
-                            console.log(product)
+                            addProductToCart(product as unknown as ProductResponseDetails)
                         }}
                         globalFilterValue={globalFilterValue}
                         onGlobalFilterChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             setGlobalFilterValue(e.target.value)
                         }}
+                    />
+                    <QuantityDialog
+                        visible={visibleQuantity}
+                        setVisible={setVisibleQuantity}
+                        product={product || null}
+                        quantity={quantity}
+                        setQuantity={setQuantity}
+                        onSave={addProductToCartHandler}
                     />
                 </div>
             </div>

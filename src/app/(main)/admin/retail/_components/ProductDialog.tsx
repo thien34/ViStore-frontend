@@ -20,7 +20,7 @@ interface ProductDialogProps {
     onGlobalFilterChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-const ProductDialog: React.FC<ProductDialogProps> = ({
+const ProductDialog = ({
     products,
     visible,
     setVisible,
@@ -30,7 +30,7 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
     addProductToCart,
     globalFilterValue,
     onGlobalFilterChange
-}) => {
+}: ProductDialogProps) => {
     const renderHeader = () => {
         return (
             <div className='flex justify-content-between'>

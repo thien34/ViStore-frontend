@@ -1,4 +1,4 @@
-import { OrderFilter, OrderRequest, OrderResponse } from '@/interface/order.interface'
+import { OrderFilter, OrderItemRequest, OrderRequest, OrderResponse } from '@/interface/order.interface'
 import { OrderItemsResponse, OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
 import http from '@/libs/http'
 
@@ -7,6 +7,9 @@ class OrderService {
 
     static async createOrder(order: OrderRequest) {
         return await http.post<OrderRequest>(`${this.basePath}`, order)
+    }
+    static async addProductToOrder(orderId: string, order: OrderItemRequest) {
+        return await http.put(`${this.basePath}/addMoreProduct/${orderId}`, order)
     }
     static async getOrders(filter: OrderFilter) {
         const params = new URLSearchParams(filter as Record<string, string>)
