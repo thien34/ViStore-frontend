@@ -646,13 +646,12 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                                                     className='rounded-md object-cover shadow-md'
                                                                 />
                                                                 <button
-                                                                    style={{ borderRadius: '5px' }}
-                                                                    className='absolute cursor-pointer border-none rounded-3xl top-0 right-0 bg-red-500 text-white p-1 transition-all duration-300 ease-in-out hover:bg-red-700 hover:scale-110'
+                                                                    className='absolute cursor-pointer border-none rounded-full px-1 top-[-5px] right-[-5px] bg-red-400 text-white transition-all duration-300 ease-in-out hover:bg-red-600 hover:scale-110'
                                                                     onClick={() =>
                                                                         onRemoveImage(column.rowIndex, imageIndex)
                                                                     }
                                                                 >
-                                                                    <i className='pi pi-trash'></i>
+                                                                    <i className='pi pi-times'></i>
                                                                 </button>
                                                             </div>
                                                         ))}
