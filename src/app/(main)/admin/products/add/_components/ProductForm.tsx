@@ -616,18 +616,19 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                     header='Image'
                                     body={(rowData, column) => (
                                         <div style={{ width: '100px' }}>
-                                            <label className='cursor-pointer rounded-lg justify-center items-center mb-4'>
-                                                <input
-                                                    type='file'
-                                                    onChange={(event) => onUpload(event, column.rowIndex)}
-                                                    className='hidden cursor-pointer'
-                                                />
-                                                <span className='text-gray-600 '>
-                                                    <i className='pi pi-image text-2xl mb-2 '></i>
-                                                </span>
-                                            </label>
-
-                                            <hr className='border-t-2 border-gray-300 mb-4' />
+                                            {!uploadedImages[column.rowIndex] ||
+                                            uploadedImages[column.rowIndex].length === 0 ? (
+                                                <label className='cursor-pointer rounded-lg justify-center items-center mb-4'>
+                                                    <input
+                                                        type='file'
+                                                        onChange={(event) => onUpload(event, column.rowIndex)}
+                                                        className='hidden cursor-pointer'
+                                                    />
+                                                    <span className='text-gray-600 '>
+                                                        <i className='pi pi-image text-2xl mb-2 '></i>
+                                                    </span>
+                                                </label>
+                                            ) : null}
 
                                             <div className='flex justify-center items-center'>
                                                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
@@ -657,7 +658,6 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                                         ))}
                                                 </div>
                                             </div>
-                                            <hr className='border-t-2 border-gray-300 mt-4' />
                                         </div>
                                     )}
                                     style={{ width: '350px', textAlign: 'center' }}
