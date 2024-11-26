@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { CustomerOrder, OrderItemsResponse } from '@/interface/orderItem.interface'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 import { InputNumber } from 'primereact/inputnumber'
@@ -61,7 +61,7 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
     const [product, setProduct] = useState<ProductResponseDetails>()
     const [quantity, setQuantity] = useState<number>(1)
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const [orderResponse, productsResponse] = await Promise.all([
                 OrderService.getOrderItems(idOrder),
@@ -87,8 +87,8 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
                 life: 3000
             })
         }
-    }
-    const fetchItem = () => {
+    }, [idOrder, toast])
+    const fetchItem = useCallback(() => {
         const data: Product[] = orderItemsResponse.map((item) => {
             const product = JSON.parse(item.productJson)
             return {
@@ -110,12 +110,12 @@ export default function ProductOrderList({ onDelete, idOrder, status }: Props) {
             }
         })
         setProducts(data)
-    }
+    }, [orderItemsResponse])
 
     useEffect(() => {
         fetchData()
         fetchItem()
-    }, [fetchItem])
+    }, [fetchData, fetchItem])
 
     const handleDecrement = (id: number) => {
         const currentItem = orderItemsResponse.find((item) => item.id === id)
