@@ -248,7 +248,7 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
     return (
         <div className='card'>
             <Toast ref={toast} />
-            <h5>Edit Product Details</h5>
+            <h5>Add Product Details</h5>
             <div className='flex flex-column gap-4'>
                 {discount && (
                     <div className='mb-3'>
