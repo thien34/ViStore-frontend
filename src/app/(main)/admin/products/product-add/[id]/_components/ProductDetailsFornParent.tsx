@@ -25,13 +25,34 @@ type AttributeRow = {
 }
 
 type Props = {
-    product: ProductResponseDetails | null
+    product: ProductResponseDetails | typeof initialFormData
     productAttributes: ProductAttributeName[]
     id: string
     name: string
 }
+
+const initialFormData: ProductResponseDetails = {
+    id: 0,
+    name: '',
+    deleted: false,
+    categoryId: 0,
+    manufacturerId: 0,
+    sku: '',
+    price: 0,
+    quantity: 0,
+    productCost: 0,
+    imageUrl: '',
+    gtin: '',
+    discountPrice: 0,
+    attributes: [],
+    largestDiscountPercentage: 0,
+    weight: 0
+}
+
 const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes, id, name }) => {
-    const [formData, setFormData] = useState<ProductResponseDetails>(product as ProductResponseDetails)
+    const [formData, setFormData] = useState<ProductResponseDetails>(
+        (product as ProductResponseDetails) || initialFormData
+    )
     const [imageUrl, setImageUrl] = useState<string>(product?.imageUrl || '')
     const [uploadedFile, setUploadedFile] = useState<File | null>(null)
     const [discount, setDiscount] = useState(null)
@@ -257,8 +278,8 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                 <div className='p-grid p-fluid'>
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='sku' className='mb-2'>
-                                SKU
+                            <label htmlFor='sku'>
+                                SKU <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
                             </label>
                             <InputText
                                 tooltip='Enter the SKU for the product'
@@ -266,13 +287,21 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                                 tooltipOptions={{ position: 'bottom' }}
                                 className={errors.sku ? 'p-invalid' : ''}
                                 value={(formData && formData.sku) || ''}
-                                onChange={(e) => handleChange(e, 'sku')}
+                                onChange={(e) => {
+                                    if (e.target.value.trim() === '') {
+                                        setErrors({ ...errors, sku: 'SKU is required' })
+                                    } else {
+                                        setErrors({ ...errors, sku: '' })
+                                    }
+                                    handleChange(e, 'sku')
+                                }}
                             />
                             {errors.sku && <small className='p-error'>{errors.sku}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full '>
-                            <label htmlFor='name' className='mb-2'>
-                                Product Name
+                            <label htmlFor='productName'>
+                                Product Name{' '}
+                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
                             </label>
 
                             <InputText
@@ -289,31 +318,37 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                     <div className='flex flex-row gap-4 mt-2'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='price' className='mb-2'>
-                                Price
+                                Price <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
                             </label>
                             <InputNumber
                                 tooltip='Enter product price'
                                 id='price'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={(formData && formData.price) || 0}
-                                onValueChange={(e) =>
+                                onValueChange={(e) => {
+                                    if (e.value && e.value <= 0) {
+                                        setErrors({ ...errors, price: 'Price must be greater than 0' })
+                                    } else {
+                                        setErrors({ ...errors, price: '' })
+                                    }
                                     handleChange(
                                         {
                                             target: { value: e.value ? e.value.toString() : '' }
                                         } as React.ChangeEvent<HTMLInputElement>,
                                         'price' as keyof ProductResponseDetails
                                     )
-                                }
+                                }}
                                 mode='currency'
                                 disabled={!!discount}
-                                className={discount ? 'p-disabled' : ''}
+                                className={discount ? 'p-disabled' : errors.price ? 'p-invalid' : ''}
                                 currency='USD'
                             />
                             {errors.price && <small className='p-error'>{errors.price}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='productCost' className='mb-2'>
-                                Product Cost
+                            <label htmlFor='productCost'>
+                                Product Cost{' '}
+                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
                             </label>
                             <InputNumber
                                 tooltip='Enter the cost of the product'
@@ -321,6 +356,11 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={(formData && formData.productCost) || 0}
                                 onValueChange={(e) => {
+                                    if (e.value && e.value <= 0) {
+                                        setErrors({ ...errors, productCost: 'Product cost must be greater than 0' })
+                                    } else {
+                                        setErrors({ ...errors, productCost: '' })
+                                    }
                                     handleChange(
                                         {
                                             target: { value: e.value ? e.value.toString() : '' }
@@ -328,6 +368,7 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                                         'productCost' as keyof ProductResponseDetails
                                     )
                                 }}
+                                max={1000000}
                                 mode='currency'
                                 className={errors.productCost ? 'p-invalid' : ''}
                                 currency='USD'
@@ -337,22 +378,29 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                     </div>
                     <div className='flex flex-row gap-4 mt-2'>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='quantity' className='mb-2'>
-                                Quantity
+                            <label htmlFor='quantity'>
+                                Quantity{' '}
+                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
                             </label>
                             <InputNumber
                                 tooltip='Enter the quantity of the product'
                                 id='quantity'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={(formData && formData.quantity) || 0}
-                                onValueChange={(e) =>
+                                onValueChange={(e) => {
+                                    if (e.value && e.value <= 0) {
+                                        setErrors({ ...errors, quantity: 'Quantity must be greater than 0' })
+                                    } else {
+                                        setErrors({ ...errors, quantity: '' })
+                                    }
                                     handleChange(
                                         {
                                             target: { value: e.value ? e.value.toString() : '' }
                                         } as React.ChangeEvent<HTMLInputElement>,
                                         'quantity' as keyof ProductResponseDetails
                                     )
-                                }
+                                }}
+                                max={1000000}
                                 className={errors.quantity ? 'p-invalid' : ''}
                             />
                             {errors.quantity && <small className='p-error'>{errors.quantity}</small>}

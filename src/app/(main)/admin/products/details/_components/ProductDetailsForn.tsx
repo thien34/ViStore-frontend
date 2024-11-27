@@ -220,7 +220,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
     return (
         <div className='card'>
             <Toast ref={toast} />
-            <h5>Edit Product Details</h5>
+            <h4>Edit Product Details</h4>
             <div className='flex flex-column gap-4'>
                 {discount && (
                     <div className='mb-3'>
