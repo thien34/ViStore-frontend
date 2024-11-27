@@ -115,6 +115,16 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                 value: attr.selectedValues
             }))
 
+        if (filteredAttributes.length === 0) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Please add at least one attribute',
+                life: 3000
+            })
+            return
+        }
+
         const productData = {
             id: formData.id,
             name: formData.name,
