@@ -351,6 +351,7 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                                 disabled={!!discount}
                                 className={discount ? 'p-disabled' : errors.price ? 'p-invalid' : ''}
                                 currency='USD'
+                                max={1000000}
                             />
                             {errors.price && <small className='p-error'>{errors.price}</small>}
                         </div>

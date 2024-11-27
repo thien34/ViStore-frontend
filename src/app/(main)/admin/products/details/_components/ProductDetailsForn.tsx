@@ -331,6 +331,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 disabled={!!discount}
                                 className={discount ? 'p-disabled' : ''}
                                 currency='USD'
+                                max={1000000}
                             />
                             {errors.price && <small className='p-error'>{errors.price}</small>}
                         </div>
@@ -360,6 +361,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 mode='currency'
                                 className={errors.productCost ? 'p-invalid' : ''}
                                 currency='USD'
+                                max={1000000}
                             />
                             {errors.productCost && <small className='p-error'>{errors.productCost}</small>}
                         </div>
@@ -389,6 +391,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                     )
                                 }}
                                 className={errors.quantity ? 'p-invalid' : ''}
+                                max={1000000}
                             />
                             {errors.quantity && <small className='p-error'>{errors.quantity}</small>}
                         </div>
