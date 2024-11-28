@@ -17,6 +17,7 @@ import { Column } from 'primereact/column'
 import { AddressesResponse, Province } from '@/interface/address.interface'
 import AddressForm from './AddressForm'
 import addressService from '@/service/address.service'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 
 interface FormProps {
     roles: RoleName[]
@@ -115,13 +116,13 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
             <div className='flex gap-x-4'>
                 <div className='w-2/3'>
                     <div className='card h-full'>
-                        <div className='text-xl font-medium mb-6'>General</div>
+                        <h4>Update Customer</h4>
                         <div className='field'>
                             <label htmlFor='email' className='font-medium w-full'>
                                 Email
                             </label>
                             <AutoComplete
-                                id='email'
+                                inputId='email'
                                 readOnly
                                 delay={230}
                                 inputStyle={{ width: '100%' }}
@@ -134,7 +135,7 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                         <div className='flex flex-wrap'>
                             <div className='field'>
                                 <label htmlFor='firstName' className='font-medium w-full'>
-                                    First name
+                                    First name <RequiredIcon />
                                 </label>
                                 <InputText
                                     id='firstName'
@@ -149,7 +150,7 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                             </div>
                             <div className='field'>
                                 <label htmlFor='lastName' className='font-medium w-full'>
-                                    Last name
+                                    Last name <RequiredIcon />
                                 </label>
                                 <InputText
                                     id='lastName'
@@ -169,6 +170,7 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                                     Date of birth
                                 </label>
                                 <Calendar
+                                    inputId='dob'
                                     readOnlyInput
                                     value={customer.dateOfBirth ? new Date(customer.dateOfBirth) : null}
                                     onChange={(e) => setCustomer({ ...customer, dateOfBirth: e.value || null })}

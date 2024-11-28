@@ -15,6 +15,7 @@ import { TreeNode } from 'primereact/treenode'
 import categoryService from '@/service/category.service'
 import Image from 'next/image'
 import { Image as PrimeImage } from 'primereact/image'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 
 interface CategoryProps {
     initialData: Category[]
@@ -269,7 +270,7 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                     <div className=''>
                         <div className='field'>
                             <label htmlFor='name' className='font-bold'>
-                                Name
+                                Name <RequiredIcon />
                             </label>
                             <InputText
                                 id='name'
@@ -282,7 +283,7 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                             {submitted && !category.name && <small className='p-error'>Name is required.</small>}
                         </div>
                         <div className='field'>
-                            <label htmlFor='name' className='font-bold'>
+                            <label htmlFor='description' className='font-bold'>
                                 Description
                             </label>
                             <InputText
@@ -296,7 +297,7 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                                 Category parent
                             </label>
                             <TreeSelect
-                                id='categoryParent'
+                                inputId='categoryParent'
                                 value={category.categoryParentId?.toString() || null}
                                 onChange={(e) =>
                                     setCategory({ ...category, categoryParentId: Number(e.value as string) })

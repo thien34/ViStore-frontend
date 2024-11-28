@@ -1,4 +1,5 @@
 'use client'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 import { AddressRequest, Province } from '@/interface/address.interface'
 import addressService from '@/service/address.service'
 import districtService from '@/service/district.service'
@@ -135,11 +136,11 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
             >
                 <div className='flex w-full gap-x-5'>
                     <div className='field w-full'>
-                        <label htmlFor='firstName' className='font-medium block'>
-                            First name
+                        <label htmlFor='firstNameAdress' className='font-medium block'>
+                            First name <RequiredIcon />
                         </label>
                         <InputText
-                            id='firstName'
+                            id='firstNameAdress'
                             value={address.firstName}
                             onChange={(e) => setAddress({ ...address, firstName: e.target.value })}
                             required
@@ -151,11 +152,11 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                         )}
                     </div>
                     <div className='field w-full'>
-                        <label htmlFor='lastName' className='font-medium block'>
-                            Last name
+                        <label htmlFor='lastNameAdress' className='font-medium block'>
+                            Last name <RequiredIcon />
                         </label>
                         <InputText
-                            id='lastName'
+                            id='lastNameAdress'
                             value={address.lastName}
                             onChange={(e) => setAddress({ ...address, lastName: e.target.value })}
                             required
@@ -168,11 +169,11 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                 </div>
                 <div className='flex w-full gap-x-5'>
                     <div className='field w-full'>
-                        <label htmlFor='email' className='font-medium block'>
-                            Email
+                        <label htmlFor='emailAdress' className='font-medium block'>
+                            Email <RequiredIcon />
                         </label>
                         <AutoComplete
-                            id='email'
+                            inputId='emailAdress'
                             delay={230}
                             value={address.email}
                             suggestions={items}
@@ -186,7 +187,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                     </div>
                     <div className='field w-full'>
                         <label htmlFor='phoneNumber' className='font-medium block'>
-                            Phone number
+                            Phone number <RequiredIcon />
                         </label>
                         <InputText
                             id='phoneNumber'
@@ -203,9 +204,10 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                 <div className='flex w-full gap-x-4'>
                     <div className='field w-full'>
                         <label htmlFor='province' className='font-medium block'>
-                            Province
+                            Province <RequiredIcon />
                         </label>
                         <Dropdown
+                            inputId='province'
                             value={provinces.find((province) => province.code === address.provinceId)}
                             onChange={(e) => {
                                 setAddress({ ...address, provinceId: e.target.value.code })
@@ -223,9 +225,10 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                     </div>
                     <div className='field w-full'>
                         <label htmlFor='district' className='font-medium block'>
-                            District
+                            District <RequiredIcon />
                         </label>
                         <Dropdown
+                            inputId='district'
                             value={districts.find((district) => district.code === address.districtId)}
                             onChange={(e) => {
                                 setAddress({ ...address, districtId: e.target.value.code })
@@ -244,9 +247,10 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                     </div>
                     <div className='field w-full'>
                         <label htmlFor='ward' className='font-medium block'>
-                            Ward
+                            Ward <RequiredIcon />
                         </label>
                         <Dropdown
+                            itemID='ward'
                             value={wards.find((ward) => ward.code === address.wardId)}
                             onChange={(e) => setAddress({ ...address, wardId: e.target.value.code })}
                             options={wards}
@@ -261,7 +265,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                 </div>
                 <div className='field w-full'>
                     <label htmlFor='addressName' className='font-medium block'>
-                        Address detail
+                        Address detail <RequiredIcon />
                     </label>
                     <InputText
                         id='addressName'

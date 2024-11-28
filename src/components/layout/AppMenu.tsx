@@ -19,10 +19,6 @@ const AppMenu = () => {
             items: [{ label: 'Retail Sales', icon: 'pi pi-fw pi-shop', to: '/admin/retail' }]
         },
         {
-            label: 'Orders',
-            items: [{ label: 'Orders', icon: 'pi pi-fw pi-table', to: '/admin/orders' }]
-        },
-        {
             label: 'Catalog',
             items: [
                 { label: 'Products', icon: 'pi pi-fw pi-box', to: '/admin/products' },
@@ -35,7 +31,22 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-mobile',
                     to: '/uikit/button'
                 },
-                { label: 'Discounts', icon: 'pi pi-fw pi-tags', to: '/admin/discounts' },
+                {
+                    label: 'Discounts',
+                    icon: 'pi pi-fw pi-dollar',
+                    items: [
+                        {
+                            label: 'Sales',
+                            icon: 'pi pi-fw pi-tags',
+                            to: '/admin/discounts'
+                        },
+                        {
+                            label: 'Vouchers',
+                            icon: 'pi pi-fw pi-receipt',
+                            to: '/admin/vouchers'
+                        }
+                    ]
+                },
                 { label: 'Customers', icon: 'pi pi-fw pi-users', to: '/admin/customers' },
                 { label: 'Customer roles', icon: 'pi pi-fw pi-key', to: '/admin/customer-roles' }
             ]
@@ -43,7 +54,7 @@ const AppMenu = () => {
         {
             label: 'Orders',
             items: [
-                { label: 'Orders', icon: 'pi pi-fw pi-table', to: '/uikit/table' },
+                { label: 'Orders', icon: 'pi pi-fw pi-table', to: '/admin/orders' },
                 { label: 'Return Goods', icon: 'pi pi-fw pi-list', to: '/admin/return-product' },
                 { label: 'Recurring payments', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
                 { label: 'Carts & Wishlists', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' }

@@ -12,6 +12,7 @@ import { classNames } from 'primereact/utils'
 import { Role } from '@/interface/role.interface'
 import roleService from '@/service/role.service'
 import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 
 interface RoleProps {
     initialData: Role[]
@@ -206,7 +207,7 @@ const ListView = ({ initialData }: RoleProps) => {
             >
                 <div className='field'>
                     <label htmlFor='name' className='font-bold'>
-                        Name
+                        Name <RequiredIcon />
                     </label>
                     <InputText
                         id='name'

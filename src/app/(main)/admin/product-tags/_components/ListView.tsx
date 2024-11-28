@@ -11,6 +11,7 @@ import { Dialog } from 'primereact/dialog'
 import { classNames } from 'primereact/utils'
 import { ProductTag, ProductTags } from '@/interface/productTag.interface'
 import productTagService from '@/service/prductTag.service'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 
 interface ProductTagProps {
     initialData: ProductTags[]
@@ -214,7 +215,7 @@ const ListView = ({ initialData }: ProductTagProps) => {
             >
                 <div className='field'>
                     <label htmlFor='name' className='font-bold'>
-                        Name
+                        Name <RequiredIcon />
                     </label>
                     <InputText
                         id='name'

@@ -12,6 +12,7 @@ import { Calendar } from 'primereact/calendar'
 import { classNames } from 'primereact/utils'
 import customerService from '@/service/customer.service'
 import { useRouter } from 'next/navigation'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 
 interface FormProps {
     roles: RoleName[]
@@ -61,13 +62,13 @@ const CustomerForm = ({ roles }: FormProps) => {
             <div className='flex'>
                 <div className='col-12 md:col-8'>
                     <div className='card'>
-                        <div className='text-xl font-medium mb-6'>General</div>
+                        <h4>Add customer</h4>
                         <div className='field'>
                             <label htmlFor='email' className='font-medium w-full'>
-                                Email
+                                Email <RequiredIcon />
                             </label>
                             <AutoComplete
-                                id='email'
+                                inputId='email'
                                 delay={230}
                                 inputStyle={{ width: '100%' }}
                                 value={customer.email}
@@ -84,7 +85,7 @@ const CustomerForm = ({ roles }: FormProps) => {
                         <div className='flex flex-wrap'>
                             <div className='field'>
                                 <label htmlFor='firstName' className='font-medium w-full'>
-                                    First name
+                                    First name <RequiredIcon />
                                 </label>
                                 <InputText
                                     id='firstName'
@@ -99,7 +100,7 @@ const CustomerForm = ({ roles }: FormProps) => {
                             </div>
                             <div className='field'>
                                 <label htmlFor='lastName' className='font-medium w-full'>
-                                    Last name
+                                    Last name <RequiredIcon />
                                 </label>
                                 <InputText
                                     id='lastName'
@@ -116,16 +117,24 @@ const CustomerForm = ({ roles }: FormProps) => {
                         <div className='flex flex-wrap'>
                             <div className='field'>
                                 <label htmlFor='dob' className='font-medium w-full'>
-                                    Date of birth
+                                    Date of birth <RequiredIcon />
                                 </label>
                                 <Calendar
+                                    inputId='dob'
                                     readOnlyInput
                                     value={customer.dateOfBirth}
                                     onChange={(e) => setCustomer({ ...customer, dateOfBirth: e.value || null })}
-                                    className={classNames({ 'p-invalid': submitted && !customer.dateOfBirth })}
+                                    maxDate={new Date()}
+                                    className={classNames({
+                                        'p-invalid':
+                                            submitted && (!customer.dateOfBirth || customer.dateOfBirth > new Date())
+                                    })}
                                 />
                                 {submitted && !customer.dateOfBirth && (
                                     <small className='p-error block'>Date of birth is required.</small>
+                                )}
+                                {submitted && customer.dateOfBirth && customer.dateOfBirth > new Date() && (
+                                    <small className='p-error block'>Date of birth cannot be in the future.</small>
                                 )}
                             </div>
                             <div className='field'>
@@ -159,9 +168,10 @@ const CustomerForm = ({ roles }: FormProps) => {
                         <div className='text-xl font-medium mb-6'>Role</div>
                         <div className='field'>
                             <label htmlFor='roleName' className='font-medium w-full'>
-                                Role name
+                                Role name <RequiredIcon />
                             </label>
                             <Dropdown
+                                inputId='roleName'
                                 value={roles.find((role) => role.id === customer.customerRoles[0])}
                                 onChange={(e) => setCustomer({ ...customer, customerRoles: [e.value.id] })}
                                 options={roles}
