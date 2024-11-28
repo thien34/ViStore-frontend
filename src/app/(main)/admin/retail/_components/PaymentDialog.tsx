@@ -63,6 +63,7 @@ export default function PaymentDialog({
     }
 
     const onTransfer = () => {
+        debugger
         setChecked(false)
         setAmountPaidLocal(totalAmount)
         router.push('/admin/checkout')
