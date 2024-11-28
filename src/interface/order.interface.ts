@@ -19,6 +19,7 @@ export interface OrderRequest {
     addressRequest: AddressRequest | null
     billCode: string
     deliveryMode: number
+    idVouchers: number[]
 }
 
 export interface OrderItemRequest {

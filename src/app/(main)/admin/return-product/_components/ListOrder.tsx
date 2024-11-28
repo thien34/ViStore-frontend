@@ -53,12 +53,10 @@ const ListOrder = ({ initialData, setOrderModalClose }: OrderProps) => {
     }
 
     const openReturnModal = () => {
-        console.log(selectedOrderItems);
         setreturnItemModal(true);
     }
 
     const handleCloseAllModal = () => {
-        console.log("Điều Hướng");
         setreturnItemModal(false);
         setselectOrderItemModal(false);
         setOrderModalClose();
@@ -68,7 +66,6 @@ const ListOrder = ({ initialData, setOrderModalClose }: OrderProps) => {
         try {
 
             const returnRequestResult = await returnProductService.createReturnRequest(returnRequest, returnItems);
-            console.log('returnRequestResult', returnRequestResult);
             const returnRequestPayload = returnRequestResult.payload as { id: number, orderId: number };
             if (!returnRequestPayload?.id) {
                 throw new Error('id is required');
@@ -138,7 +135,7 @@ const ListOrder = ({ initialData, setOrderModalClose }: OrderProps) => {
                             initialData={selectedOrderItems}
                             onSelectedOrderItems={(orderItemInfo) => setSelectedOrderItems(orderItemInfo)}
                             submitReturnRequest={(returnItems, returnRequest) => {
-                                // router.push('/admin/manfacturers');                                
+                                // router.push('/admin/manfacturers');
                                 handleReturn(returnItems, returnRequest);
                                 handleCloseAllModal();
                             }}

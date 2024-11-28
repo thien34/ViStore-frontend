@@ -9,6 +9,11 @@ class VoucherService {
         const response = await axios.get<{ data: Voucher[] }>(this.basePath + `?discountTypeId=ASSIGNED_TO_ORDER_TOTAL`);
         return response.data.data;
     }
+    async getAllIsPublished() {
+        const response = await axios.get<{ data: Voucher[] }>(this.basePath + `?discountTypeId=ASSIGNED_TO_ORDER_TOTAL&isPublished=true`);
+        return response.data.data;
+    }
+
     async getById(id: number) {
         const response = await http.get<Voucher>(`${this.basePath}/${id}`)
         return response
@@ -23,8 +28,8 @@ class VoucherService {
         const response = await http.put<Voucher>(`${this.basePath}/${id}`, voucher)
         return response.payload
     }
-    async validateCoupons(couponCodes: string[], subTotal: number, email: string) {
-        const path = `/validate-coupons?subTotal=${subTotal}&email=${email}`;
+    async validateCoupons(couponCodes: string[]) {
+        const path = `/validate-coupons`;
         const data = { couponCodes };
         const response = await http.post(path, data);
         return response.payload;

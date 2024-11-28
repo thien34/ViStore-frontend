@@ -34,7 +34,6 @@ const ListView = () => {
             try {
                 setLoading(true)
                 const response = await voucherService.getAll()
-                console.log(response)
                 setDiscounts(response)
                 setFilteredDiscounts(response)
             } catch (error) {
@@ -108,15 +107,25 @@ const ListView = () => {
             ? 'https://deo.shopeemobile.com/shopee/shopee-seller-live-sg/mmf_portal_seller_root_dir/static/modules/vouchers/image/percent-colorful.0e15568.png'
             : 'https://deo.shopeemobile.com/shopee/shopee-seller-live-sg/mmf_portal_seller_root_dir/static/modules/vouchers/image/dollar-colorful.5e618d0.png'
 
-        return (
-            <div className='flex items-center gap-2'>
-                <Image src={imageUrl} alt='Discount Type' className='w-4rem h-4rem' style={{ borderRadius: '50%' }} />
-                <div>
-                    <div>{rowData.name}</div>
-                    <div style={{ fontSize: '0.85em', color: '#888' }}>Mã voucher: {rowData.couponCode}</div>
+            return (
+                <div className='flex items-center gap-2'>
+                    <Image
+                        src={imageUrl}
+                        alt='Discount Type'
+                        className='w-4rem h-4rem'
+                        style={{ borderRadius: '50%' }}
+                    />
+                    <div>
+                        <div>{rowData.name}</div>
+                        <div style={{ fontSize: '0.85em', color: '#888' }}>
+                            {rowData.couponCode
+                                ? `Voucher code: ${rowData.couponCode}`
+                                : 'Applicable'}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        )
+            );
+
     }
 
     const editAndExpiredButtonTemplate = (rowData: Voucher) => {

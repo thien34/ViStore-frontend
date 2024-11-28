@@ -51,7 +51,6 @@ const ReturnProduct = () => {
         }
     };
     const closeModal = () => {
-        console.log('close modal')
         setVisible(false);
         fetchData();
     }
