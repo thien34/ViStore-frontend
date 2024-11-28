@@ -384,9 +384,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 const uploadedFilesObj: { [key: number]: File[] } = uploadedFiles
                 const uploadedFilesArray: File[][] = Object.values(uploadedFilesObj)
 
-                const data = await ProductService.addProducts(productsData, uploadedFilesArray)
+                await ProductService.addProducts(productsData, uploadedFilesArray)
                 setIsLoading(false)
-                console.log('Products added successfully:', data)
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Success',
@@ -767,7 +766,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         )}
                     </AccordionTab>
                 </Accordion>
-                <Button disabled={combinedRows.length === 0} onClick={handleAddProduct}>
+                <Button
+                    disabled={!!(combinedRows.length === 0 || nameError || categoryError || manufactureError)}
+                    onClick={handleAddProduct}
+                >
                     Add New
                 </Button>
             </div>

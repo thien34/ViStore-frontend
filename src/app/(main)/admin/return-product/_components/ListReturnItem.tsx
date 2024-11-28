@@ -3,16 +3,18 @@
 import { ReturnItem } from "@/interface/returnProduct.interface"
 import { Column } from "primereact/column"
 import { DataTable } from "primereact/datatable"
+import { useEffect, useState } from "react"
 
 export interface ReturnItemProps {
     initialData: ReturnItem[]
 }
 
 const ListReturnItems = ({ initialData }: ReturnItemProps) => {
+    const [returnItems, setReturnItems] = useState<ReturnItem[]>(initialData)
     return (
         <div>
             <DataTable
-                value={initialData}
+                value={returnItems}
                 dataKey='id'
                 removableSort
                 resizableColumns
@@ -30,7 +32,7 @@ const ListReturnItems = ({ initialData }: ReturnItemProps) => {
                 <Column field="quantity" header="Quantity" />
                 <Column field="discountAmountPerItem" header="Discount" />
                 <Column field="refundTotal" header="Refund Total" />
-            </DataTable>          
+            </DataTable>
         </div>
     )
 }

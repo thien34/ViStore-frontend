@@ -17,7 +17,6 @@ import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch'
 import { Checkbox } from 'primereact/checkbox'
 import { ToggleButton } from 'primereact/togglebutton'
 import voucherService from '@/service/voucher.service'
-import { Dropdown } from 'primereact/dropdown'
 import { InputMask, InputMaskChangeEvent } from 'primereact/inputmask'
 
 const DiscountForm = () => {
@@ -40,7 +39,6 @@ const DiscountForm = () => {
     const [enableMaxDiscount, setEnableMaxDiscount] = useState<boolean>(true)
     const [requiresCouponCode, setRequiresCouponCode] = useState<boolean>(true)
     const [couponCode, setCouponCode] = useState<string | undefined>()
-    const [discountLimitationType, setDiscountLimitationType] = useState(3)
     const [limitationTimes, setLimitationTimes] = useState(null)
     const [perCustomerLimit, setPerCustomerLimit] = useState(null)
     const [isCumulative, setIsCumulative] = useState<boolean>(false)
@@ -73,13 +71,6 @@ const DiscountForm = () => {
     const filteredCustomers = customers.filter((customer) =>
         `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    const discountLimitationTypes = [
-        // { id: 0, label: 'None' },
-        // { id: 1, label: 'Limited Vouchers' },
-        // { id: 2, label: 'Limited Per Customer' },
-        { id: 3, label: 'Limited Vouchers and Per Customer' }
-    ]
-
     const showSuccessToast = () => {
         toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Discount created successfully!' })
     }
@@ -105,6 +96,7 @@ const DiscountForm = () => {
             detail: errorMessage || 'Failed to create discount'
         })
     }
+    const discountLimitationType = 3
 
     const handleCreateDiscount = () => {
         if (!validateForm()) {
@@ -169,7 +161,6 @@ const DiscountForm = () => {
     }
 
     const validateForm = () => {
-        debugger
         let isValid = true
         const newErrors: {
             discountName: string | null
@@ -262,7 +253,7 @@ const DiscountForm = () => {
             isValid = false
         }
         const limitationTimeValid = limitationTimes != null ? limitationTimes : 0
-        if (discountLimitationType !== 2 && (limitationTimeValid <= 0 || limitationTimeValid > 1000000)) {
+        if ((limitationTimeValid <= 0 || limitationTimeValid > 1000000)) {
             newErrors.limitationTimes = 'Limitation times must be between 1 and 1000000.'
             isValid = false
         }
@@ -292,7 +283,6 @@ const DiscountForm = () => {
     const fetchCustomers = async () => {
         const customerData = await customerService.getAll()
             setCustomers(customerData.payload.items)
-            console.log('Items', customerData.payload.items)
     }
     useEffect(() => {
         fetchCustomers()
