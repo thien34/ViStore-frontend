@@ -760,7 +760,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         )}
                     </AccordionTab>
                 </Accordion>
-                <Button disabled={combinedRows.length === 0} onClick={handleAddProduct}>
+                <Button
+                    disabled={!!(combinedRows.length === 0 || nameError || categoryError || manufactureError)}
+                    onClick={handleAddProduct}
+                >
                     Add New
                 </Button>
             </div>
