@@ -21,6 +21,7 @@ import { Toast } from 'primereact/toast'
 import { useRouter } from 'next/navigation'
 import ManagerPath from '@/constants/ManagerPath'
 import Spinner from '@/components/spinner/Spinner'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 
 export interface AttributeRow {
     selectedAttribute: ProductAttributeName | null
@@ -452,6 +453,11 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         }
     }
 
+    const isAddAttributeDisabled = () => {
+        const availableAttributes = getAvailableAttributes()
+        return attributeRows.length >= availableAttributes.length
+    }
+
     return (
         <div>
             <Toast ref={toast} />
@@ -462,8 +468,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='productName'>
-                                Product Name{' '}
-                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Product Name <RequiredIcon />
                             </label>
                             <InputText
                                 id='productName'
@@ -485,10 +490,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='weight'>
-                                Weight <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Weight <RequiredIcon />
                             </label>
                             <InputNumber
-                                inputId='minmax-buttons'
+                                inputId='weight'
                                 onValueChange={(e) => {
                                     if (e.value && e.value <= 0) {
                                         setWeightError('Weight must be greater than 0')
@@ -512,11 +517,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     <div className='flex flex-row gap-4 align-items-center'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='category'>
-                                Categories{' '}
-                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Categories <RequiredIcon />
                             </label>
                             <TreeSelect
-                                id='category'
+                                inputId='category'
                                 value={selectedCategory ? String(selectedCategory.id) : null}
                                 onChange={(e) => {
                                     setSelectedCategory({ id: Number(e.value) })
@@ -525,17 +529,16 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 options={categories}
                                 filter
                                 placeholder='Select a category'
-                                showClear
                                 className={`${categoryError ? 'p-invalid' : ''}`}
                             />
                             {categoryError && <small className='p-error'>{categoryError}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='brand'>
-                                Manufactures{' '}
-                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Manufactures <RequiredIcon />
                             </label>
                             <Dropdown
+                                inputId='brand'
                                 value={selectedManufacture}
                                 onChange={(e) => {
                                     setSelectedManufacture(e.value)
@@ -552,14 +555,14 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
                     <div className='flex flex-row gap-4 align-items-center'>
                         <div className='flex flex-column gap-2 w-full'>
-                            {
-                                <Editor
-                                    value={text}
-                                    onTextChange={(e) => setText(e.htmlValue || '')}
-                                    style={{ height: '100px', width: '100%' }}
-                                    placeholder='Enter product description'
-                                />
-                            }
+                            <label htmlFor='description'>Description</label>
+                            <Editor
+                                id='description'
+                                value={text}
+                                onTextChange={(e) => setText(e.htmlValue || '')}
+                                style={{ height: '100px', width: '100%' }}
+                                placeholder='Enter product description'
+                            />
                         </div>
                     </div>
                 </div>
@@ -597,12 +600,16 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                     className='w-full'
                                 />
                                 <Button
-                                    className='pi pi-trash bg-gray-500 text-xs'
+                                    className='pi pi-trash bg-gray-500 text-xs p-3'
                                     onClick={() => removeAttributeRow(index)}
                                 />
                             </div>
                         ))}
-                        <Button onClick={addAttributeRow} className='flex items-center mb-5'>
+                        <Button
+                            onClick={addAttributeRow}
+                            className='flex items-center mb-5'
+                            disabled={isAddAttributeDisabled()}
+                        >
                             <i className={PrimeIcons.PLUS}></i>
                             <span className='ml-2'>Add attribute</span>
                         </Button>

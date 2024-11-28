@@ -21,7 +21,7 @@ function ProductList({ products }: Props) {
                 value={products}
                 paginator
                 rows={5}
-                rowsPerPageOptions={[5, 10, 25, 50, 100, 200, 500, 1000]}
+                rowsPerPageOptions={[5, 10, 25, 50]}
                 tableStyle={{ minWidth: '50rem' }}
                 paginatorTemplate='RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink'
                 currentPageReportTemplate='{first} to {last} of {totalRecords}'

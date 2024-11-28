@@ -16,6 +16,7 @@ import { Image } from 'primereact/image'
 import ProductService from '@/service/ProducrService'
 import { classNames } from 'primereact/utils'
 import { Toast } from 'primereact/toast'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 
 interface ProductAddFormProps {
     categories: Category[]
@@ -74,7 +75,9 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
             <div className='flex flex-column gap-4'>
                 <div className='flex flex-row gap-4'>
                     <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='productName'>Product Name</label>
+                        <label htmlFor='productName'>
+                            Product Name <RequiredIcon />
+                        </label>
                         <InputText
                             tooltip='Enter the name of the product'
                             tooltipOptions={{ position: 'bottom' }}
@@ -87,7 +90,9 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
                         {submitted && !name && <small className='p-error'>Name is required.</small>}
                     </div>
                     <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='weight'>Weight</label>
+                        <label htmlFor='weight'>
+                            Weight <RequiredIcon />
+                        </label>
                         <InputNumber
                             inputId='weight'
                             value={weight}
@@ -109,6 +114,7 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='category'>Categories</label>
                         <Dropdown
+                            inputId='category'
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.value)}
                             options={categories}
@@ -123,6 +129,7 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='brand'>Manufactures</label>
                         <Dropdown
+                            inputId='brand'
                             value={selectedManufacture}
                             onChange={(e) => setSelectedManufacture(e.value)}
                             options={manufacturers}
@@ -140,8 +147,9 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
 
                 <div className='flex flex-row gap-4 align-items-center'>
                     <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='brand'>Description</label>
+                        <label htmlFor='description'>Description</label>
                         <Editor
+                            id='description'
                             value={text}
                             onTextChange={(e) => setText(e.htmlValue || '')}
                             style={{ height: '100px', width: '100%' }}

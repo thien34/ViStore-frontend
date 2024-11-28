@@ -18,6 +18,7 @@ import { Promotion } from '@/interface/discount.interface'
 import { Message } from 'primereact/message'
 import QRCode from 'react-qr-code'
 import Image from 'next/image'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
@@ -261,7 +262,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='sku'>
-                                SKU <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                SKU <RequiredIcon />
                             </label>
                             <InputText
                                 tooltip='Enter the SKU for the product'
@@ -281,11 +282,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                             {errors.sku && <small className='p-error'>{errors.sku}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='name'>
-                                Product Name{' '}
-                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
-                            </label>
-
+                            <label htmlFor='name'>Product Name</label>
                             <InputText
                                 id='name'
                                 tooltipOptions={{ position: 'bottom' }}
@@ -307,11 +304,11 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                     <div className='flex flex-row gap-4 mt-2'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='price'>
-                                Price <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Price <RequiredIcon />
                             </label>
                             <InputNumber
                                 tooltip='Enter product price'
-                                id='price'
+                                inputId='price'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.price}
                                 onValueChange={(e) => {
@@ -337,12 +334,11 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='productCost' className='mb-2'>
-                                Product Cost{' '}
-                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Product Cost <RequiredIcon />
                             </label>
                             <InputNumber
                                 tooltip='Enter the cost of the product'
-                                id='productCost'
+                                itemID='productCost'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.productCost}
                                 onValueChange={(e) => {
@@ -369,12 +365,11 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                     <div className='flex flex-row gap-4 mt-2'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='quantity'>
-                                Quantity{' '}
-                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Quantity <RequiredIcon />
                             </label>
                             <InputNumber
                                 tooltip='Enter the quantity of the product'
-                                id='quantity'
+                                inputId='quantity'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.quantity}
                                 onValueChange={(e) => {

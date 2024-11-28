@@ -13,19 +13,20 @@ import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { Tooltip } from 'primereact/tooltip'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Promotion } from '@/interface/discount.interface'
 import { Message } from 'primereact/message'
 import QRCode from 'react-qr-code'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import RequiredIcon from '@/components/icon/RequiredIcon'
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
     selectedValues: string | undefined
 }
 
 type Props = {
-    product: ProductResponseDetails | typeof initialFormData
+    product?: ProductResponseDetails | typeof initialFormData
     productAttributes: ProductAttributeName[]
     id: string
     name: string
@@ -117,15 +118,6 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
     const handleSave = async () => {
         const isValid = validateFields()
         if (Object.keys(isValid).length > 0) {
-            return
-        }
-        if (!isValid) {
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Please fill in all required fields',
-                life: 3000
-            })
             return
         }
         const filteredAttributes = attributeRows
@@ -288,7 +280,7 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='sku'>
-                                SKU <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                SKU <RequiredIcon />
                             </label>
                             <InputText
                                 tooltip='Enter the SKU for the product'
@@ -308,13 +300,9 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                             {errors.sku && <small className='p-error'>{errors.sku}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full '>
-                            <label htmlFor='productName'>
-                                Product Name{' '}
-                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
-                            </label>
-
+                            <label htmlFor='productName'>Product Name</label>
                             <InputText
-                                id='name'
+                                id='productName'
                                 disabled
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={name}
@@ -327,11 +315,11 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                     <div className='flex flex-row gap-4 mt-2'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='price' className='mb-2'>
-                                Price <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Price <RequiredIcon />
                             </label>
                             <InputNumber
                                 tooltip='Enter product price'
-                                id='price'
+                                inputId='price'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={(formData && formData.price) || 0}
                                 onValueChange={(e) => {
@@ -357,12 +345,11 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='productCost'>
-                                Product Cost{' '}
-                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Product Cost <RequiredIcon />
                             </label>
                             <InputNumber
                                 tooltip='Enter the cost of the product'
-                                id='productCost'
+                                inputId='productCost'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={(formData && formData.productCost) || 0}
                                 onValueChange={(e) => {
@@ -389,12 +376,11 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                     <div className='flex flex-row gap-4 mt-2'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='quantity'>
-                                Quantity{' '}
-                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                                Quantity <RequiredIcon />
                             </label>
                             <InputNumber
                                 tooltip='Enter the quantity of the product'
-                                id='quantity'
+                                inputId='quantity'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={(formData && formData.quantity) || 0}
                                 onValueChange={(e) => {

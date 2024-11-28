@@ -9,7 +9,6 @@ export default async function ProductParentAdd(props: { params: { id: string } }
     return (
         <>
             <ProductDetailsFormParent
-                product={null}
                 productAttributes={productAttributesData}
                 id={props.params.id}
                 name={product?.name || ''}
