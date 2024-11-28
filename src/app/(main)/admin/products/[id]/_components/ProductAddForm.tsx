@@ -127,6 +127,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     return (
         <div className='card'>
             <Toast ref={toast} />
+            <h4>Edit Product</h4>
             <div className='flex flex-column gap-4'>
                 <div className='flex flex-row gap-4'>
                     <div className='flex flex-column gap-2 w-full'>
@@ -209,7 +210,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     tableStyle={{ minWidth: '50rem' }}
                     paginator
                     rows={5}
-                    rowsPerPageOptions={[5, 10, 25, 50]}
+                    rowsPerPageOptions={[5, 10, 25, 50, 100, 200, 500, 1000]}
                     paginatorTemplate='RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink'
                     currentPageReportTemplate='{first} to {last} of {totalRecords}'
                 >

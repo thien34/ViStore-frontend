@@ -66,6 +66,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [nameError, setNameError] = useState<string>('')
     const [categoryError, setCategoryError] = useState<string>('')
     const [manufactureError, setManufactureError] = useState<string>('')
+    const [weightError, setWeightError] = useState<string>('')
     const [bulkValues, setBulkValues] = useState({
         unitPrice: 0,
         productCost: 0,
@@ -89,7 +90,29 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
     const handleKeydown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         if (event.key === 'Enter') {
-            const input = (event.target as HTMLInputElement).value
+            const input = (event.target as HTMLInputElement).value.trim()
+
+            // Validate input
+            if (input === '') return
+            if (input.length > 50) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Attribute value cannot exceed 50 characters',
+                    life: 3000
+                })
+                return
+            }
+            if (!/^[a-zA-Z0-9\s]+(?:-[a-zA-Z0-9\s]+)*$/.test(input)) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Only letters, numbers, spaces and hyphens are allowed, but hyphens cannot be followed by numbers',
+                    life: 3000
+                })
+                return
+            }
+
             addCustomTag(input, index)
             ;(event.target as HTMLInputElement).value = ''
             setTimeout(() => {
@@ -204,14 +227,32 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
         switch (field) {
             case 'quantity':
+                if (newValue && Number(newValue) > 1000000) {
+                    event.preventDefault()
+                } else if (isPositiveInteger(newValue)) {
+                    rowData[field] = newValue
+                } else {
+                    event.preventDefault()
+                }
+                break
             case 'unitPrice':
-            case 'productCost':
-                if (isPositiveInteger(newValue)) {
-                    if (field === 'unitPrice' && Number(newValue) < Number(rowData.productCost)) {
+                if (newValue && Number(newValue) > 1000000) {
+                    event.preventDefault()
+                } else if (isPositiveInteger(newValue)) {
+                    if (Number(newValue) < Number(rowData.productCost)) {
                         event.preventDefault()
                     } else {
                         rowData[field] = newValue
                     }
+                } else {
+                    event.preventDefault()
+                }
+                break
+            case 'productCost':
+                if (newValue && Number(newValue) > 1000000) {
+                    event.preventDefault()
+                } else if (isPositiveInteger(newValue)) {
+                    rowData[field] = newValue
                 } else {
                     event.preventDefault()
                 }
@@ -236,9 +277,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     }
 
     const validateFields = () => {
-        const errors: { name?: string; category?: string; manufacture?: string; attribute?: string } = {}
+        const errors: { name?: string; category?: string; manufacture?: string; attribute?: string; weight?: string } =
+            {}
 
-        if (!name) {
+        if (!name || name.trim() === '') {
             errors.name = 'Product name is required'
         }
 
@@ -248,6 +290,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
         if (!selectedManufacture) {
             errors.manufacture = 'Manufacturer is required'
+        }
+        if (weight <= 0) {
+            errors.weight = 'Weight must be greater than 0'
         }
         const missingAttributes = attributeRows.filter((row) => {
             return row.selectedAttribute && row.selectedValues.length === 0
@@ -271,12 +316,22 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         return productAttributes.filter((attr) => !selectedAttributeCodes.has(attr.id))
     }
     const handleAddProduct = async () => {
+        if (combinedRows.length === 0) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Please add at least one combination',
+                life: 3000
+            })
+            return
+        }
         try {
             setIsLoading(true)
             const errors = validateFields()
             setNameError(errors.name || '')
             setCategoryError(errors.category || '')
             setManufactureError(errors.manufacture || '')
+            setWeightError(errors.weight || '')
             if (Object.keys(errors).length > 0) {
                 return
             }
@@ -402,40 +457,64 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             <Toast ref={toast} />
             <Spinner isLoading={isLoading} />
             <div className='card'>
+                <h4>Add Product</h4>
                 <div className='flex flex-column gap-4'>
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='productName'>Product Name</label>
+                            <label htmlFor='productName'>
+                                Product Name{' '}
+                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                            </label>
                             <InputText
                                 id='productName'
                                 onChange={(e) => {
-                                    setName(e.target.value)
-                                    setNameError('')
+                                    const value = e.target.value
+                                    if (value.trim() === '') {
+                                        setNameError('Product name is required')
+                                    } else if (value.length <= 50) {
+                                        setName(value)
+                                        setNameError('')
+                                    } else {
+                                        setNameError('Product name cannot exceed 50 characters')
+                                    }
                                 }}
                                 placeholder='Enter product name'
+                                className={`${nameError ? 'p-invalid' : ''}`}
                             />
                             {nameError && <small className='p-error'>{nameError}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='weight'>Weight</label>
+                            <label htmlFor='weight'>
+                                Weight <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                            </label>
                             <InputNumber
                                 inputId='minmax-buttons'
-                                onChange={(e) => {
-                                    setWeight(e.value || 0)
+                                onValueChange={(e) => {
+                                    if (e.value && e.value <= 0) {
+                                        setWeightError('Weight must be greater than 0')
+                                    } else {
+                                        setWeight(e.value || 0)
+                                        setWeightError('')
+                                    }
                                 }}
                                 placeholder='Enter weight'
                                 mode='decimal'
-                                defaultValue={0}
                                 showButtons
                                 min={0}
+                                value={weight}
                                 suffix='g'
+                                className={`${weightError ? 'p-invalid' : ''}`}
                             />
+                            {weightError && <small className='p-error'>{weightError}</small>}
                         </div>
                     </div>
 
                     <div className='flex flex-row gap-4 align-items-center'>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='category'>Categories</label>
+                            <label htmlFor='category'>
+                                Categories{' '}
+                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                            </label>
                             <TreeSelect
                                 id='category'
                                 value={selectedCategory ? String(selectedCategory.id) : null}
@@ -447,11 +526,15 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 filter
                                 placeholder='Select a category'
                                 showClear
+                                className={`${categoryError ? 'p-invalid' : ''}`}
                             />
                             {categoryError && <small className='p-error'>{categoryError}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='brand'>Manufactures</label>
+                            <label htmlFor='brand'>
+                                Manufactures{' '}
+                                <i className='pi pi-exclamation-circle p-error' style={{ fontSize: '1rem' }}></i>
+                            </label>
                             <Dropdown
                                 value={selectedManufacture}
                                 onChange={(e) => {
@@ -461,6 +544,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 options={manufacturers}
                                 placeholder='Select a manufacture'
                                 optionLabel='manufacturerName'
+                                className={`${manufactureError ? 'p-invalid' : ''}`}
                             />
                             {manufactureError && <small className='p-error'>{manufactureError}</small>}
                         </div>
@@ -534,9 +618,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             id='bulkUnitPrice'
                                             value={bulkValues.unitPrice}
                                             onValueChange={(e) => handleBulkUpdate('unitPrice', e.value || 0)}
-                                            mode='currency'
-                                            currency='USD'
                                             min={0}
+                                            max={1000000}
                                         />
                                         <Button onClick={() => applyBulkUpdate('unitPrice')} label='Apply' />
                                     </div>
@@ -550,9 +633,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             id='bulkProductCost'
                                             value={bulkValues.productCost}
                                             onValueChange={(e) => handleBulkUpdate('productCost', e.value || 0)}
-                                            mode='currency'
-                                            currency='USD'
                                             min={0}
+                                            max={1000000}
                                         />
                                         <Button onClick={() => applyBulkUpdate('productCost')} label='Apply' />
                                     </div>
@@ -567,6 +649,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             value={bulkValues.quantity}
                                             onValueChange={(e) => handleBulkUpdate('quantity', e.value || 0)}
                                             min={0}
+                                            max={1000000}
                                         />
                                         <Button onClick={() => applyBulkUpdate('quantity')} label='Apply' />
                                     </div>
@@ -677,7 +760,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         )}
                     </AccordionTab>
                 </Accordion>
-                <Button onClick={handleAddProduct}>Add New</Button>
+                <Button disabled={combinedRows.length === 0} onClick={handleAddProduct}>
+                    Add New
+                </Button>
             </div>
         </div>
     )
