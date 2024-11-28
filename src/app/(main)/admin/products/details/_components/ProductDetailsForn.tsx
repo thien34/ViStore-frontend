@@ -147,7 +147,6 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
 
         try {
             await ProductService.updateProduct(formData.id, productData)
-            console.log('Product updated successfully.')
             toast.current?.show({
                 severity: 'success',
                 summary: 'Successful',

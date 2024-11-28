@@ -182,8 +182,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             })
             return
         }
-
-        console.log('Applying voucher...')
     }
 
     const handleGetAddress = async (addressRequest: Address) => {

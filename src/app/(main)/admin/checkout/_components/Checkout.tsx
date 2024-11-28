@@ -44,7 +44,6 @@ const CheckoutPage = ({ totalAmount }: Props) => {
             return
         }
         const orderLocalParsed = JSON.parse(orderLocal)
-        console.log(orderLocalParsed)
         OrderService.createOrder(orderLocalParsed).then((res) => {
             if (res.status === 200) {
                 localStorage.removeItem('orderLocal')

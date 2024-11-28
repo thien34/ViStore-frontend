@@ -12,9 +12,7 @@ class DiscountService {
             const errorResponse = await response.json()
             throw new Error(`Failed to get discounts: ${errorResponse.message || 'Unknown error'}`)
         }
-
         const result = await response.json()
-        console.log(result.data)
         return result.data
     }
     async createDiscount(discountData: Promotion) {

@@ -34,7 +34,6 @@ const ListView = () => {
             try {
                 setLoading(true)
                 const response = await voucherService.getAll()
-                console.log(response)
                 setDiscounts(response)
                 setFilteredDiscounts(response)
             } catch (error) {

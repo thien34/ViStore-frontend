@@ -39,7 +39,6 @@ const DiscountForm = () => {
     const [enableMaxDiscount, setEnableMaxDiscount] = useState<boolean>(true)
     const [requiresCouponCode, setRequiresCouponCode] = useState<boolean>(true)
     const [couponCode, setCouponCode] = useState<string | undefined>()
-    const [discountLimitationType] = useState(3)
     const [limitationTimes, setLimitationTimes] = useState(null)
     const [perCustomerLimit, setPerCustomerLimit] = useState(null)
     const [isCumulative, setIsCumulative] = useState<boolean>(false)
@@ -97,6 +96,7 @@ const DiscountForm = () => {
             detail: errorMessage || 'Failed to create discount'
         })
     }
+    const discountLimitationType = 3
 
     const handleCreateDiscount = () => {
         if (!validateForm()) {
@@ -161,7 +161,6 @@ const DiscountForm = () => {
     }
 
     const validateForm = () => {
-        debugger
         let isValid = true
         const newErrors: {
             discountName: string | null
@@ -254,7 +253,7 @@ const DiscountForm = () => {
             isValid = false
         }
         const limitationTimeValid = limitationTimes != null ? limitationTimes : 0
-        if (discountLimitationType !== 2 && (limitationTimeValid <= 0 || limitationTimeValid > 1000000)) {
+        if ((limitationTimeValid <= 0 || limitationTimeValid > 1000000)) {
             newErrors.limitationTimes = 'Limitation times must be between 1 and 1000000.'
             isValid = false
         }

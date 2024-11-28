@@ -66,7 +66,6 @@ export default function OrderList({ orders }: Props) {
         }
     }
     const paymentModeBody = (row: OrderResponse) => {
-        console.log(row.paymentMode)
         switch (row.paymentMode) {
             case PaymentModeType.Online:
                 return <Tag value='Online' severity='info' />

@@ -383,9 +383,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 const uploadedFilesObj: { [key: number]: File[] } = uploadedFiles
                 const uploadedFilesArray: File[][] = Object.values(uploadedFilesObj)
 
-                const data = await ProductService.addProducts(productsData, uploadedFilesArray)
+                await ProductService.addProducts(productsData, uploadedFilesArray)
                 setIsLoading(false)
-                console.log('Products added successfully:', data)
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Success',

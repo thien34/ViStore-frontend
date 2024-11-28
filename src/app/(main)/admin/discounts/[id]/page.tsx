@@ -85,7 +85,6 @@ const DiscountUpdate = () => {
 
                 const appliedProducts: ProductResponse[] = data.appliedProducts || []
                 if (data.status === 'EXPIRED') {
-                    console.log('Product is expired')
                     setIsExpired(true)
                 } else if (data.status === 'UPCOMING') {
                     setIsExpired(false)
@@ -100,7 +99,6 @@ const DiscountUpdate = () => {
                 )
 
                 const allProducts: ProductResponse[] = await ProductService.getAllProducts()
-                console.log('All Products:', allProducts)
                 setProducts(allProducts)
 
                 const selectedParentProducts = allProducts.filter((product: ProductResponse) =>
@@ -146,7 +144,6 @@ const DiscountUpdate = () => {
     const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
     const handleUpdateDiscount = async () => {
-        debugger
         if (!validateForm()) {
             showFailedToast()
             return

@@ -229,10 +229,6 @@ const DiscountForm = () => {
 
     const onFetchedProductsSelectionChange = (e: any) => {
         setSelectedFetchedProducts(e.value as ProductResponseDetails[])
-        console.log(
-            'Selected Variant IDs:',
-            e.value.map((product: ProductResponseDetails) => product.id)
-        )
     }
 
     return (
