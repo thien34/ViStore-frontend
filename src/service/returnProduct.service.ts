@@ -40,23 +40,29 @@ class ReturnProductService {
         return response;
     }
 
-    async createReturnRequest(returnRequest: ReturnRequestRequest, returnItem: ReturnItemRequest[]) {
-        const totalReturnQuantity = returnItem.reduce((total, item) => total + item.quantity, 0)
-        returnRequest.totalReturnQuantity = totalReturnQuantity
+    async createReturnRequest(returnRequest: ReturnRequestRequest) {
         const response = await http.post(this.returnRequestPath, returnRequest)
         return response;
     }
 
     async createReturnItem(returnItems: ReturnItemRequest[], returnRequestId: number) {
+        if (returnItems.length === 0) {
+            throw new Error("No items to return");
+        }
+
         returnItems.forEach(item => {
-            item.returnRequestId = returnRequestId
-        })
-        const response = await http.post(this.returnItemPath, returnItems)
+            item.returnRequestId = returnRequestId;
+        });
+
+        const response = await http.post(this.returnItemPath, returnItems);
         return response;
     }
 
     async createReturnInvoice(request: ReturnInvoiceRequest) {
-        const response = await http.post(this.returnInvoicePath, request)
+        const response = await http.post(this.returnInvoicePath, request);
+        if (response.status !== 200) {
+            throw new Error('Failed to create return invoice');
+        }
         return response;
     }
 
