@@ -1,10 +1,16 @@
 import { PagingResponse } from "./paging.interface"
 
 export interface ReturnInvoice {
-    id?: number,
+    id: number,
     returnRequestId: number,
+    firstName: string,
+    lastName: string,
+    billCode: string,
     orderId: number,
     refundAmount: number,
+    returnFee: number,
+    customerEmail: string,
+    returnItems: ReturnItem[]
 }
 
 export interface ReturnInvoiceRequest {
@@ -35,14 +41,17 @@ export interface ReturnItemRequest {
 }
 
 export interface ReturnRequest {
-    id?: number,
+    id: number,
     customerId: number,
     orderId: number,
+    firstName: string,
+    lastName: string,
     reasonForReturn: string,
     requestAction: string,
     totalReturnQuantity: number,
     customerComments: string,
     staffNotes: string,
+    returnFee: number,
     returnRequestStatusId: string
 }
 
@@ -54,11 +63,14 @@ export interface ReturnRequestRequest {
     totalReturnQuantity: number,
     customerComments: string,
     staffNotes: string,
+    returnFee: number,
     returnRequestStatusId: string
 }
 
-export interface OrderResponse {
+export interface CustomerOrderResponse {
     orderId: number,
+    billCode: string,
+    orderDate: string,
     customerId: number,
     firstName: string,
     lastName: string,
@@ -86,7 +98,7 @@ export interface PictureReTurnProductResponse {
 }
 
 
-export type OrderPagingResponse = PagingResponse<OrderResponse>
+export type OrderPagingResponse = PagingResponse<CustomerOrderResponse>
 export type ReturnInvoicePagingResponse = PagingResponse<ReturnInvoice>
 export type ReturnRequestPagingResponse = PagingResponse<ReturnRequest>
 export type OrderItemInfoPagingResponse = PagingResponse<OrderItemInfoResponse>
