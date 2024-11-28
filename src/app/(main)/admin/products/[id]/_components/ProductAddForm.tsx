@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/alt-text */
 'use client'
 import { Category } from '@/interface/category.interface'
 import { ManufacturerName } from '@/interface/manufacturer.interface'
@@ -11,11 +10,13 @@ import { Dropdown } from 'primereact/dropdown'
 import { Editor } from 'primereact/editor'
 import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
-import { Toast } from 'primereact/toast'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Image } from 'primereact/image'
 import ProductService from '@/service/ProducrService'
+import { classNames } from 'primereact/utils'
+import { Toast } from 'primereact/toast'
+
 interface ProductAddFormProps {
     categories: Category[]
     manufacturers: ManufacturerName[]
@@ -24,24 +25,16 @@ interface ProductAddFormProps {
     products: ProductResponseDetails[]
 }
 
-const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacturers, product, products }) => {
+const ProductAddForm = ({ categories, manufacturers, product, products }: ProductAddFormProps) => {
     const [name, setName] = useState<string>('')
     const [weight, setWeight] = useState<number>(0)
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
     const [selectedManufacture, setSelectedManufacture] = useState<ManufacturerName | null>(null)
     const [text, setText] = useState<string>('')
-    const [errorMessage, setErrorMessage] = useState<string>('')
+    const [submitted, setSubmitted] = useState(false)
     const toast = useRef<Toast>(null)
-    const [productsData, setProductsData] = useState<ProductResponseDetails[]>(products)
-    const [, setErrors] = useState({
-        name: false,
-        selectedCategory: false,
-        selectedManufacture: false,
-        weight: false
-    })
 
     useEffect(() => {
-        setErrorMessage('')
         if (product) {
             setName(product.name)
             setWeight(product.weight || 0)
@@ -52,76 +45,26 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     }, [product, categories, manufacturers])
 
     const handleSave = async () => {
-        let hasError = false
-        const newErrors = {
-            name: false,
-            selectedCategory: false,
-            selectedManufacture: false,
-            weight: false
-        }
-
-        if (!name) {
-            newErrors.name = true
-            hasError = true
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Name is required.',
-                life: 3000
-            })
-        }
-
-        if (!selectedCategory) {
-            newErrors.selectedCategory = true
-            hasError = true
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Category is required.',
-                life: 3000
-            })
-        }
-
-        if (!selectedManufacture) {
-            newErrors.selectedManufacture = true
-            hasError = true
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Manufacturer is required.',
-                life: 3000
-            })
-        }
-
-        if (!weight) {
-            newErrors.weight = true
-            hasError = true
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Weight is required.',
-                life: 3000
-            })
-        }
-
-        setErrors(newErrors)
-
-        if (hasError) return
+        setSubmitted(true)
+        if (!name || !selectedCategory || !selectedManufacture || !weight) return
 
         await ProductService.updateProductParent(
-            { name, weight, categoryId: selectedCategory?.id || 0, manufacturerId: selectedManufacture?.id || 0 },
+            {
+                name,
+                weight,
+                categoryId: selectedCategory?.id || 0,
+                manufacturerId: selectedManufacture?.id || 0
+            },
             product.id
-        ).then(() => {
-            ProductService.getProductsByParentId(+product.id).then((res) => {
-                setProductsData(res)
-            })
-            toast.current?.show({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Product updated successfully',
-                life: 3000
-            })
+        )
+        toast.current?.show({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Product updated successfully',
+            life: 3000
         })
+
+        setSubmitted(false)
     }
 
     return (
@@ -139,7 +82,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder='Enter product name'
+                            className={classNames({ 'p-invalid': submitted && !name })}
                         />
+                        {submitted && !name && <small className='p-error'>Name is required.</small>}
                     </div>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='weight'>Weight</label>
@@ -154,7 +99,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             suffix='g'
                             tooltip='Enter the weight of the product in grams'
                             tooltipOptions={{ position: 'bottom' }}
+                            className={classNames({ 'p-invalid': submitted && !weight })}
                         />
+                        {submitted && !weight && <small className='p-error'>Weight is required.</small>}
                     </div>
                 </div>
 
@@ -169,7 +116,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             optionLabel='name'
                             tooltip='Select the category for the product'
                             tooltipOptions={{ position: 'bottom' }}
+                            className={classNames({ 'p-invalid': submitted && !selectedCategory })}
                         />
+                        {submitted && !selectedCategory && <small className='p-error'>Category is required.</small>}
                     </div>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='brand'>Manufactures</label>
@@ -181,14 +130,17 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             optionLabel='manufacturerName'
                             tooltip='Select the manufacturer of the product'
                             tooltipOptions={{ position: 'bottom' }}
+                            className={classNames({ 'p-invalid': submitted && !selectedManufacture })}
                         />
+                        {submitted && !selectedManufacture && (
+                            <small className='p-error'>Manufacturer is required.</small>
+                        )}
                     </div>
                 </div>
 
                 <div className='flex flex-row gap-4 align-items-center'>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='brand'>Description</label>
-
                         <Editor
                             value={text}
                             onTextChange={(e) => setText(e.htmlValue || '')}
@@ -198,15 +150,13 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     </div>
                 </div>
 
-                {errorMessage && <small className='p-error'>{errorMessage}</small>}
-
                 <div>
                     <Link href={`/admin/products/product-add/${product.id}`}>
                         <Button label='Add Product Details' className='float-right' />
                     </Link>
                 </div>
                 <DataTable
-                    value={productsData}
+                    value={products}
                     tableStyle={{ minWidth: '50rem' }}
                     paginator
                     rows={5}
@@ -226,11 +176,11 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     <Column
                         header='Image'
                         body={(rowData) => (
-                            // eslint-disable-next-line @next/next/no-img-element
                             <Image
                                 src={rowData.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
                                 width='50'
                                 height='50'
+                                alt={rowData.name || 'Product Image'}
                             />
                         )}
                     />
