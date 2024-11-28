@@ -34,6 +34,7 @@ interface CustommerOrderProps {
         shippingCost: number
         tax: number
         total: number
+        discount: number
     }
     totalWeight: number
     fetchBill: () => void
@@ -76,6 +77,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
     const [validVouchers, setValidVouchers] = useState([])
+    const [totalDiscount, setTotalDiscount] = useState<number>(0)
     const handleOpen = (voucher: Voucher) => {
         setSelectedVoucher(voucher)
         setIsOpen(true)
@@ -83,16 +85,23 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const validateCouponCode = async () => {
         setLoading(true)
         setMessage('')
-
         try {
+            if (!customer?.email) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'You cannot apply more than one voucher without selecting a customer.'
+                })
+                return
+            }
+
             const response = await axios.post('http://localhost:8080/api/admin/vouchers/validate-coupons', {
-                subTotal: 10000,
-                email: 'nguyenkienynk@gmail.com',
+                subTotal: orderTotals.subtotal,
+                email: customer?.email,
                 couponCodes: couponCodes
             })
-
-            const voucherResponses = response.data.voucherResponses
-
+            const { totalDiscount, voucherResponses } = response.data
+            setTotalDiscount(totalDiscount || 0)
             const validVoucherList = voucherResponses.filter((voucher: CustomIsApplicable) => voucher.isApplicable)
             setValidVouchers(validVoucherList)
 
@@ -256,23 +265,22 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         return true
     }
     const validateDiscount = () => {
-
-            if (validVouchers.length > 1 && !customer) {
-                toast.current?.show({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'You cannot apply more than one voucher without selecting a customer.'
-                });
-                return;
-            }
-            if (validVouchers.length > 2) {
-                toast.current?.show({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Combination vouchers can only combine a maximum of 2 vouchers.'
-                })
-                return
-            }
+        if (validVouchers.length > 0 && !customer) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'You cannot apply more than one voucher without selecting a customer.'
+            })
+            return
+        }
+        if (validVouchers.length > 2) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Combination vouchers can only combine a maximum of 2 vouchers.'
+            })
+            return
+        }
 
         return true
     }
@@ -992,7 +1000,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             Discount
                                         </dt>
                                         <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${orderTotals.shippingCost.toFixed(2)}
+                                            ${totalDiscount.toFixed(2)}
                                         </dd>
                                     </dl>
                                     <dl className='flex items-center justify-between gap-4 py-3'>
@@ -1000,7 +1008,13 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             Total
                                         </dt>
                                         <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${orderTotals.total.toFixed(2)}
+                                            $
+                                            {(
+                                                orderTotals.subtotal +
+                                                orderTotals.shippingCost +
+                                                orderTotals.tax -
+                                                totalDiscount
+                                            ).toFixed(2)}
                                         </dd>
                                     </dl>
                                     <dl className='flex items-center justify-between gap-4 py-3'>
