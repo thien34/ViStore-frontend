@@ -67,14 +67,14 @@ export default function ProductListComponent({
     const [, setScanResult] = useState<string>('')
     const [totalWeight, setTotalWeight] = useState<number>(0)
     const [, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
-    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const [orderTotals, setOrderTotals] = useState<{
         subtotal: number
         shippingCost: number
         tax: number
         total: number
-    }>({ subtotal: 0, shippingCost: 0, tax: 0, total: 0 })
+        discount: number
+    }>({ subtotal: 0, shippingCost: 0, tax: 0, total: 0, discount: 0 })
 
     const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
@@ -126,6 +126,7 @@ export default function ProductListComponent({
             subtotal,
             shippingCost: 0,
             tax: 0,
+            discount: 0,
             total: subtotal
         }
         setOrderTotals(orderTotals)
@@ -139,7 +140,6 @@ export default function ProductListComponent({
     }
 
     const addProductToCartHandler = () => {
-        setIsLoading(true)
         if (quantity === 0) {
             toast.current?.show({
                 severity: 'error',
@@ -176,9 +176,6 @@ export default function ProductListComponent({
                     detail: error instanceof Error ? error.message : 'An error occurred',
                     life: 3000
                 })
-            })
-            .finally(() => {
-                setIsLoading(false)
             })
     }
 

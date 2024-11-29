@@ -602,17 +602,19 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     />
                                 )}
                             </div>
-                            <div className='field w-full'>
-                                <label htmlFor='addressName' className='font-medium block'>
-                                    Address detail
-                                </label>
-                                <InputText
-                                    onChange={(e) => setAddressDetailGenerated(e.target.value)}
-                                    value={addressDetailGenerated || ''}
-                                    id='addressName'
-                                    className='w-full'
-                                />
-                            </div>
+                            {checked && (
+                                <div className='field w-full'>
+                                    <label htmlFor='addressName' className='font-medium block'>
+                                        Address detail
+                                    </label>
+                                    <InputText
+                                        onChange={(e) => setAddressDetailGenerated(e.target.value)}
+                                        value={addressDetailGenerated || ''}
+                                        id='addressName'
+                                        className='w-full'
+                                    />
+                                </div>
+                            )}
                         </>
                     </div>
                     <div className='w-1/2'>
