@@ -53,6 +53,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [customerDialogVisible, setCustomerDialogVisible] = useState<boolean>(false)
     const [customer, setCustomer] = useState<Customer | null>(null)
     const [visibleRight, setVisibleRight] = useState<boolean>(false)
+    const [, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
     const [address, setAddress] = useState<AddressesResponse>({
         addressDetail: '',
         firstName: '',
@@ -104,6 +105,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             setTotalDiscount(totalDiscount || 0)
             const validVoucherList = voucherResponses.filter((voucher: CustomIsApplicable) => voucher.isApplicable)
             setValidVouchers(validVoucherList)
+            setAmountPaidLocal(orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount)
 
             if (validVoucherList.length === 0) {
                 setMessage('No valid vouchers found.')
@@ -1047,7 +1049,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             <PaymentDialog
                 visible={visible}
                 setVisible={setVisible}
-                totalAmount={orderTotals.total}
+                totalAmount={orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount}
                 setAmountPaid={setAmountPaid}
                 amountPaid={amountPaid}
             />
