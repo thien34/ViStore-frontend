@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useRef, useEffect } from 'react'
 import { Button } from 'primereact/button'
 import { Toast } from 'primereact/toast'
@@ -246,8 +245,6 @@ const DiscountForm = () => {
                             onChange={(e) => setDiscountName(e.target.value)}
                             required
                             placeholder='Enter discount name'
-                            tooltip='Enter discount name'
-                            tooltipOptions={{ position: 'top' }}
                         />
                         {errors.discountName && <small className='p-error'>{errors.discountName}</small>}
                     </div>
@@ -257,7 +254,6 @@ const DiscountForm = () => {
                         <InputNumber
                             inputId='value'
                             value={value}
-                            showButtons
                             mode='decimal'
                             onValueChange={(e) => setValue(e.value !== undefined ? e.value : null)}
                             suffix='%'
@@ -265,13 +261,11 @@ const DiscountForm = () => {
                             max={50}
                             required
                             placeholder='Enter discount value'
-                            tooltip='Enter discount value'
-                            tooltipOptions={{ position: 'top' }}
                         />
                         {errors.value && <small className='p-error'>{errors.value}</small>}
                     </div>
 
-                    <div>
+                    <div className='flex justify-between'>
                         <div className='field'>
                             <label htmlFor='fromDate'>From Date</label>
                             <Calendar
@@ -288,8 +282,6 @@ const DiscountForm = () => {
                                 touchUI
                                 dateFormat='dd/mm/yy'
                                 placeholder='Select start date'
-                                tooltip='Select start date'
-                                tooltipOptions={{ position: 'top' }}
                                 showButtonBar
                                 required
                             />
@@ -311,8 +303,6 @@ const DiscountForm = () => {
                                 minDate={minEndDate}
                                 dateFormat='dd/mm/yy'
                                 placeholder='Select end date'
-                                tooltip='Select end date'
-                                tooltipOptions={{ position: 'top' }}
                                 showButtonBar
                                 required
                                 hourFormat='12'
@@ -321,23 +311,11 @@ const DiscountForm = () => {
                             {errors.dateError && <small className='p-error'>{errors.dateError}</small>}
                         </div>
                     </div>
-                    {/* <div className='flex justify-start gap-2 items-center space-x-2'>
-                        <label htmlFor='active' className='flex items-center justify-center'>
-                            <p>Active</p>
-                        </label>
-                        <Checkbox
-                            onChange={handleChange}
-                            checked={checked}
-                            className='h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
-                        />
-                    </div> */}
                     <div className='flex justify-center gap-2 items-center space-x-2 my-3'>
                         <InputTextarea
                             value={comments}
                             onChange={(e) => setComments(e.target.value)}
                             placeholder='Comments'
-                            tooltip='Enter comments'
-                            tooltipOptions={{ position: 'top' }}
                             rows={5}
                             cols={30}
                         />
@@ -360,43 +338,25 @@ const DiscountForm = () => {
                             placeholder='Search by name'
                         />
                     </div>
-                    {products.length === 0 ? (
-                        <div className='card flex justify-content-center'>
-                            <Image
-                                src='http://res.cloudinary.com/dccuxj8ll/image/upload/v1730563551/PRODUCTS/w2kr72d76emyc9ftgnn9.png'
-                                alt='Image'
-                                width='250'
-                            />
-                        </div>
-                    ) : (
-                        <DataTable
-                            value={filteredProducts}
-                            paginator
-                            rows={9}
-                            dataKey='id'
-                            selection={selectedProducts}
-                            onSelectionChange={onProductSelectionChange}
-                            selectionMode='checkbox'
-                        >
-                            <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
-                            <Column field='id' header='STT' />
-                            <Column field='name' header='Product Name' sortable />
-                        </DataTable>
-                    )}
+                    <DataTable
+                        value={filteredProducts}
+                        paginator
+                        rows={9}
+                        dataKey='id'
+                        selection={selectedProducts}
+                        onSelectionChange={onProductSelectionChange}
+                        selectionMode='checkbox'
+                    >
+                        <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
+                        <Column field='id' header='STT' />
+                        <Column field='name' header='Product Name' sortable />
+                    </DataTable>
                 </div>
             </div>
-            <div className='col-12'>
-                <h4 className='text-lg font-semibold mb-4'>Product variations</h4>
-                {errors.productError && <small className='p-error'>{errors.productError}</small>}
-                {fetchedProducts.length === 0 ? (
-                    <div className='card flex justify-content-center'>
-                        <Image
-                            src='http://res.cloudinary.com/dccuxj8ll/image/upload/v1730558259/PRODUCTS/x8cxrp84efnxyt0izxnv.jpg'
-                            alt='Image'
-                            width='300'
-                        />
-                    </div>
-                ) : (
+            {fetchedProducts.length > 0 && (
+                <div className='col-12'>
+                    <h4 className='text-lg font-semibold mb-4'>Product variations</h4>
+                    {errors.productError && <small className='p-error'>{errors.productError}</small>}
                     <DataTable
                         value={fetchedProducts}
                         paginator
@@ -439,8 +399,8 @@ const DiscountForm = () => {
                         <Column sortable field='manufacturerName' header='Manufacturer Name' />
                         <Column sortable field='sku' header='SKU' />
                     </DataTable>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     )
 }

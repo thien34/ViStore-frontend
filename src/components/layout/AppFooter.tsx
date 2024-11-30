@@ -15,7 +15,7 @@ const AppFooter = () => {
                 height={20}
             />
             by
-            <span className='font-medium ml-2'>PrimeReact</span>
+            <span className='font-medium ml-2'>ViStore</span>
         </div>
     )
 }
