@@ -1,9 +1,12 @@
-import VoucherForm from "./_components/ListView"
+import customerService from '@/service/customer.service'
+import VoucherForm from './_components/ListView'
 
-const VoucherAddPage = () => {
+const VoucherAddPage = async () => {
+    const { payload: customers } = await customerService.getAll()
+
     return (
         <>
-            <VoucherForm />
+            <VoucherForm initialCustomers={customers.items} />
         </>
     )
 }
