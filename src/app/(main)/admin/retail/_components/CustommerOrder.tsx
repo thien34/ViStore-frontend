@@ -1,7 +1,7 @@
 import { Button } from 'primereact/button'
 import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch'
 import { InputText } from 'primereact/inputtext'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FaIdCard, FaUserPlus } from 'react-icons/fa'
 import AddressComponent from '@/components/address/AddressComponent'
 import provinceService from '@/service/province.service'
@@ -49,7 +49,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [amountPaid, setAmountPaid] = useState<number>(0)
     const [customerDialogVisible, setCustomerDialogVisible] = useState<boolean>(false)
     const [customer, setCustomer] = useState<Customer | null>(null)
-
     const [visibleRight, setVisibleRight] = useState<boolean>(false)
     const [, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
     const [address, setAddress] = useState<AddressesResponse>({
@@ -238,6 +237,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         }
         return true
     }
+
     const validateDiscount = () => {
         if (validVouchers.length > 0 && !customer) {
             toast.current?.show({
@@ -255,7 +255,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             })
             return
         }
-
         return true
     }
 
@@ -442,6 +441,11 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             })
         }
     }
+
+    useEffect(() => {
+        if (couponCodes.length > 0) validateCouponCode()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [orderTotals.subtotal])
 
     return (
         <div className='space-y-4 w-full'>
