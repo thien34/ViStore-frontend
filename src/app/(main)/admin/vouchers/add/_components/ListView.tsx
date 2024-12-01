@@ -470,30 +470,34 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                         </label>
                     </div>
                     <div className='flex justify-between'>
-                        <div className='field flex items-center gap-4'>
-                            <label className='mb-0' htmlFor='limitationTimes'>
-                                Limitation Times
-                            </label>
-                            <InputNumber
-                                style={{ width: '80px' }}
-                                id='limitationTimes'
-                                value={limitationTimes}
-                                onValueChange={(e) => setLimitationTimes(e.value)}
-                                className={errors.limitationTimes ? 'p-invalid' : ''}
-                            />
+                        <div>
+                            <div className='field flex items-center gap-4 mb-0'>
+                                <label className='mb-0' htmlFor='limitationTimes'>
+                                    Limitation Times
+                                </label>
+                                <InputNumber
+                                    style={{ width: '80px' }}
+                                    id='limitationTimes'
+                                    value={limitationTimes}
+                                    onValueChange={(e) => setLimitationTimes(e.value)}
+                                    className={errors.limitationTimes ? 'p-invalid' : ''}
+                                />
+                            </div>
                             {errors.limitationTimes && <small className='p-error'>{errors.limitationTimes}</small>}
                         </div>
-                        <div className='field flex items-center gap-4'>
-                            <label className='mb-0' htmlFor='perCustomerLimit'>
-                                Per Customer Limit
-                            </label>
-                            <InputNumber
-                                style={{ width: '80px' }}
-                                id='perCustomerLimit'
-                                value={perCustomerLimit}
-                                onValueChange={(e) => setPerCustomerLimit(e.value)}
-                                className={errors.perCustomerLimit ? 'p-invalid' : ''}
-                            />
+                        <div>
+                            <div className='field flex items-center gap-4 mb-0'>
+                                <label className='mb-0' htmlFor='perCustomerLimit'>
+                                    Per Customer Limit
+                                </label>
+                                <InputNumber
+                                    style={{ width: '80px' }}
+                                    id='perCustomerLimit'
+                                    value={perCustomerLimit}
+                                    onValueChange={(e) => setPerCustomerLimit(e.value)}
+                                    className={errors.perCustomerLimit ? 'p-invalid' : ''}
+                                />
+                            </div>
                             {errors.perCustomerLimit && <small className='p-error'>{errors.perCustomerLimit}</small>}
                         </div>
                     </div>
