@@ -1,8 +1,9 @@
-import { Action, Event, Subtitle, Timeline, Title } from '@reactuiutils/horizontal-timeline'
+import { Event, Subtitle, Timeline, Title } from '@reactuiutils/horizontal-timeline'
 import { FaBug, FaRegCalendarCheck, FaTimesCircle, FaTruck, FaRegCheckCircle, FaRegClock } from 'react-icons/fa'
 import { OrderStatusType } from '@/interface/order.interface'
 import '@reactuiutils/horizontal-timeline/timeline.css'
 import { OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
+import { Button } from 'primereact/button'
 
 const statusConfig = {
     [OrderStatusType.CREATED]: { label: 'Created', icon: FaRegCalendarCheck, color: 'blue' },
@@ -20,13 +21,15 @@ const statusConfig = {
 interface Props {
     orderStatusHistoryResponses: OrderStatusHistoryResponse[]
     orderId: number
+    handleConfirmPrevious: () => Promise<void>
+    latestStatus: OrderStatusType
 }
 
 export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
     return (
         <>
             <div className='card'>
-                <h4>Order History</h4>
+                <h4 className='text-xl font-semibold'>Order History</h4>
                 <Timeline minEvents={6}>
                     {orderStatusHistoryResponses.map((status) => {
                         const config = statusConfig[status.status as keyof typeof statusConfig] || {
@@ -36,23 +39,43 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                         }
                         return (
                             <Event key={status.id} color={config.color} icon={config.icon}>
-                                <Title>{config.label}</Title>
-                                <Subtitle>
-                                    {new Date(status.paidDate).toLocaleString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    })}
-                                </Subtitle>
+                                <Title className='text-[15px] mb-2 mx-5 w-full'>{config.label}</Title>
+                                <div className='flex flex-col'>
+                                    <Subtitle>
+                                        {new Date(status.paidDate).toLocaleString('en-US', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </Subtitle>
+                                </div>
                                 {status.notes && (
-                                    <Action onClick={() => alert(`Details: ${status.notes}`)}>View Notes</Action>
+                                    <Button className='h-4 my-3' onClick={() => alert(`Details: ${status.notes}`)}>
+                                        View Notes
+                                    </Button>
                                 )}
                             </Event>
                         )
                     })}
                 </Timeline>
+                {/* <Button
+                    disabled={
+                        latestStatus === OrderStatusType.SHIPPING_CONFIRMED ||
+                        latestStatus === OrderStatusType.DELIVERING ||
+                        latestStatus === OrderStatusType.DELIVERED ||
+                        latestStatus === OrderStatusType.COMPLETED ||
+                        latestStatus === OrderStatusType.CANCELLED ||
+                        latestStatus === OrderStatusType.CREATED ||
+                        latestStatus === OrderStatusType.PAID ||
+                        latestStatus === OrderStatusType.PENDING
+                    }
+                    onClick={() => handleConfirmPrevious()}
+                    className='ms-auto flex items-center gap-2 mt-5 bg-gray-200 text-gray-500 hover:bg-gray-300 border-none font-semibold'
+                >
+                    <FaArrowLeft /> Previous Status
+                </Button> */}
             </div>
         </>
     )

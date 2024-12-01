@@ -30,3 +30,13 @@ export interface CustomerOrder {
     addressOrder: string
     addressId: number
 }
+
+export interface CustomerOrderResponse {
+    billId: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string
+    delivery: string
+    orderStatusType: number
+}
+
