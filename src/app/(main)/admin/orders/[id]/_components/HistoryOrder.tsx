@@ -4,6 +4,8 @@ import { OrderStatusType } from '@/interface/order.interface'
 import '@reactuiutils/horizontal-timeline/timeline.css'
 import { OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
 import { Button } from 'primereact/button'
+import { Dialog } from 'primereact/dialog'
+import { useState } from 'react'
 
 const statusConfig = {
     [OrderStatusType.CREATED]: { label: 'Created', icon: FaRegCalendarCheck, color: 'blue' },
@@ -26,6 +28,13 @@ interface Props {
 }
 
 export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
+    const [visible, setVisible] = useState(false)
+    const [notes, setNotes] = useState('')
+
+    const handleViewNotes = (note: string) => {
+        setNotes(note)
+        setVisible(true)
+    }
     return (
         <>
             <div className='card'>
@@ -52,7 +61,7 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                                     </Subtitle>
                                 </div>
                                 {status.notes && (
-                                    <Button className='h-4 my-3' onClick={() => alert(`Details: ${status.notes}`)}>
+                                    <Button className='h-4 my-3' onClick={() => handleViewNotes(status.notes)}>
                                         View Notes
                                     </Button>
                                 )}
@@ -76,6 +85,19 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                 >
                     <FaArrowLeft /> Previous Status
                 </Button> */}
+                <Dialog
+                    visible={visible}
+                    modal
+                    header='Notes Order'
+                    position='top'
+                    style={{ width: '30rem' }}
+                    onHide={() => {
+                        if (!visible) return
+                        setVisible(false)
+                    }}
+                >
+                    <p className='m-0'>{notes}</p>
+                </Dialog>
             </div>
         </>
     )

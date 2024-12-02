@@ -86,6 +86,9 @@ export interface OrderResponse {
     paymentMethod: number
     paymentMode: number
     customerId: number
+    orderShippingTotal: number
+    orderDiscountTotal: number
+    orderSubtotalDiscount: number
 }
 
 export interface OrderFilter {

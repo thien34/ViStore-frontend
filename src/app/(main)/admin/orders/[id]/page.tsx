@@ -5,9 +5,10 @@ import { useUpdateEffect } from 'primereact/hooks'
 import HistoryOrder from './_components/HistoryOrder'
 import { OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
 import ProductOrderList from './_components/ProductOrderList'
-import { OrderStatusType } from '@/interface/order.interface'
+import { OrderFilter, OrderResponse, OrderStatusType } from '@/interface/order.interface'
 import ChangeStatusOrderHistory from './_components/ChangeStatusOrderHistory'
 import CustomerOrderInfo from './_components/CustomerOrder'
+import OrderToltalPrice from './_components/OrderToltalPrice'
 
 interface Props {
     params: {
@@ -22,15 +23,24 @@ export default function OrderDetail({ params }: Props) {
     const [latestStatus, setLatestStatus] = useState<OrderStatusHistoryResponse>()
     const [reason, setReason] = useState('')
     const [isPrevious, setIsPrevious] = useState(false)
+    const [order, setOrder] = useState<OrderResponse>()
+    const [filter, setFilter] = useState<OrderFilter>({})
 
     useUpdateEffect(() => {
         fetchOrderStatusHistory()
+        fetchOrder()
     }, [id])
 
     const fetchOrderStatusHistory = async () => {
         OrderService.getOrderStatusHistory(id).then((response) => {
             setOrderStatusHistoryResponses(response.payload)
             setLatestStatus(response.payload[response.payload.length - 1])
+        })
+    }
+
+    const fetchOrder = async () => {
+        OrderService.getOrders(filter).then((response) => {
+            setOrder(response.payload.find((order) => order.id === Number(id)))
         })
     }
 
@@ -107,6 +117,7 @@ export default function OrderDetail({ params }: Props) {
                         status={latestStatus?.status as OrderStatusType}
                     />
                 )}
+                {order && <OrderToltalPrice order={order} />}
             </div>
         </>
     )
