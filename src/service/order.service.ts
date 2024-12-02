@@ -1,5 +1,5 @@
-import { OrderFilter, OrderItemRequest, OrderRequest, OrderResponse } from '@/interface/order.interface'
-import { OrderItemsResponse, OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
+import { OrderFilter, OrderItemRequest, OrderRequest, OrderResponse, OrderStatusType } from '@/interface/order.interface'
+import { OrderItemsResponse, OrderStatusHistoryResponse, CustomerOrderResponse } from '@/interface/orderItem.interface'
 import http from '@/libs/http'
 
 class OrderService {
@@ -23,6 +23,12 @@ class OrderService {
     }
     static async updateOrderItem(orderId: number, quantity: number) {
         return await http.put(`${this.basePath}/updateQuantity/${orderId}?quantity=${quantity}`, {})
+    }
+    static async changeStatusOrder(orderId: number, reason: string, status: OrderStatusType) {
+        return await http.get(`${this.basePath}/change-status/${status}?reason=${reason}&orderId=${orderId}`, {})
+    }
+    static async getCustomerOrder(orderId: number) {
+        return await http.get<CustomerOrderResponse>(`${this.basePath}/customer/order/${orderId}`)
     }
 }
 
