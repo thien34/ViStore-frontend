@@ -1,5 +1,7 @@
 import { OrderResponse } from '@/interface/order.interface'
-import React from 'react'
+import OrderService from '@/service/order.service'
+import { Tag } from 'primereact/tag'
+import React, { useState, useEffect } from 'react'
 
 type Props = {
     order: OrderResponse
@@ -9,16 +11,23 @@ export default function OrderToltalPrice({ order }: Props) {
     const formatPrice = (price: number) => {
         return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
     }
+    const [discounts, setDiscounts] = useState<string[]>([])
+    useEffect(() => {
+        OrderService.getDiscountsByOrderId(order.id).then((res) => {
+            setDiscounts(res.payload)
+        })
+    }, [order.id])
     return (
         <div className='card flex justify-between p-4 shadow-lg rounded-lg bg-white'>
-            {/* Phần thông tin bên trái */}
             <div className='flex flex-col'>
                 <div className='text-gray-700 font-medium text-lg'>
-                    <span>Vouchers</span>
+                    <span>Vouchers: </span>
+                    {discounts.map((discount) => (
+                        <Tag className='w-fit' key={discount} value={discount} />
+                    ))}
                 </div>
             </div>
 
-            {/* Phần thông tin bên phải */}
             <div className='space-y-4'>
                 <div className='flex justify-between items-center'>
                     <span className='text-gray-600'>Total Order Price: </span>

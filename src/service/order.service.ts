@@ -30,6 +30,12 @@ class OrderService {
     static async getCustomerOrder(orderId: number) {
         return await http.get<CustomerOrderResponse>(`${this.basePath}/customer/order/${orderId}`)
     }
+    static async getDiscountsByOrderId(orderId: number) {
+        return await http.get<string[]>(`${this.basePath}/discounts/${orderId}`)
+    }
+    static async cancelOrder(orderId: number, reason: string) {
+        return await http.get(`${this.basePath}/cancel-order/${orderId}?note=${reason}`, {})
+    }
 }
 
 export default OrderService
