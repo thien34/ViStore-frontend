@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import OrderService from '@/service/order.service'
 import { useUpdateEffect } from 'primereact/hooks'
 import HistoryOrder from './_components/HistoryOrder'
@@ -9,6 +9,8 @@ import { OrderFilter, OrderResponse, OrderStatusType } from '@/interface/order.i
 import ChangeStatusOrderHistory from './_components/ChangeStatusOrderHistory'
 import CustomerOrderInfo from './_components/CustomerOrder'
 import OrderToltalPrice from './_components/OrderToltalPrice'
+import { Toast } from 'primereact/toast'
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
 
 interface Props {
     params: {
@@ -25,7 +27,7 @@ export default function OrderDetail({ params }: Props) {
     const [isPrevious, setIsPrevious] = useState(false)
     const [order, setOrder] = useState<OrderResponse>()
     const [filter, setFilter] = useState<OrderFilter>({})
-
+    const toast = useRef<Toast>(null)
     useUpdateEffect(() => {
         fetchOrderStatusHistory()
         fetchOrder()
@@ -89,10 +91,35 @@ export default function OrderDetail({ params }: Props) {
         setIsPrevious(true)
     }
 
+    const cancelOrder = async (reason: string) => {
+        setVisibleConfirm(false)
+        confirmDialog({
+            message: 'Are you sure you want to cancel this order?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            defaultFocus: 'accept',
+            accept: async () => {
+                await OrderService.cancelOrder(Number(id), reason).then((response) => {
+                    if (response.status === 200) {
+                        toast.current?.show({
+                            severity: 'success',
+                            summary: 'Success',
+                            detail: 'Cancel order successfully!',
+                            life: 3000
+                        })
+                        fetchOrderStatusHistory()
+                    }
+                })
+            }
+        })
+    }
+
     return (
         <>
             <div className='card'>
                 <h4 className='text-xl font-semibold'>Order Detail</h4>
+                <ConfirmDialog />
+                <Toast ref={toast} />
                 <HistoryOrder
                     orderStatusHistoryResponses={orderStatusHistoryResponses}
                     orderId={Number(id)}
@@ -107,6 +134,7 @@ export default function OrderDetail({ params }: Props) {
                     latestStatus={latestStatus?.status as OrderStatusType}
                     reason={reason}
                     setReason={setReason}
+                    cancelOrder={cancelOrder}
                 />
                 <CustomerOrderInfo />
                 {orderStatusHistoryResponses.length > 0 && (
