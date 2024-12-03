@@ -1,17 +1,19 @@
 import { Voucher } from '@/interface/voucher.interface'
 import http from '@/libs/http'
-import axios from 'axios';
+import axios from 'axios'
 class VoucherService {
     private basePath = 'http://localhost:8080/api/admin/vouchers'
     private path = '/api/admin/vouchers'
 
     async getAll() {
-        const response = await axios.get<{ data: Voucher[] }>(this.basePath + `?discountTypeId=ASSIGNED_TO_ORDER_TOTAL`);
-        return response.data.data;
+        const response = await axios.get<{ data: Voucher[] }>(this.basePath + `?discountTypeId=ASSIGNED_TO_ORDER_TOTAL`)
+        return response.data.data
     }
     async getAllIsPublished() {
-        const response = await axios.get<{ data: Voucher[] }>(this.basePath + `?discountTypeId=ASSIGNED_TO_ORDER_TOTAL&isPublished=true`);
-        return response.data.data;
+        const response = await axios.get<{ data: Voucher[] }>(
+            this.basePath + `?discountTypeId=ASSIGNED_TO_ORDER_TOTAL&isPublished=true&status=ACTIVE`
+        )
+        return response.data.data
     }
 
     async getById(id: number) {
@@ -29,10 +31,10 @@ class VoucherService {
         return response.payload
     }
     async validateCoupons(couponCodes: string[]) {
-        const path = `/validate-coupons`;
-        const data = { couponCodes };
-        const response = await http.post(path, data);
-        return response.payload;
+        const path = `/validate-coupons`
+        const data = { couponCodes }
+        const response = await http.post(path, data)
+        return response.payload
     }
 }
 

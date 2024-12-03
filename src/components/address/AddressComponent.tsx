@@ -84,7 +84,7 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                                 fetchDistricts(e.target.value.code)
                             }}
                             options={provinces}
-                            optionLabel='fullName'
+                            optionLabel='name'
                             placeholder='Select a Province'
                             filter
                             className={(classNames({ 'p-invalid': submitted && !address.provinceId }), 'w-full')}
@@ -109,7 +109,7 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                                 fetchWards(e.target.value.code)
                             }}
                             options={districts}
-                            optionLabel='fullName'
+                            optionLabel='name'
                             placeholder='Select a District'
                             filter
                             disabled={!address.provinceId}
@@ -134,7 +134,7 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                                 handleAddressChange(updatedAddress)
                             }}
                             options={wards}
-                            optionLabel='fullName'
+                            optionLabel='name'
                             placeholder='Select a Ward'
                             filter
                             disabled={!address.districtId}

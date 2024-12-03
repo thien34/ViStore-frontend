@@ -10,7 +10,7 @@ import { InputNumber } from 'primereact/inputnumber'
 import { InputTextarea } from 'primereact/inputtextarea'
 import { useRouter } from 'next/navigation'
 import { Customer } from '@/interface/customer.interface'
-import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch'
+import { InputSwitch } from 'primereact/inputswitch'
 import { Checkbox } from 'primereact/checkbox'
 import { ToggleButton } from 'primereact/togglebutton'
 import voucherService from '@/service/voucher.service'
@@ -36,7 +36,6 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
     const [minStartDate, setMinStartDate] = useState<Date | undefined>(new Date())
     const [minEndDate, setMinEndDate] = useState<Date | undefined>(undefined)
     const [maxDiscountAmount, setMaxDiscountAmount] = useState<number | null>(null)
-    const [requiresCouponCode, setRequiresCouponCode] = useState<boolean>(true)
     const [couponCode, setCouponCode] = useState<string | undefined>()
     const [limitationTimes, setLimitationTimes] = useState(null)
     const [perCustomerLimit, setPerCustomerLimit] = useState(null)
@@ -102,9 +101,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
             showFailedToast('Form validation failed. Please correct the fields.')
             return
         }
-        const formattedCouponCode = requiresCouponCode
-            ? `VI${couponCode?.toUpperCase()?.replace(/^VI/, '').replace(/-/g, '')}`
-            : undefined
+        const formattedCouponCode = `VI${couponCode?.toUpperCase()?.replace(/^VI/, '').replace(/-/g, '')}`
         const discountPayload = {
             name: discountName,
             comment: comments,
@@ -116,7 +113,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
             endDateUtc: toDate?.toISOString(),
             maxDiscountAmount: maxDiscountAmount,
             minOderAmount: minOrderAmount,
-            requiresCouponCode: requiresCouponCode,
+            requiresCouponCode: true,
             couponCode: formattedCouponCode,
             selectedCustomerIds: selectedCustomers.map((customer) => customer.id),
             isPublished: isPublished,
@@ -136,7 +133,6 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                 setToDate(null)
                 setComments('')
                 setMaxDiscountAmount(null)
-                setRequiresCouponCode(false)
                 setCouponCode('')
                 setSelectedCustomers([])
                 router.push('/admin/vouchers')
@@ -190,12 +186,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
             newErrors.discountName = 'Discount name is required.'
             isValid = false
         }
-        if (requiresCouponCode) {
-            if (!couponCode || !couponCode.trim()) {
-                newErrors.couponCode = 'Coupon code is required.'
-                isValid = false
-            }
-        }
+
         if (value === null || isNaN(value) || value <= 0) {
             newErrors.value = 'Please enter a valid positive discount value.'
             isValid = false
@@ -292,8 +283,6 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                             setIsPublished(newIsPublished)
                             if (newIsPublished) {
                                 setSelectedCustomers([])
-                            } else {
-                                setRequiresCouponCode(true)
                             }
                         }}
                         className='w-9rem mt-1 mb-5'
@@ -358,7 +347,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                                     id='maxDiscountAmount'
                                     value={maxDiscountAmount}
                                     prefix='$'
-                                    onValueChange={(e) => setMaxDiscountAmount(e.value)}
+                                    onValueChange={(e) => setMaxDiscountAmount(e.value ?? 0)}
                                     min={1}
                                     max={5000}
                                     showButtons
@@ -375,7 +364,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                         <InputNumber
                             id='minOrderAmount'
                             value={minOrderAmount}
-                            onValueChange={(e) => setMinOrderAmount(e.value)}
+                            onValueChange={(e) => setMinOrderAmount(e.value ?? 0)}
                             prefix='$'
                             min={1}
                             max={1000000}
@@ -433,19 +422,18 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                             {errors.dateError && <small className='p-error'>{errors.dateError}</small>}
                         </div>
                     </div>
-                    {requiresCouponCode && (
-                        <div className='field'>
-                            <label htmlFor='couponCode'>Coupon Code</label>
-                            <InputMask
-                                className='uppercase'
-                                value={couponCode}
-                                onChange={(e: InputMaskChangeEvent) => setCouponCode(e.target.value)}
-                                mask='VI-*******'
-                                placeholder='VI-'
-                            />
-                            {errors.couponCode && <small className='p-error'>{errors.couponCode}</small>}
-                        </div>
-                    )}
+
+                    <div className='field'>
+                        <label htmlFor='couponCode'>Coupon Code</label>
+                        <InputMask
+                            className='uppercase'
+                            value={couponCode}
+                            onChange={(e: InputMaskChangeEvent) => setCouponCode(e.target.value)}
+                            mask='VI-*******'
+                            placeholder='VI-'
+                        />
+                        {errors.couponCode && <small className='p-error'>{errors.couponCode}</small>}
+                    </div>
                     <div className='my-4'>
                         <Checkbox
                             id='ingredient'
