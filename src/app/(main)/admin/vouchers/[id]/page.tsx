@@ -13,7 +13,7 @@ import { InputTextarea } from 'primereact/inputtextarea'
 import { Toast } from 'primereact/toast'
 import { Customer } from '@/interface/customer.interface'
 import axios from 'axios'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Message } from 'primereact/message'
 const VoucherUpdate = () => {
     const [isPublished, setIsPublished] = useState(false)
@@ -36,6 +36,7 @@ const VoucherUpdate = () => {
     const [isExpired, setIsExpired] = useState(false)
     const params = useParams()
     const [errors, setErrors] = useState<Record<string, string>>({})
+    const router = useRouter()
     const fetchCustomers = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/admin/customers')
@@ -48,19 +49,14 @@ const VoucherUpdate = () => {
     }
     const validateForm = () => {
         const newErrors: Record<string, string> = {}
-        const currentDate = new Date() // Lấy thời gian hiện tại
+        const currentDate = new Date()
 
-        // Validate voucher name
         if (!discountName.trim()) {
             newErrors.discountName = 'Voucher name is required.'
         }
-
-        // Validate limitation times
         if (limitationTimes <= 0) {
             newErrors.limitationTimes = 'Limitation times must be greater than 0.'
         }
-
-        // Validate end date
         if (!toDate) {
             newErrors.toDate = 'End date is required.'
         } else if (toDate <= currentDate) {
@@ -88,16 +84,15 @@ const VoucherUpdate = () => {
             endDateUtc: toDate?.toISOString(),
             maxUsageCount: limitationTimes
         }
-
         try {
-            const response = await axios.put(`http://localhost:8080/api/admin/vouchers/${params.id}`, updatedVoucher)
+            await axios.put(`http://localhost:8080/api/admin/vouchers/${params.id}`, updatedVoucher)
             toast.current?.show({
                 severity: 'success',
                 summary: 'Voucher Updated',
                 detail: 'Voucher has been successfully updated.',
                 life: 3000
             })
-            console.log('Updated voucher:', response.data)
+            router.push('/admin/vouchers')
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Failed to update voucher. Please try again later.'
             toast.current?.show({
@@ -106,7 +101,6 @@ const VoucherUpdate = () => {
                 detail: errorMessage,
                 life: 5000
             })
-            console.error('Error updating voucher:', error)
         }
     }
 

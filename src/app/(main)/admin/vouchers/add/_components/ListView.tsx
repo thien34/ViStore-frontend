@@ -244,11 +244,9 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                 isValid = false
             }
         }
-        const validDiscountPercentage = !usePercentage && value != null ? value : 0
-
-        if (minOrderAmount >= 0 && validDiscountPercentage > 0.69 * minOrderAmount) {
-            newErrors.value = 'Voucher value cannot exceed 69% of the minimum order amount.'
-            isValid = false
+        if (value != null && minOrderAmount >= value) {
+            newErrors.value = 'Voucher value cannot exceed minimum order amount.';
+            isValid = false;
         }
         const limitationTimeValid = limitationTimes != null ? limitationTimes : 0
         if (limitationTimeValid <= 0 || limitationTimeValid > 1000000) {
@@ -435,17 +433,6 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                             {errors.dateError && <small className='p-error'>{errors.dateError}</small>}
                         </div>
                     </div>
-                    {isPublished && (
-                        <div className='field flex gap-2'>
-                            <label htmlFor='requiresCouponCode'>Requires Coupon Code</label>
-                            <InputSwitch
-                                id='requiresCouponCode'
-                                checked={requiresCouponCode}
-                                onChange={(e: InputSwitchChangeEvent) => setRequiresCouponCode(e.value)}
-                                disabled={!isPublished}
-                            />
-                        </div>
-                    )}
                     {requiresCouponCode && (
                         <div className='field'>
                             <label htmlFor='couponCode'>Coupon Code</label>
