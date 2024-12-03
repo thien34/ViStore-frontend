@@ -101,38 +101,37 @@ const ListView = () => {
                 return { severity: null, icon: null }
         }
     }
+    const typeBodyTemplate = (rowData: Voucher) => {
+        if (rowData.isPublished) {
+            return <Tag value='Public' icon='pi pi-unlock' severity='info' />
+        } else {
+            return <Tag value='Private' icon='pi pi-lock' severity='warning' />
+        }
+    }
 
     const voucherInfoTemplate = (rowData: Voucher) => {
         const imageUrl = rowData.usePercentage
             ? 'https://deo.shopeemobile.com/shopee/shopee-seller-live-sg/mmf_portal_seller_root_dir/static/modules/vouchers/image/percent-colorful.0e15568.png'
             : 'https://deo.shopeemobile.com/shopee/shopee-seller-live-sg/mmf_portal_seller_root_dir/static/modules/vouchers/image/dollar-colorful.5e618d0.png'
 
-            return (
-                <div className='flex items-center gap-2'>
-                    <Image
-                        src={imageUrl}
-                        alt='Discount Type'
-                        className='w-4rem h-4rem'
-                        style={{ borderRadius: '50%' }}
-                    />
-                    <div>
-                        <div>{rowData.name}</div>
-                        <div style={{ fontSize: '0.85em', color: '#888' }}>
-                            {rowData.couponCode
-                                ? `Voucher code: ${rowData.couponCode}`
-                                : 'Applicable'}
-                        </div>
+        return (
+            <div className='flex items-center gap-2'>
+                <Image src={imageUrl} alt='Discount Type' className='w-4rem h-4rem' style={{ borderRadius: '50%' }} />
+                <div>
+                    <div>{rowData.name}</div>
+                    <div style={{ fontSize: '0.85em', color: '#888' }}>
+                        {rowData.couponCode ? `Voucher code: ${rowData.couponCode}` : 'Applicable'}
                     </div>
                 </div>
-            );
-
+            </div>
+        )
     }
 
     const editAndExpiredButtonTemplate = (rowData: Voucher) => {
         return (
             <div className='flex gap-2'>
                 {rowData.status !== 'CANCEL' && (
-                    <Link href={`/admin/discounts/${rowData.id}`}>
+                    <Link href={`/admin/vouchers/${rowData.id}`}>
                         <Button icon='pi pi-pencil' severity='info' aria-label='Edit' rounded />
                     </Link>
                 )}
@@ -274,6 +273,7 @@ const ListView = () => {
                     <Column header='Voucher Name | Voucher Code' frozen body={voucherInfoTemplate} />
                     <Column header='Status' body={statusBodyTemplate} />
                     <Column header='Discount Value' body={formatDiscountAndStock} />
+                    <Column header='Type' body={typeBodyTemplate} />
                     <Column
                         header='Limitation Times'
                         body={(rowData) => (rowData.limitationTimes ? rowData.limitationTimes : 'Infinite')}
