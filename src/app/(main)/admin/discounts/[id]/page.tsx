@@ -12,7 +12,6 @@ import ProductService from '@/service/ProducrService'
 import { Image } from 'primereact/image'
 import { InputNumber } from 'primereact/inputnumber'
 import { ProgressSpinner } from 'primereact/progressspinner'
-import { Checkbox } from 'primereact/checkbox'
 import { InputTextarea } from 'primereact/inputtextarea'
 import discountService from '@/service/discount.service'
 import { useParams, useRouter } from 'next/navigation'
@@ -36,7 +35,6 @@ const DiscountUpdate = () => {
     const [originalToDate, setOriginalToDate] = useState<Date | null>(null)
     const [isExpired, setIsExpired] = useState<boolean>(false)
     const [originalFromDate, setOriginalFromDate] = useState<Date | null>(null)
-    // const [checked, setChecked] = useState<boolean>(false)
     const [selectedProducts, setSelectedProducts] = useState<ProductResponse[]>([])
     const [comments, setComments] = useState<string>('')
     const [searchTerm, setSearchTerm] = useState<string>('')
@@ -77,7 +75,6 @@ const DiscountUpdate = () => {
                 setValue(data.discountPercentage !== undefined ? data.discountPercentage : null)
                 setFromDate(data.startDateUtc ? new Date(data.startDateUtc) : null)
                 setToDate(data.endDateUtc ? new Date(data.endDateUtc) : null)
-                // setChecked(data.isActive || false)
                 setIsActive(data.status === 'ACTIVE')
                 setOriginalToDate(data.endDateUtc ? new Date(data.endDateUtc) : null)
                 setOriginalFromDate(data.startDateUtc ? new Date(data.startDateUtc) : null)
@@ -150,7 +147,6 @@ const DiscountUpdate = () => {
         }
 
         const discountPayload = {
-            // isActive: checked,
             name: discountName,
             comment: comments,
             discountTypeId: 1,
@@ -410,12 +406,6 @@ const DiscountUpdate = () => {
                             {errors.toDate && <small className='p-error'>{errors.toDate}</small>}
                             {errors.dateError && <small className='p-error'>{errors.dateError}</small>}
                         </div>
-
-                        {/* <div className='field-checkbox'>
-                            <Checkbox onChange={(e) => setChecked(e.checked || false)} checked={checked} />
-                            <label htmlFor='active'>Active</label>
-                        </div> */}
-
                         <div className='field'>
                             <InputTextarea
                                 value={comments}

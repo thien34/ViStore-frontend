@@ -214,7 +214,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                                 fetchDistricts(e.target.value.code)
                             }}
                             options={provinces}
-                            optionLabel='fullName'
+                            optionLabel='name'
                             placeholder='Select a Province'
                             filter
                             className={classNames({ 'p-invalid': submitted && !address.provinceId })}
@@ -235,7 +235,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                                 fetchWards(e.target.value.code)
                             }}
                             options={districts}
-                            optionLabel='fullName'
+                            optionLabel='name'
                             placeholder='Select a District'
                             filter
                             disabled={!address.provinceId}
@@ -254,7 +254,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             value={wards.find((ward) => ward.code === address.wardId)}
                             onChange={(e) => setAddress({ ...address, wardId: e.target.value.code })}
                             options={wards}
-                            optionLabel='fullName'
+                            optionLabel='name'
                             placeholder='Select a Ward'
                             filter
                             disabled={!address.districtId}

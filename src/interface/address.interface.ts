@@ -32,7 +32,6 @@ export interface Address {
     province: string
     district: string
     address: string
-
 }
 
 export type AddressPagingResponse = PagingResponse<AddressesResponse>
@@ -43,17 +42,17 @@ export interface AddressSearch extends PagingRequest {
 
 export interface Province {
     code: string
-    fullName: string
+    name: string
 }
 
 export interface District {
     code: string
-    fullName: string
+    name: string
 }
 
 export interface Ward {
     code: string
-    fullName: string
+    name: string
 }
 
 export interface ShippingFee {
