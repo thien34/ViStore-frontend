@@ -27,7 +27,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                     alt='logo'
                 />
                 <span>
-                    <b>Vítore</b>
+                    <b>ViStore</b>
                 </span>
             </Link>
 
