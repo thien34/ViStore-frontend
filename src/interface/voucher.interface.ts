@@ -1,4 +1,5 @@
 export interface Voucher {
+    [x: string]: number
     id?: number
     name: string
     comment: string

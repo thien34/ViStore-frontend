@@ -25,6 +25,7 @@ import { Voucher } from '@/interface/voucher.interface'
 import axios from 'axios'
 import { AutoComplete } from 'primereact/autocomplete'
 import VoucherSidebar from './VoucherSidebar'
+import dayjs from 'dayjs'
 
 interface CustommerOrderProps {
     orderTotals: {
@@ -73,6 +74,17 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [loading, setLoading] = useState(false)
     const [validVouchers, setValidVouchers] = useState([])
     const [totalDiscount, setTotalDiscount] = useState<number>(0)
+    const [hoveredVoucher, setHoveredVoucher] = useState<Voucher | null>(null)
+
+    const handleHoverEnter = (voucher: Voucher) => {
+        setHoveredVoucher(voucher)
+    }
+    const handleHoverLeave = () => {
+        setHoveredVoucher(null)
+    }
+    const handleClearCouponCodes = () => {
+        setCouponCodes([])
+    }
 
     const validateCouponCode = async () => {
         setLoading(true)
@@ -101,12 +113,29 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             if (validVoucherList.length === 0) {
                 setMessage('No valid vouchers found.')
             }
-        } catch (error) {
-            console.error('Error validating coupon:', error)
-            setMessage('Error validating coupon. Please try again later.')
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Voucher Error',
+                    detail: error.response.data.message
+                })
+                console.log('====================================')
+                console.log(error.response.data.message)
+                console.log('====================================')
+            } else {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Error validating coupon. Please try again later.'
+                })
+            }
         } finally {
             setLoading(false)
         }
+    }
+    const formatDate = (dateString: string | undefined): string => {
+        return dayjs(dateString).format('DD/MM/YYYY HH:mm')
     }
 
     const handleApplyVoucher = () => {
@@ -171,6 +200,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (!billId) return
         const validVoucherIds = validVouchers.map((voucher: Voucher) => voucher.id).filter((id) => id !== undefined)
         CartService.getCart(billId).then(async (res: CartResponse[]) => {
+            const totalOrder = orderTotals.total - totalDiscount;
             const order: OrderRequest = {
                 customerId: customer?.id || 1,
                 orderGuid: billId,
@@ -182,10 +212,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
                 paymentMode: PaymentModeType.IN_STORE,
                 orderSubtotal: orderTotals.subtotal,
-                orderSubtotalDiscount: 0,
+                orderSubtotalDiscount: totalDiscount,
                 orderShipping: orderTotals.shippingCost,
-                orderDiscount: 0,
-                orderTotal: orderTotals.total,
+                orderDiscount: totalDiscount,
+                orderTotal: totalOrder,
                 refundedAmount: 0,
                 paidDateUtc: '',
                 billCode: 'Bill' + numberBill,
@@ -336,6 +366,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     }
 
     const handleOrder = async () => {
+        debugger
         const billId = localStorage.getItem('billIdCurrent')
         if (!billId) return
         if (!validateAddress()) return
@@ -352,6 +383,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             defaultFocus: 'reject',
             accept: () => {
                 CartService.getCart(billId).then(async (res: CartResponse[]) => {
+                    const totalOrder = orderTotals.total - totalDiscount;
                     const order: OrderRequest = {
                         customerId: customer?.id || 1,
                         orderGuid: billId,
@@ -364,10 +396,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
                         paymentMode: PaymentModeType.IN_STORE,
                         orderSubtotal: orderTotals.subtotal,
-                        orderSubtotalDiscount: 0,
+                        orderSubtotalDiscount: totalDiscount,
                         orderShipping: orderTotals.shippingCost,
-                        orderDiscount: 0,
-                        orderTotal: orderTotals.total,
+                        orderDiscount: totalDiscount,
+                        orderTotal: totalOrder,
                         refundedAmount: 0,
                         paidDateUtc: '',
                         billCode: 'Bill' + numberBill,
@@ -647,31 +679,68 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             )}
 
                                             {validVouchers.length > 0 && (
-                                                <div className='mt-3'>
-                                                    <h3 className='text-sm font-semibold text-green-700 mb-2'>
+                                                <div className='mt-4'>
+                                                    <h3 className='text-sm font-semibold text-green-700 mb-3'>
                                                         Valid Vouchers:
                                                     </h3>
-                                                    <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-green-200 rounded-md p-2'>
+                                                    <ul className='grid grid-cols-2 gap-3 max-h-40 border border-green-200 rounded-md p-3'>
                                                         {validVouchers.map((voucher: Voucher, index) => (
                                                             <li
                                                                 key={index}
-                                                                className='flex items-center justify-between px-2 py-1 rounded-md border border-green-500 bg-green-50 hover:bg-green-100 transition-colors text-xs'
+                                                                className='flex items-center justify-between px-3 py-2 rounded-md border border-green-500 bg-green-50 hover:bg-green-100 transition-colors text-xs relative'
+                                                                onMouseEnter={() => handleHoverEnter(voucher)}
+                                                                onMouseLeave={handleHoverLeave}
                                                             >
                                                                 <span className='font-semibold text-green-700'>
                                                                     {voucher.couponCode}
                                                                 </span>
                                                                 <button
                                                                     onClick={() => handleRemoveValidVoucher(index)}
-                                                                    className='text-red-500 hover:text-red-700 ml-1'
+                                                                    className='text-red-500 hover:text-red-700 ml-2'
                                                                 >
                                                                     ×
                                                                 </button>
+
+                                                                {hoveredVoucher?.id === voucher.id && (
+                                                                    <div className='absolute bg-white shadow-lg p-4 rounded-lg w-64 border border-gray-300 mt-60 z-20'>
+                                                                        <h4 className='font-semibold text-sm text-green-700'>
+                                                                            Voucher Conditions
+                                                                        </h4>
+                                                                        <div className='text-xs text-gray-600 mt-2 space-y-2'>
+                                                                            {(voucher.discountPercent ||
+                                                                                voucher.discountAmount) && (
+                                                                                <p>
+                                                                                    Discount:{' '}
+                                                                                    {voucher.discountPercent
+                                                                                        ? `${voucher.discountPercent}%`
+                                                                                        : `$${voucher.discountAmount}`}
+                                                                                </p>
+                                                                            )}
+                                                                            {voucher.minOderAmount && (
+                                                                                <p>
+                                                                                    Min Order Amount: $
+                                                                                    {voucher.minOderAmount}
+                                                                                </p>
+                                                                            )}
+                                                                            {voucher.maxDiscountAmount && (
+                                                                                <p>
+                                                                                    Max Discount: $
+                                                                                    {voucher.maxDiscountAmount}
+                                                                                </p>
+                                                                            )}
+                                                                            <p>
+                                                                                Validity:{' '}
+                                                                                {formatDate(voucher.startDateUtc)} -{' '}
+                                                                                {formatDate(voucher.endDateUtc)}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                             </li>
                                                         ))}
                                                     </ul>
                                                 </div>
                                             )}
-
                                             {couponCodes.length > 0 && (
                                                 <div className='mt-4'>
                                                     <h3 className='text-sm font-semibold text-blue-700 mb-2'>
@@ -695,6 +764,14 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                                             </li>
                                                         ))}
                                                     </ul>
+                                                    <div className='mt-2'>
+                                                        <button
+                                                            onClick={handleClearCouponCodes}
+                                                            className='px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition-colors text-sm'
+                                                        >
+                                                            Clear All
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             )}
 
