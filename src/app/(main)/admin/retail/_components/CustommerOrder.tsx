@@ -82,7 +82,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'You cannot apply more than one voucher without selecting a customer.'
+                    detail: 'Bạn không thể áp dụng nhiều hơn một phiếu giảm giá nếu không chọn một khách hàng.'
                 })
                 return
             }
@@ -99,11 +99,11 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             setAmountPaidLocal(orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount)
 
             if (validVoucherList.length === 0) {
-                setMessage('No valid vouchers found.')
+                setMessage('Không tìm thấy phiếu giảm giá hợp lệ.')
             }
         } catch (error) {
-            console.error('Error validating coupon:', error)
-            setMessage('Error validating coupon. Please try again later.')
+            console.error('Lỗi khi xác thực phiếu giảm giá:', error)
+            setMessage('Lỗi khi xác thực phiếu giảm giá. Mời thử lại.')
         } finally {
             setLoading(false)
         }
@@ -114,7 +114,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Please select a customer before adding a voucher.'
+                detail: 'Vui lòng chọn một khách hàng trước khi thêm phiếu giảm giá.'
             })
             return
         }
@@ -122,7 +122,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'You cannot apply more than one voucher without selecting a customer.'
+                detail: 'Bạn không thể áp dụng nhiều hơn một phiếu giảm giá nếu không chọn một khách hàng.'
             })
             return
         }
@@ -188,7 +188,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 orderTotal: orderTotals.total,
                 refundedAmount: 0,
                 paidDateUtc: '',
-                billCode: 'Bill' + numberBill,
+                billCode: 'Hóa Đơn' + numberBill,
                 deliveryMode: checked ? 0 : 1,
                 orderItems: res.map((item) => ({
                     productId: item.productResponse.id,
@@ -230,7 +230,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Please select an address'
+                    detail: 'Vui lòng chọn một địa chỉ'
                 })
                 return false
             }
@@ -243,7 +243,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'You cannot apply more than one voucher without selecting a customer.'
+                detail: 'Bạn không thể áp dụng nhiều hơn một phiếu giảm giá nếu không chọn một khách hàng.'
             })
             return
         }
@@ -251,7 +251,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Combination vouchers can only combine a maximum of 2 vouchers.'
+                detail: 'Phiếu giảm giá kết hợp chỉ có thể kết hợp tối đa 2 phiếu.'
             })
             return
         }
@@ -263,7 +263,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Please enter the correct amount'
+                detail: 'Vui lòng nhập số tiền chính xác'
             })
             return false
         }
@@ -346,8 +346,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             .filter((id): id is number => id !== undefined)
 
         confirmDialog({
-            message: 'Are you sure you want to proceed with this order?',
-            header: 'Order Confirmation',
+            message: 'Bạn có chắc muốn tiếp tục đơn hàng này không?',
+            header: 'Xác Nhận Đơn Hàng',
             icon: 'pi pi-exclamation-triangle',
             defaultFocus: 'reject',
             accept: () => {
@@ -370,7 +370,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         orderTotal: orderTotals.total,
                         refundedAmount: 0,
                         paidDateUtc: '',
-                        billCode: 'Bill' + numberBill,
+                        billCode: 'Hóa Đơn' + numberBill,
                         deliveryMode: checked ? 0 : 1,
                         orderItems: res.map((item) => ({
                             productId: item.productResponse.id,
@@ -402,7 +402,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             toast.current?.show({
                                 severity: 'success',
                                 summary: 'Success',
-                                detail: 'Order created successfully'
+                                detail: 'Đơn hàng đã được tạo thành công'
                             })
                             await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -420,8 +420,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const onCheckRetail = () => {
         if (customer) {
             confirmDialog({
-                message: 'Are you sure you want to retail?',
-                header: 'Confirmation',
+                message: 'Bạn có chắc muốn bán lẻ không?',
+                header: 'Xác Nhận',
                 icon: 'pi pi-exclamation-triangle',
                 defaultFocus: 'accept',
                 accept: () => {
@@ -451,9 +451,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         <div className='space-y-4 w-full'>
             <div className='card'>
                 <div className='flex justify-between items-center'>
-                    {checked && <h3 className='text-2xl font-bold'>Shipping Information</h3>}
+                    {checked && <h3 className='text-2xl font-bold'>Thông Tin Vận Chuyển</h3>}
                     <h3></h3>
-                    <h3 className='text-2xl font-bold'>Payment Summary</h3>
+                    <h3 className='text-2xl font-bold'>Tóm Tắt Thanh Toán</h3>
                 </div>
                 <div className='space-y-4  mt-2 flex justify-between'>
                     <div className='w-2/3'>
@@ -464,7 +464,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             <div className='flex justify-between'>
                                 <div className='flex items-center justify-between gap-4 py-3'>
                                     <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                        Retail
+                                        Bán Lẻ
                                     </label>
                                     <InputSwitch checked={!customer ? true : false} onChange={() => onCheckRetail()} />
                                 </div>
@@ -473,7 +473,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
 
                                     <FaUserPlus
                                         onClick={() => setCustomerDialogVisible(true)}
-                                        data-pr-tooltip='Pick Customer'
+                                        data-pr-tooltip='Chọn Khách Hàng'
                                         className='text-primary-700 text-5xl cursor-pointer customer-tooltip '
                                     />
                                     {customer != null && checked && (
@@ -493,7 +493,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             <div className='flex flex-wrap justify-content-between w-full'>
                                 <div className='field w-full md:w-[49%]'>
                                     <label htmlFor='firstName' className='font-medium block'>
-                                        First name
+                                        Tên Khách Hàng
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -512,7 +512,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 </div>
                                 <div className='field w-full md:w-[49%]'>
                                     <label htmlFor='lastName' className='font-medium block'>
-                                        Last name
+                                        Họ Khách Hàng
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -533,7 +533,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             <div className='flex flex-wrap justify-content-between w-full'>
                                 <div className='field w-full md:w-[49%]'>
                                     <label htmlFor='phoneNumber' className='font-medium block'>
-                                        Phone number
+                                        Số Điện Thoại
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -552,7 +552,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 </div>
                                 <div className='field w-full md:w-[49%]'>
                                     <label htmlFor='note' className='font-medium block'>
-                                        Note
+                                        Ghi Chú
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -582,7 +582,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             {checked && (
                                 <div className='field w-full'>
                                     <label htmlFor='addressName' className='font-medium block'>
-                                        Address detail
+                                        Địa Chỉ Chi Tiết
                                     </label>
                                     <InputText
                                         onChange={(e) => setAddressDetailGenerated(e.target.value)}
@@ -600,7 +600,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 <div className='-my-3 divide-y divide-gray-200 dark:divide-gray-800'>
                                     <div className='flex items-center justify-between gap-4 py-3'>
                                         <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Delivery
+                                            Vận Chuyển
                                         </label>
                                         <InputSwitch
                                             checked={checked}
@@ -610,7 +610,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     <dl className='flex items-center justify-between gap-4 py-3'>
                                         <div className='flex items-center justify-center gap-3'>
                                             <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                                Coupon
+                                                Phiếu Giảm Giá
                                             </dt>
                                             <div className='flex items-center gap-3'>
                                                 <AutoComplete
@@ -619,7 +619,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                                     value={couponCode}
                                                     onInput={handleInputChange}
                                                     onKeyDown={handleKeyDown}
-                                                    placeholder='Enter coupon codes'
+                                                    placeholder='Nhập mã giảm giá'
                                                 />
                                                 <Button
                                                     icon='pi pi-thumbtack'
@@ -649,7 +649,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             {validVouchers.length > 0 && (
                                                 <div className='mt-3'>
                                                     <h3 className='text-sm font-semibold text-green-700 mb-2'>
-                                                        Valid Vouchers:
+                                                        Voucher hợp lệ:
                                                     </h3>
                                                     <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-green-200 rounded-md p-2'>
                                                         {validVouchers.map((voucher: Voucher, index) => (
@@ -675,7 +675,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             {couponCodes.length > 0 && (
                                                 <div className='mt-4'>
                                                     <h3 className='text-sm font-semibold text-blue-700 mb-2'>
-                                                        Entered Coupon Codes:
+                                                        Mã phiếu giảm giá đã nhập:
                                                     </h3>
                                                     <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2'>
                                                         {couponCodes.map((code, index) => (
@@ -700,7 +700,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
 
                                             {validVouchers.length === 0 && couponCodes.length === 0 && (
                                                 <div className='mt-3 text-xs text-gray-500 text-center font-medium'>
-                                                    No discount applied.
+                                                    Không áp dụng giảm giá.
                                                 </div>
                                             )}
                                         </dl>
@@ -708,7 +708,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
 
                                     <dl className='flex items-center justify-between gap-4 py-3'>
                                         <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Subtotal
+                                            Tổng phụ
                                         </dt>
                                         <dd className='text-base font-medium text-gray-900 dark:text-white'>
                                             ${orderTotals.subtotal.toFixed(2)}
@@ -716,7 +716,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     </dl>
                                     <dl className='flex items-center justify-between gap-4 py-3'>
                                         <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Shipping Cost
+                                            Chi phí vận chuyển
                                         </dt>
                                         <dd className='text-base font-medium text-gray-900 dark:text-white'>
                                             ${orderTotals.shippingCost.toFixed(2)}
@@ -724,7 +724,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     </dl>
                                     <dl className='flex items-center justify-between gap-4 py-3'>
                                         <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Discount
+                                            Giảm giá
                                         </dt>
                                         <dd className='text-base font-medium text-gray-900 dark:text-white'>
                                             ${totalDiscount.toFixed(2)}
@@ -732,7 +732,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     </dl>
                                     <dl className='flex items-center justify-between gap-4 py-3'>
                                         <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Total
+                                            Tổng cộng
                                         </dt>
                                         <dd className='text-base font-medium text-gray-900 dark:text-white'>
                                             $
@@ -746,7 +746,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     </dl>
                                     <dl className='flex items-center justify-between gap-4 py-3'>
                                         <dt className='text-base font-normal flex items-center gap-2 text-gray-500 dark:text-gray-400'>
-                                            Customer Payment{' '}
+                                            Thanh toán của khách hàng{' '}
                                             <FaIdCard
                                                 className='text-primary-700 text-5xl cursor-pointer'
                                                 onClick={handlePayment}
@@ -764,7 +764,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     className='flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800'
                                     onClick={handleOrder}
                                 >
-                                    Proceed to Payment
+                                    Tiến hành thanh toán
                                 </button>
                             </div>
                         </div>

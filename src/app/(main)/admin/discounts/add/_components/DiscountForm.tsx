@@ -49,7 +49,7 @@ const DiscountForm = () => {
     const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
     const showSuccessToast = () => {
-        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Discount created successfully!' })
+        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Giảm giá được tạo thành công!' })
     }
     useEffect(() => {
         const now = new Date()
@@ -69,13 +69,13 @@ const DiscountForm = () => {
         toast.current?.show({
             severity: 'error',
             summary: 'Error',
-            detail: errorMessage || 'Failed to create discount'
+            detail: errorMessage || 'Giảm giá được tạo thất bại!'
         })
     }
 
     const handleCreateDiscount = () => {
         if (!validateForm()) {
-            showFailedToast('Form validation failed. Please correct the fields.')
+            showFailedToast('Xác thực biểu mẫu không thành công. Vui lòng sửa các trường.')
             return
         }
 
@@ -106,16 +106,16 @@ const DiscountForm = () => {
             .catch((error) => {
                 if (error.response && error.response.status === 400) {
                     const backendMessage = error.response.data.message
-                    if (backendMessage && backendMessage.includes('Discount with this name already exists')) {
+                    if (backendMessage && backendMessage.includes('Giảm giá với tên này đã tồn tại')) {
                         setErrors((prevErrors) => ({
                             ...prevErrors,
-                            discountName: 'This discount name is already in use.'
+                            discountName: 'Tên giảm giá này đã được sử dụng.'
                         }))
                     } else {
-                        showFailedToast(backendMessage || 'An error occurred.')
+                        showFailedToast(backendMessage || 'Đã xảy ra lỗi.')
                     }
                 } else {
-                    showFailedToast('An unexpected error occurred.')
+                    showFailedToast('Đã xảy ra lỗi không mong muốn.')
                 }
             })
     }
@@ -139,31 +139,31 @@ const DiscountForm = () => {
         }
 
         if (!discountName.trim()) {
-            newErrors.discountName = 'Discount name is required.'
+            newErrors.discountName = 'Tên giảm giá là bắt buộc'
             isValid = false
         }
 
         if (value === null || isNaN(value) || value <= 0) {
-            newErrors.value = 'Please enter a valid positive discount value.'
+            newErrors.value = 'Vui lòng nhập giá trị chiết khấu dương hợp lệ.'
             isValid = false
         } else if (value > 50) {
-            newErrors.value = 'You cannot set a discount higher than 50%.'
+            newErrors.value = 'Bạn không thể đặt mức giảm giá cao hơn 50%.'
             isValid = false
         }
 
         if (!fromDate) {
-            newErrors.fromDate = 'From date is required.'
+            newErrors.fromDate = 'Ngày bắt đầu là bắt buộc.'
             isValid = false
         } else if (isNaN(fromDate.getTime())) {
-            newErrors.fromDate = 'Invalid from date.'
+            newErrors.fromDate = 'Ngày bắt đầu không hợp lệ'
             isValid = false
         }
 
         if (!toDate) {
-            newErrors.toDate = 'To Date is required.'
+            newErrors.toDate = 'Ngày kết thúc là bắt buộc'
             isValid = false
         } else if (isNaN(toDate.getTime())) {
-            newErrors.toDate = 'Invalid To Date.'
+            newErrors.toDate = 'Ngày kết thúc không hợp lệ'
             isValid = false
         }
 
@@ -173,22 +173,22 @@ const DiscountForm = () => {
             const durationInDays = durationInMs / (1000 * 60 * 60 * 24)
 
             if (durationInDays > 180) {
-                newErrors.dateError = 'The duration of the program must not exceed 180 days.'
+                newErrors.dateError = 'Thời lượng của chương trình không được vượt quá 180 ngày.'
                 isValid = false
             } else if (fromDate > toDate) {
-                newErrors.dateError = 'The start date cannot be after the end date.'
+                newErrors.dateError = 'Ngày bắt đầu không thể sau ngày kết thúc.'
                 isValid = false
             } else if (durationInHours < 1) {
-                newErrors.dateError = 'The program duration must be at least 1 hour.'
+                newErrors.dateError = 'Thời lượng chương trình phải ít nhất là 1 giờ.'
                 isValid = false
             }
         }
 
         if (selectedFetchedProducts.length === 0) {
-            newErrors.productError = 'At least one product must be selected.'
+            newErrors.productError = 'Phải chọn ít nhất một sản phẩm.'
             isValid = false
         } else if (selectedFetchedProducts.some((product) => product.quantity <= 1)) {
-            newErrors.productError = 'All selected variants must have a quantity greater than 1.'
+            newErrors.productError = 'Tất cả các biến thể được chọn phải có số lượng lớn hơn 1.'
             isValid = false
         }
 
@@ -198,7 +198,7 @@ const DiscountForm = () => {
 
     const handleRowSelect = (event: DataTableRowEvent) => {
         const selectedProductId = event.data.id
-        console.log('Selected Product Variant ID:', selectedProductId)
+        console.log('ID biến thể sản phẩm đã chọn:', selectedProductId)
     }
 
     const onProductSelectionChange = async (e: any) => {
@@ -211,7 +211,7 @@ const DiscountForm = () => {
                 const productsByParentIds = await ProductService.getProductsByParentIds(selectedIds)
                 setFetchedProducts(productsByParentIds)
             } catch (error) {
-                console.error('Error fetching products by parent IDs:', error)
+                console.error('Lỗi tìm nạp sản phẩm theo ID gốc:', error)
             }
         } else {
             setFetchedProducts([])
@@ -235,16 +235,16 @@ const DiscountForm = () => {
             <Toast ref={toast} />
             <div className='p-fluid grid'>
                 <div className='col-12 md:col-6'>
-                    <h3>Create Discount</h3>
+                    <h3>Tạo Giảm Giá</h3>
 
                     <div className='field'>
-                        <label htmlFor='discountName'>Discount Name</label>
+                        <label htmlFor='discountName'>Tên Giảm Giá</label>
                         <InputText
                             id='discountName'
                             value={discountName}
                             onChange={(e) => setDiscountName(e.target.value)}
                             required
-                            placeholder='Enter discount name'
+                            placeholder='Nhập tên giảm giá'
                         />
                         {errors.discountName && <small className='p-error'>{errors.discountName}</small>}
                     </div>
@@ -260,14 +260,14 @@ const DiscountForm = () => {
                             min={1}
                             max={50}
                             required
-                            placeholder='Enter discount value'
+                            placeholder='Nhập giá trị giảm giá'
                         />
                         {errors.value && <small className='p-error'>{errors.value}</small>}
                     </div>
 
                     <div className='flex justify-between'>
                         <div className='field'>
-                            <label htmlFor='fromDate'>From Date</label>
+                            <label htmlFor='fromDate'>Ngày bắt đầu</label>
                             <Calendar
                                 id='fromDate'
                                 value={fromDate}
@@ -281,7 +281,7 @@ const DiscountForm = () => {
                                 hourFormat='12'
                                 touchUI
                                 dateFormat='dd/mm/yy'
-                                placeholder='Select start date'
+                                placeholder='Chọn ngày bắt đầu'
                                 showButtonBar
                                 required
                             />
@@ -289,7 +289,7 @@ const DiscountForm = () => {
                         </div>
 
                         <div className='field'>
-                            <label htmlFor='toDate'>To Date</label>
+                            <label htmlFor='toDate'>Ngày Kết Thúc</label>
                             <Calendar
                                 id='toDate'
                                 value={toDate}
@@ -302,7 +302,7 @@ const DiscountForm = () => {
                                 showIcon
                                 minDate={minEndDate}
                                 dateFormat='dd/mm/yy'
-                                placeholder='Select end date'
+                                placeholder='Chọn ngày kết thúc'
                                 showButtonBar
                                 required
                                 hourFormat='12'
@@ -315,27 +315,27 @@ const DiscountForm = () => {
                         <InputTextarea
                             value={comments}
                             onChange={(e) => setComments(e.target.value)}
-                            placeholder='Comments'
+                            placeholder='Bình Luận'
                             rows={5}
                             cols={30}
                         />
                     </div>
                     <Button
                         className='mt-4'
-                        label='Create Discount'
+                        label='Tạo Giảm Giá'
                         icon='pi pi-check'
                         onClick={handleCreateDiscount}
                     />
                 </div>
 
                 <div className='col-12 md:col-6'>
-                    <h4>Select Products</h4>
+                    <h4>Chọn Sản Phẩm</h4>
                     <div className='field'>
                         <InputText
                             id='productSearch'
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder='Search by name'
+                            placeholder='Tìm theo tên'
                         />
                     </div>
                     <DataTable
@@ -348,14 +348,14 @@ const DiscountForm = () => {
                         selectionMode='checkbox'
                     >
                         <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
-                        <Column field='id' header='STT' />
-                        <Column field='name' header='Product Name' sortable />
+                        <Column field='id' header='#' />
+                        <Column field='name' header='Tên Sản Phẩm' sortable />
                     </DataTable>
                 </div>
             </div>
             {fetchedProducts.length > 0 && (
                 <div className='col-12'>
-                    <h4 className='text-lg font-semibold mb-4'>Product variations</h4>
+                    <h4 className='text-lg font-semibold mb-4'>Biến Thể Sản Phẩm</h4>
                     {errors.productError && <small className='p-error'>{errors.productError}</small>}
                     <DataTable
                         value={fetchedProducts}
@@ -370,7 +370,7 @@ const DiscountForm = () => {
                         <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
                         <Column
                             field='name'
-                            header='Product Name'
+                            header='Tên Sản Phẩm'
                             body={(rowData) => (
                                 <Button
                                     label={rowData.name}
@@ -382,7 +382,7 @@ const DiscountForm = () => {
                         />
                         <Column
                             field='imageUrl'
-                            header='Image'
+                            header='Hình Ảnh'
                             body={(rowData) => (
                                 <Image
                                     src={rowData.imageUrl}
@@ -394,9 +394,9 @@ const DiscountForm = () => {
                                 />
                             )}
                         />
-                        <Column sortable field='categoryName' header='Category Name' />
-                        <Column sortable field='quantity' header='Quantity' />
-                        <Column sortable field='manufacturerName' header='Manufacturer Name' />
+                        <Column sortable field='categoryName' header='Tên Danh Mục' />
+                        <Column sortable field='quantity' header='Số Lượng' />
+                        <Column sortable field='manufacturerName' header='Tên Nhà Sản Xuất' />
                         <Column sortable field='sku' header='SKU' />
                     </DataTable>
                 </div>

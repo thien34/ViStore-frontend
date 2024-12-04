@@ -109,7 +109,7 @@ const DiscountUpdate = () => {
                         const variations: ProductResponse[] = await ProductService.getProductsByParentId(parentId)
                         fetchedVariations.push(...variations)
                     } catch (error) {
-                        console.error(`Error fetching products for parentId ${parentId}:`, error)
+                        console.error(`Lỗi khi tìm nạp sản phẩm cho parentId ${parentId}:`, error)
                     }
                 }
                 setFetchedProducts(fetchedVariations)
@@ -119,7 +119,7 @@ const DiscountUpdate = () => {
                 )
                 setSelectedFetchedProducts(updatedSelectedFetchedProducts)
             } catch (error) {
-                console.error('Error fetching discount:', error)
+                console.error('Lỗi khi tìm nạp giảm giá:', error)
             } finally {
                 setLoading(false)
             }
@@ -129,14 +129,14 @@ const DiscountUpdate = () => {
     }, [id])
 
     const showSuccessToast = () => {
-        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Discount updated successfully!' })
+        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật giảm giá thành công!' })
     }
     useEffect(() => {
         validateForm()
     }, [discountName, value, fromDate, toDate, selectedFetchedProducts])
 
     const showFailedToast = () => {
-        toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to update discount' })
+        toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Cập nhật giảm giá thất bại!' })
     }
     const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -200,31 +200,31 @@ const DiscountUpdate = () => {
         }
 
         if (!discountName.trim()) {
-            newErrors.discountName = 'Discount name is required.'
+            newErrors.discountName = 'Tên giảm giá là bắt buộc'
             isValid = false
         }
 
         if (value === null || isNaN(value) || value <= 0) {
-            newErrors.value = 'Please enter a valid positive discount value.'
+            newErrors.value = 'Vui lòng nhập giá trị chiết khấu dương hợp lệ.'
             isValid = false
         } else if (value > 50) {
-            newErrors.value = 'You cannot set a discount higher than 50%.'
+            newErrors.value = 'Bạn không thể đặt mức giảm giá cao hơn 50%.'
             isValid = false
         }
 
         if (!fromDate) {
-            newErrors.fromDate = 'From Date is required.'
+            newErrors.fromDate = 'Từ ngày là bắt buộc.'
             isValid = false
         } else if (isNaN(fromDate.getTime())) {
-            newErrors.fromDate = 'Invalid From Date.'
+            newErrors.fromDate = 'Không hợp lệ từ ngày.'
             isValid = false
         }
 
         if (!toDate) {
-            newErrors.toDate = 'To Date is required.'
+            newErrors.toDate = 'Đến ngày là bắt buộc.'
             isValid = false
         } else if (isNaN(toDate.getTime())) {
-            newErrors.toDate = 'Invalid To Date.'
+            newErrors.toDate = 'Không hợp lệ cho đến nay.'
             isValid = false
         }
 
@@ -234,24 +234,24 @@ const DiscountUpdate = () => {
             const durationInDays = durationInMs / (1000 * 60 * 60 * 24)
 
             if (durationInDays > 180) {
-                newErrors.dateError = 'The duration of the program must not exceed 180 days.'
+                newErrors.dateError = 'Thời lượng của chương trình không được vượt quá 180 ngày.'
                 isValid = false
             } else if (fromDate > toDate) {
-                newErrors.dateError = 'The start date cannot be after the end date.'
+                newErrors.dateError = 'Ngày bắt đầu không thể sau ngày kết thúc.'
                 isValid = false
             } else if (durationInHours < 1) {
-                newErrors.dateError = 'The program duration must be at least 1 hour.'
+                newErrors.dateError = 'Thời lượng chương trình phải ít nhất là 1 giờ.'
                 isValid = false
             } else if (originalFromDate && fromDate < originalFromDate) {
-                newErrors.fromDate = 'Program start times can only be changed later.'
+                newErrors.fromDate = 'Thời gian bắt đầu chương trình chỉ có thể được thay đổi sau đó.'
                 isValid = false
             } else if (originalToDate && toDate > originalToDate) {
-                newErrors.dateError = 'The program end time can only be changed to an earlier time.'
+                newErrors.dateError = 'Thời gian kết thúc chương trình chỉ có thể được thay đổi về thời gian sớm hơn.'
                 isValid = false
             }
         }
         if (selectedFetchedProducts.length === 0) {
-            newErrors.productError = 'At least one product must be selected.'
+            newErrors.productError = 'Phải chọn ít nhất một sản phẩm.'
             isValid = false
         }
 
@@ -292,7 +292,7 @@ const DiscountUpdate = () => {
                 const variations = await ProductService.getProductsByParentId(parentId)
                 fetchedVariations.push(...variations)
             } catch (error) {
-                console.error(`Error fetching products for parentId ${parentId}:`, error)
+                console.error(`Lỗi khi tìm nạp sản phẩm cho parentId ${parentId}:`, error)
             }
         }
 
@@ -343,20 +343,20 @@ const DiscountUpdate = () => {
                         <h3>Update Discount</h3>
 
                         <div className='field'>
-                            <label htmlFor='discountName'>Discount Name</label>
+                            <label htmlFor='discountName'>Tên Giảm Giá</label>
                             <InputText
                                 id='discountName'
                                 value={discountName}
                                 onChange={(e) => setDiscountName(e.target.value)}
-                                placeholder='Enter discount name'
-                                tooltip="Enter discount name" tooltipOptions={{ position: 'top' }}
+                                placeholder='Nhập tên giảm giá'
+                                tooltip="Nhập tên giảm giá" tooltipOptions={{ position: 'top' }}
                                 required
                             />
                             {errors.discountName && <small className='p-error'>{errors.discountName}</small>}
                         </div>
 
                         <div className='field'>
-                            <label htmlFor='value'>Value</label>
+                            <label htmlFor='value'>Giá Trị</label>
                             <InputNumber
                                 inputId='value'
                                 value={value}
@@ -364,8 +364,8 @@ const DiscountUpdate = () => {
                                 mode='decimal'
                                 onValueChange={(e) => setValue(e.value !== undefined ? e.value : null)}
                                 suffix='%'
-                                placeholder='Enter value'
-                                tooltip="Enter value" tooltipOptions={{ position: 'top' }}
+                                placeholder='Nhập giá trị'
+                                tooltip="Nhập giá trị" tooltipOptions={{ position: 'top' }}
                                 min={1}
                                 max={50}
                                 required
@@ -374,15 +374,15 @@ const DiscountUpdate = () => {
                         </div>
 
                         <div className='field'>
-                            <label htmlFor='fromDate'>From Date</label>
+                            <label htmlFor='fromDate'>Từ Ngày</label>
                             <Calendar
                                 id='fromDate'
                                 value={fromDate}
                                 onChange={(e) => setFromDate(e.value)}
                                 showTime
                                 disabled={isActive}
-                                placeholder='Select start date'
-                                tooltip="Enter start date" tooltipOptions={{ position: 'top' }}
+                                placeholder='Chọn ngày bắt đầu'
+                                tooltip="Nhập ngày bắt đầu" tooltipOptions={{ position: 'top' }}
                                 dateFormat='dd/mm/yy'
                                 hourFormat='12'
                                 required
@@ -391,14 +391,14 @@ const DiscountUpdate = () => {
                         </div>
 
                         <div className='field'>
-                            <label htmlFor='toDate'>To Date</label>
+                            <label htmlFor='toDate'>Đến Ngày</label>
                             <Calendar
                                 id='toDate'
                                 value={toDate}
                                 onChange={(e) => setToDate(e.value)}
                                 showTime
-                                placeholder='Select end date'
-                                tooltip="Enter end date" tooltipOptions={{ position: 'top' }}
+                                placeholder='Chọn ngày kết thúc'
+                                tooltip="Nhập ngày kết thúc" tooltipOptions={{ position: 'top' }}
                                 dateFormat='dd/mm/yy'
                                 hourFormat='12'
                                 required
@@ -410,27 +410,27 @@ const DiscountUpdate = () => {
                             <InputTextarea
                                 value={comments}
                                 onChange={(e) => setComments(e.target.value)}
-                                placeholder='Comments'
-                                tooltip="Enter comments" tooltipOptions={{ position: 'top' }}
+                                placeholder='Bình luận'
+                                tooltip="Nhập bình luận" tooltipOptions={{ position: 'top' }}
                                 rows={5}
                                 cols={30}
                             />
                         </div>
                         <Button
                             className='mt-4'
-                            label='Update Discount'
+                            label='Cập Nhật Giảm Giá'
                             icon='pi pi-check'
                             onClick={handleUpdateDiscount}
                         />
                     </div>
                     <div className='col-12 md:col-6'>
-                        <h4>Select Products</h4>
+                        <h4>Chọn Sản Phẩm</h4>
                         <div className='field'>
                             <InputText
                                 id='productSearch'
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder='Search by name'
+                                placeholder='Tìm theo tên'
                             />
                         </div>
                         {products.length === 0 ? (
@@ -452,12 +452,12 @@ const DiscountUpdate = () => {
                             >
                                 <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
                                 <Column field='id' header='STT' />
-                                <Column field='name' sortable header='Product Name' />
+                                <Column field='name' sortable header='Tên Sản Phẩm' />
                             </DataTable>
                         )}
                     </div>
                     <div className='col-12'>
-                        <h4 className='text-lg font-semibold mb-4'>Product Variations</h4>
+                        <h4 className='text-lg font-semibold mb-4'>Biến Thể Sản Phẩm</h4>
                         {errors.productError && <small className='p-error'>{errors.productError}</small>}
                         {fetchedProducts.length === 0 ? (
                             <div className='card flex justify-content-center'>
@@ -479,7 +479,7 @@ const DiscountUpdate = () => {
                                 <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
                                 <Column
                                     field='name'
-                                    header='Product Name'
+                                    header='Tên Sản Phẩm'
                                     body={(rowData) => (
                                         <Button
                                             label={rowData.name}
@@ -489,11 +489,11 @@ const DiscountUpdate = () => {
                                     )}
                                     sortable
                                 />
-                                <Column field='imageUrl' header='Image' body={imageBodyTemplate} />
-                                <Column sortable field='price' header='Price' />
-                                <Column sortable field='quantity' header='Quantity' />
-                                <Column sortable field='categoryName' header='Category Name' />
-                                <Column sortable field='manufacturerName' header='Manufacturer Name' />
+                                <Column field='imageUrl' header='Hình Ảnh' body={imageBodyTemplate} />
+                                <Column sortable field='price' header='Giá' />
+                                <Column sortable field='quantity' header='Số Lượng' />
+                                <Column sortable field='categoryName' header='Tên Danh Mục' />
+                                <Column sortable field='manufacturerName' header='Tên Nhà Sản Xuất' />
                                 <Column sortable field='sku' header='SKU' />
                             </DataTable>
                         )}
@@ -501,11 +501,11 @@ const DiscountUpdate = () => {
                 </div>
             )}
             <div className='col-12'>
-                <h4 className='text-lg font-semibold mb-4'>Applied Products</h4>
+                <h4 className='text-lg font-semibold mb-4'>Sản Phẩm Áp Dụng </h4>
                 <DataTable value={appliedProducts} paginator rows={5}>
                     <Column
                         field='name'
-                        header='Product Name'
+                        header='Tên sản phẩm'
                         body={(rowData) => (
                             <Button
                                 label={rowData.name}
@@ -515,10 +515,10 @@ const DiscountUpdate = () => {
                         )}
                         sortable
                     />
-                    <Column sortable field='fullName' header='Name' />
-                    <Column field='categoryName' header='Category' />
-                    <Column sortable field='imageUrl' header='Image' body={imageBodyTemplate} />
-                    <Column field='manufacturerName' header='Manufacturer' />
+                    <Column sortable field='fullName' header='Tên' />
+                    <Column field='categoryName' header='Danh Mục' />
+                    <Column sortable field='imageUrl' header='Hình Ảnh' body={imageBodyTemplate} />
+                    <Column field='manufacturerName' header='Nhà Sản Xuất' />
                     <Column sortable field='sku' header='SKU' />
                 </DataTable>
             </div>

@@ -97,16 +97,16 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                 await addressService.update(address.id, address)
                 toast.current?.show({
                     severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Address Updated',
+                    summary: 'Thành công',
+                    detail: 'Địa chỉ đã được cập nhật',
                     life: 3000
                 })
             } else {
                 await addressService.create(address)
                 toast.current?.show({
                     severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Address Created',
+                    summary: 'Thành công',
+                    detail: 'Địa chỉ đã được tạo',
                     life: 3000
                 })
             }
@@ -117,8 +117,8 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
 
     const addressDialogFooter = (
         <>
-            <Button label='Cancel' icon='pi pi-times' outlined onClick={hideDialog} />
-            <Button label='Save' icon='pi pi-check' onClick={saveAddress} />
+            <Button label='Hủy' icon='pi pi-times' outlined onClick={hideDialog} />
+            <Button label='Lưu' icon='pi pi-check' onClick={saveAddress} />
         </>
     )
     return (
@@ -127,7 +127,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
             <Dialog
                 visible={addressDialog}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                header='Address Details'
+                header='Chi tiết địa chỉ'
                 style={{ width: '45vw' }}
                 modal
                 className='p-fluid'
@@ -137,7 +137,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                 <div className='flex w-full gap-x-5'>
                     <div className='field w-full'>
                         <label htmlFor='firstNameAdress' className='font-medium block'>
-                            First name <RequiredIcon />
+                            Tên Khách Hàng <RequiredIcon />
                         </label>
                         <InputText
                             id='firstNameAdress'
@@ -148,12 +148,12 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             className={classNames({ 'p-invalid': submitted && !address.firstName })}
                         />
                         {submitted && !address.firstName && (
-                            <small className='p-error block'>First name is required.</small>
+                            <small className='p-error block'>Tên khách hàng là bắt buộc.</small>
                         )}
                     </div>
                     <div className='field w-full'>
                         <label htmlFor='lastNameAdress' className='font-medium block'>
-                            Last name <RequiredIcon />
+                            Họ Khách Hàng <RequiredIcon />
                         </label>
                         <InputText
                             id='lastNameAdress'
@@ -163,7 +163,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             className={classNames({ 'p-invalid': submitted && !address.lastName })}
                         />
                         {submitted && !address.lastName && (
-                            <small className='p-error block'>Last name is required.</small>
+                            <small className='p-error block'>Họ là bắt buộc.</small>
                         )}
                     </div>
                 </div>
@@ -180,14 +180,14 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             completeMethod={search}
                             required
                             onChange={(e) => setAddress({ ...address, email: e.value })}
-                            placeholder='Enter your email'
+                            placeholder='Nhập email của bạn'
                             className={classNames({ 'p-invalid': submitted && !address.email })}
                         />
-                        {submitted && !address.email && <small className='p-error'>Email is required.</small>}
+                        {submitted && !address.email && <small className='p-error'>Email là bắt buộc.</small>}
                     </div>
                     <div className='field w-full'>
                         <label htmlFor='phoneNumber' className='font-medium block'>
-                            Phone number <RequiredIcon />
+                            Số Điện Thoại <RequiredIcon />
                         </label>
                         <InputText
                             id='phoneNumber'
@@ -197,14 +197,14 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             className={classNames({ 'p-invalid': submitted && !address.phoneNumber })}
                         />
                         {submitted && !address.phoneNumber && (
-                            <small className='p-error block'>Phone number is required.</small>
+                            <small className='p-error block'>Số điện thoại là bắt buộc.</small>
                         )}
                     </div>
                 </div>
                 <div className='flex w-full gap-x-4'>
                     <div className='field w-full'>
                         <label htmlFor='province' className='font-medium block'>
-                            Province <RequiredIcon />
+                            Tỉnh <RequiredIcon />
                         </label>
                         <Dropdown
                             inputId='province'
@@ -215,17 +215,17 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             }}
                             options={provinces}
                             optionLabel='name'
-                            placeholder='Select a Province'
+                            placeholder='Chọn tỉnh'
                             filter
                             className={classNames({ 'p-invalid': submitted && !address.provinceId })}
                         />
                         {submitted && !address.provinceId && (
-                            <small className='p-error block'>Province is required.</small>
+                            <small className='p-error block'>Tỉnh là bắt buộc.</small>
                         )}
                     </div>
                     <div className='field w-full'>
                         <label htmlFor='district' className='font-medium block'>
-                            District <RequiredIcon />
+                            Quận <RequiredIcon />
                         </label>
                         <Dropdown
                             inputId='district'
@@ -236,18 +236,18 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             }}
                             options={districts}
                             optionLabel='name'
-                            placeholder='Select a District'
+                            placeholder='Chọn quận'
                             filter
                             disabled={!address.provinceId}
                             className={classNames({ 'p-invalid': submitted && !address.districtId })}
                         />
                         {submitted && !address.districtId && (
-                            <small className='p-error block'>District is required.</small>
+                            <small className='p-error block'>Quận là bắt buộc.</small>
                         )}
                     </div>
                     <div className='field w-full'>
                         <label htmlFor='ward' className='font-medium block'>
-                            Ward <RequiredIcon />
+                            Phường <RequiredIcon />
                         </label>
                         <Dropdown
                             itemID='ward'
@@ -255,17 +255,17 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                             onChange={(e) => setAddress({ ...address, wardId: e.target.value.code })}
                             options={wards}
                             optionLabel='name'
-                            placeholder='Select a Ward'
+                            placeholder='Chọn phường'
                             filter
                             disabled={!address.districtId}
                             className={classNames({ 'p-invalid': submitted && !address.wardId })}
                         />
-                        {submitted && !address.wardId && <small className='p-error block'>Ward is required.</small>}
+                        {submitted && !address.wardId && <small className='p-error block'>Phường là bắt buộc.</small>}
                     </div>
                 </div>
                 <div className='field w-full'>
                     <label htmlFor='addressName' className='font-medium block'>
-                        Address detail <RequiredIcon />
+                        Chi tiết địa chỉ <RequiredIcon />
                     </label>
                     <InputText
                         id='addressName'
@@ -275,7 +275,7 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                         className={classNames({ 'p-invalid': submitted && !address.addressName })}
                     />
                     {submitted && !address.addressName && (
-                        <small className='p-error block'>Address name is required.</small>
+                        <small className='p-error block'>Tên địa chỉ là bắt buộc.</small>
                     )}
                 </div>
             </Dialog>

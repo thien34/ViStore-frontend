@@ -44,10 +44,10 @@ interface ColumnMeta {
 }
 
 const columns: ColumnMeta[] = [
-    { field: 'name', header: 'Name' },
-    { field: 'unitPrice', header: 'Unit Price' },
-    { field: 'productCost', header: 'Product Cost' },
-    { field: 'quantity', header: 'Quantity' }
+    { field: 'name', header: 'Tên Sản Phẩm' },
+    { field: 'unitPrice', header: 'Đơn Giá' },
+    { field: 'productCost', header: 'Giá Nhập' },
+    { field: 'quantity', header: 'Số Lượng' }
 ]
 interface ProductAddFormProps {
     categories: TreeNode[]
@@ -99,7 +99,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Attribute value cannot exceed 50 characters',
+                    detail: 'Giá trị thuộc tính không được vượt quá 50 ký tự',
                     life: 3000
                 })
                 return
@@ -108,7 +108,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Only letters, numbers, spaces and hyphens are allowed, but hyphens cannot be followed by numbers',
+                    detail: 'Chỉ được phép sử dụng chữ cái, số, khoảng cách và dấu gạch nối, nhưng không được theo sau dấu gạch nối bằng số',
                     life: 3000
                 })
                 return
@@ -282,18 +282,18 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             {}
 
         if (!name || name.trim() === '') {
-            errors.name = 'Product name is required'
+            errors.name = 'Tên sản phẩm là bắt buộc'
         }
 
         if (!selectedCategory) {
-            errors.category = 'Category is required'
+            errors.category = 'Danh mục sản phẩm là bắt buộc'
         }
 
         if (!selectedManufacture) {
-            errors.manufacture = 'Manufacturer is required'
+            errors.manufacture = 'Nhà sản xuất là bắt buộc'
         }
         if (weight <= 0) {
-            errors.weight = 'Weight must be greater than 0'
+            errors.weight = 'Trọng lượng phải lớn hơn 0'
         }
         const missingAttributes = attributeRows.filter((row) => {
             return row.selectedAttribute && row.selectedValues.length === 0
@@ -302,10 +302,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Please select all attributes for each combination',
+                detail: 'Vui lòng chọn tất cả các thuộc tính cho mỗi kết hợp',
                 life: 3000
             })
-            errors.attribute = 'Please select all attributes for each combination'
+            errors.attribute = 'Vui lòng chọn tất cả các thuộc tính cho mỗi kết hợp'
         }
         return errors
     }
@@ -321,7 +321,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Please add at least one combination',
+                detail: 'Vui lòng thêm ít nhất một kết hợp',
                 life: 3000
             })
             return
@@ -389,7 +389,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Success',
-                    detail: 'Products added successfully!',
+                    detail: 'Sản phẩm đã được thêm thành công',
                     life: 3000
                 })
                 router.push(ManagerPath.PRODUCT)
@@ -398,12 +398,12 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Failed to add products.',
+                    detail: 'Thêm sản phẩm thất bại',
                     life: 3000
                 })
             }
         } catch (error) {
-            console.error('Error deleting bill:', error)
+            console.error('Lỗi khi xóa hóa đơn:', error)
         } finally {
             setIsLoading(false)
         }
@@ -462,46 +462,46 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             <Toast ref={toast} />
             <Spinner isLoading={isLoading} />
             <div className='card'>
-                <h4>Add Product</h4>
+                <h4>Thêm Sản Phẩm</h4>
                 <div className='flex flex-column gap-4'>
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='productName'>
-                                Product Name <RequiredIcon />
+                                Tên Sản Phẩm <RequiredIcon />
                             </label>
                             <InputText
                                 id='productName'
                                 onChange={(e) => {
                                     const value = e.target.value
                                     if (value.trim() === '') {
-                                        setNameError('Product name is required')
+                                        setNameError('Tên sản phẩm là bắt buộc')
                                     } else if (value.length <= 50) {
                                         setName(value)
                                         setNameError('')
                                     } else {
-                                        setNameError('Product name cannot exceed 50 characters')
+                                        setNameError('Tên sản phẩm không được vượt quá 50 ký tự')
                                     }
                                 }}
-                                placeholder='Enter product name'
+                                placeholder='Nhập tên sản phẩm'
                                 className={`${nameError ? 'p-invalid' : ''}`}
                             />
                             {nameError && <small className='p-error'>{nameError}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='weight'>
-                                Weight <RequiredIcon />
+                                Trọng Lượng <RequiredIcon />
                             </label>
                             <InputNumber
                                 inputId='weight'
                                 onValueChange={(e) => {
                                     if (e.value && e.value <= 0) {
-                                        setWeightError('Weight must be greater than 0')
+                                        setWeightError('Trọng lượng phải lớn hơn 0')
                                     } else {
                                         setWeight(e.value || 0)
                                         setWeightError('')
                                     }
                                 }}
-                                placeholder='Enter weight'
+                                placeholder='Nhập trọng lượng sản phẩm'
                                 mode='decimal'
                                 showButtons
                                 min={0}
@@ -516,7 +516,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     <div className='flex flex-row gap-4 align-items-center'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='category'>
-                                Categories <RequiredIcon />
+                                Danh Mục <RequiredIcon />
                             </label>
                             <TreeSelect
                                 inputId='category'
@@ -527,14 +527,14 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 }}
                                 options={categories}
                                 filter
-                                placeholder='Select a category'
+                                placeholder='Chọn một danh mục'
                                 className={`${categoryError ? 'p-invalid' : ''}`}
                             />
                             {categoryError && <small className='p-error'>{categoryError}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='brand'>
-                                Manufactures <RequiredIcon />
+                                Nhà Sản Xuất <RequiredIcon />
                             </label>
                             <Dropdown
                                 inputId='brand'
@@ -544,7 +544,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                     setManufactureError('')
                                 }}
                                 options={manufacturers}
-                                placeholder='Select a manufacture'
+                                placeholder='Chọn một nhà cung cấp'
                                 optionLabel='manufacturerName'
                                 className={`${manufactureError ? 'p-invalid' : ''}`}
                             />
@@ -554,20 +554,20 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
                     <div className='flex flex-row gap-4 align-items-center'>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='description'>Description</label>
+                            <label htmlFor='description'>Mô Tả</label>
                             <Editor
                                 id='description'
                                 value={text}
                                 onTextChange={(e) => setText(e.htmlValue || '')}
                                 style={{ height: '100px', width: '100%' }}
-                                placeholder='Enter product description'
+                                placeholder='Nhập mô tả sản phẩm'
                             />
                         </div>
                     </div>
                 </div>
 
                 <Accordion className='mt-5' activeIndex={0}>
-                    <AccordionTab header='Attributes'>
+                    <AccordionTab header='Thuộc tính'>
                         {attributeRows.map((row, index) => (
                             <div key={index} className='mb-4 flex items-center'>
                                 <Dropdown
@@ -583,7 +583,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                         generateCombinations()
                                     }}
                                     optionLabel='name'
-                                    placeholder='Select an attribute'
+                                    placeholder='Chọn một thuộc tính'
                                     className='w-[200px] mr-4'
                                     style={{ minWidth: '200px', width: '200px', maxWidth: '200px' }}
                                 />
@@ -593,7 +593,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                     onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
                                         handleKeydown(event, index)
                                     }
-                                    placeholder='Enter values'
+                                    placeholder='Nhập giá trị'
                                     multiple
                                     onChange={(e) => handleChange(e.value, index)}
                                     className='w-full'
@@ -610,14 +610,14 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                             disabled={isAddAttributeDisabled()}
                         >
                             <i className={PrimeIcons.PLUS}></i>
-                            <span className='ml-2'>Add attribute</span>
+                            <span className='ml-2'>Thêm thuộc tính</span>
                         </Button>
 
                         {combinedRows.length > 0 && (
                             <div className='flex flex-row gap-4 mb-4 mt-4'>
                                 <div className='flex-1'>
                                     <label htmlFor='bulkUnitPrice' className='block mb-2'>
-                                        Bulk Unit Price
+                                        Đồng Bộ Đơn Giá
                                     </label>
                                     <div className='flex gap-2'>
                                         <InputNumber
@@ -627,12 +627,12 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             min={0}
                                             max={1000000}
                                         />
-                                        <Button onClick={() => applyBulkUpdate('unitPrice')} label='Apply' />
+                                        <Button onClick={() => applyBulkUpdate('unitPrice')} label='Áp Dụng' />
                                     </div>
                                 </div>
                                 <div className='flex-1'>
                                     <label htmlFor='bulkProductCost' className='block mb-2'>
-                                        Bulk Product Cost
+                                        Đồng Bộ Giá Nhập
                                     </label>
                                     <div className='flex gap-2'>
                                         <InputNumber
@@ -642,12 +642,12 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             min={0}
                                             max={1000000}
                                         />
-                                        <Button onClick={() => applyBulkUpdate('productCost')} label='Apply' />
+                                        <Button onClick={() => applyBulkUpdate('productCost')} label='Áp Dụng' />
                                     </div>
                                 </div>
                                 <div className='flex-1'>
                                     <label htmlFor='bulkQuantity' className='block mb-2'>
-                                        Bulk Quantity
+                                        Đồng Bộ Số Lượng
                                     </label>
                                     <div className='flex gap-2'>
                                         <InputNumber
@@ -657,7 +657,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             min={0}
                                             max={1000000}
                                         />
-                                        <Button onClick={() => applyBulkUpdate('quantity')} label='Apply' />
+                                        <Button onClick={() => applyBulkUpdate('quantity')} label='Áp Dụng' />
                                     </div>
                                 </div>
                             </div>
@@ -770,7 +770,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     disabled={!!(combinedRows.length === 0 || nameError || categoryError || manufactureError)}
                     onClick={handleAddProduct}
                 >
-                    Add New
+                    Thêm Mới
                 </Button>
             </div>
         </div>

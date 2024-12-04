@@ -27,8 +27,8 @@ const emptyCustomer: Customer = {
 }
 const domains = ['@gmail.com', '@yahoo.com', '@outlook.com', '@hotmail.com']
 const genders = [
-    { name: 'Male', key: '0' },
-    { name: 'Female', key: '1' }
+    { name: 'Nam', key: '0' },
+    { name: 'Nữ', key: '1' }
 ]
 
 const CustomerForm = ({ roles }: FormProps) => {
@@ -48,8 +48,8 @@ const CustomerForm = ({ roles }: FormProps) => {
             await customerService.create(customer)
             toast.current?.show({
                 severity: 'success',
-                summary: 'Successful',
-                detail: 'Customer Created',
+                summary: 'Thành công',
+                detail: 'Khách hàng đã được tạo',
                 life: 3000
             })
             router.push('/admin/customers')
@@ -62,7 +62,7 @@ const CustomerForm = ({ roles }: FormProps) => {
             <div className='flex'>
                 <div className='col-12 md:col-8'>
                     <div className='card'>
-                        <h4>Add customer</h4>
+                        <h4>Thêm Khách Hàng</h4>
                         <div className='field'>
                             <label htmlFor='email' className='font-medium w-full'>
                                 Email <RequiredIcon />
@@ -77,15 +77,15 @@ const CustomerForm = ({ roles }: FormProps) => {
                                 required
                                 autoFocus
                                 onChange={(e) => setCustomer({ ...customer, email: e.value })}
-                                placeholder='Enter your email'
+                                placeholder='Nhập email của bạn'
                                 className={classNames({ 'p-invalid': submitted && !customer.email }, 'w-full')}
                             />
-                            {submitted && !customer.email && <small className='p-error'>Email is required.</small>}
+                            {submitted && !customer.email && <small className='p-error'>Email là bắt buộc.</small>}
                         </div>
                         <div className='flex flex-wrap'>
                             <div className='field'>
                                 <label htmlFor='firstName' className='font-medium w-full'>
-                                    First name <RequiredIcon />
+                                    Tên Khách Hàng <RequiredIcon />
                                 </label>
                                 <InputText
                                     id='firstName'
@@ -95,12 +95,12 @@ const CustomerForm = ({ roles }: FormProps) => {
                                     className={classNames({ 'p-invalid': submitted && !customer.firstName })}
                                 />
                                 {submitted && !customer.firstName && (
-                                    <small className='p-error block'>First name is required.</small>
+                                    <small className='p-error block'>Tên khách hàng là bắt buộc.</small>
                                 )}
                             </div>
                             <div className='field'>
                                 <label htmlFor='lastName' className='font-medium w-full'>
-                                    Last name <RequiredIcon />
+                                    Họ Khách Hàng <RequiredIcon />
                                 </label>
                                 <InputText
                                     id='lastName'
@@ -110,14 +110,14 @@ const CustomerForm = ({ roles }: FormProps) => {
                                     className={classNames({ 'p-invalid': submitted && !customer.lastName })}
                                 />
                                 {submitted && !customer.lastName && (
-                                    <small className='p-error block'>Last name is required.</small>
+                                    <small className='p-error block'>Họ khách hàng là bắt buộc.</small>
                                 )}
                             </div>
                         </div>
                         <div className='flex flex-wrap'>
                             <div className='field'>
                                 <label htmlFor='dob' className='font-medium w-full'>
-                                    Date of birth <RequiredIcon />
+                                    Ngày Sinh <RequiredIcon />
                                 </label>
                                 <Calendar
                                     inputId='dob'
@@ -131,16 +131,16 @@ const CustomerForm = ({ roles }: FormProps) => {
                                     })}
                                 />
                                 {submitted && !customer.dateOfBirth && (
-                                    <small className='p-error block'>Date of birth is required.</small>
+                                    <small className='p-error block'>Ngày sinh là bắt buộc.</small>
                                 )}
                                 {submitted && customer.dateOfBirth && customer.dateOfBirth > new Date() && (
-                                    <small className='p-error block'>Date of birth cannot be in the future.</small>
+                                    <small className='p-error block'>Ngày sinh không được là ngày ở tương lai.</small>
                                 )}
                             </div>
                             <div className='field'>
                                 <div className='flex flex-wrap gap-3'>
                                     <label htmlFor='name' className='font-medium w-full'>
-                                        Gender
+                                        Giới Tính
                                     </label>
                                     {genders.map((gender) => {
                                         return (
@@ -165,10 +165,10 @@ const CustomerForm = ({ roles }: FormProps) => {
                 </div>
                 <div className='col-12 md:col-4'>
                     <div className='card'>
-                        <div className='text-xl font-medium mb-6'>Role</div>
+                        <div className='text-xl font-medium mb-6'>Vai Trò</div>
                         <div className='field'>
                             <label htmlFor='roleName' className='font-medium w-full'>
-                                Role name <RequiredIcon />
+                                Tên Vai Trò <RequiredIcon />
                             </label>
                             <Dropdown
                                 inputId='roleName'
@@ -177,21 +177,21 @@ const CustomerForm = ({ roles }: FormProps) => {
                                 options={roles}
                                 optionLabel='name'
                                 style={{ width: '100%' }}
-                                placeholder='Select a role'
+                                placeholder='Chọn một vai trò'
                                 className={classNames(
                                     { 'p-invalid': submitted && customer.customerRoles.length < 1 },
                                     'md:w-full'
                                 )}
                             />
                             {submitted && customer.customerRoles.length < 1 && (
-                                <small className='p-error block'>Customer Role is required.</small>
+                                <small className='p-error block'>Vai trò của khách hàng là bắt buộc.</small>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
             <div className='mt-3'>
-                <Button label='Submit' onClick={() => saveCustomer()} />
+                <Button label='Nộp' onClick={() => saveCustomer()} />
             </div>
         </>
     )

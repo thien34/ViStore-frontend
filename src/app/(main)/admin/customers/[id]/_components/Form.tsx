@@ -28,13 +28,13 @@ interface FormProps {
 }
 
 const genders = [
-    { name: 'Male', key: '0' },
-    { name: 'Female', key: '1' }
+    { name: 'Nam', key: '0' },
+    { name: 'Nữ', key: '1' }
 ]
 
 const activities = [
-    { name: 'Active', key: true },
-    { name: 'Inactive', key: false }
+    { name: 'Hoạt động', key: true },
+    { name: 'Ngừng hoạt động', key: false }
 ]
 
 const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId }: FormProps) => {
@@ -67,8 +67,8 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
             await customerService.update(customerId, customer)
             toast.current?.show({
                 severity: 'success',
-                summary: 'Successful',
-                detail: 'Customer Updated',
+                summary: 'Thành công',
+                detail: 'Khách hàng đã được cập nhật',
                 life: 3000
             })
             router.push('/admin/customers')
@@ -77,13 +77,13 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
 
     const header = (
         <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
-            <h5 className='m-0'>Manage Address</h5>
+            <h5 className='m-0'>Quản Lý Địa Chỉ</h5>
             <span className='block mt-2 md:mt-0 p-input-icon-left'>
                 <i className='pi pi-search' />
                 <InputText
                     type='search'
                     onInput={(e) => setGlobalFilter(e.currentTarget.value)}
-                    placeholder='Search...'
+                    placeholder='Tìm kiếm...'
                 />
             </span>
         </div>
@@ -116,7 +116,7 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
             <div className='flex gap-x-4'>
                 <div className='w-2/3'>
                     <div className='card h-full'>
-                        <h4>Update Customer</h4>
+                        <h4>Cập Nhật Khách Hàng</h4>
                         <div className='field'>
                             <label htmlFor='email' className='font-medium w-full'>
                                 Email
@@ -130,12 +130,12 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                                 onChange={(e) => setCustomer({ ...customer, email: e.value })}
                                 className={'w-full'}
                             />
-                            <small className='p-info'>Email cannot be updated.</small>
+                            <small className='p-info'>Email không thể cập nhật.</small>
                         </div>
                         <div className='flex flex-wrap'>
                             <div className='field'>
                                 <label htmlFor='firstName' className='font-medium w-full'>
-                                    First name <RequiredIcon />
+                                    Tên Khách Hàng <RequiredIcon />
                                 </label>
                                 <InputText
                                     id='firstName'
@@ -145,12 +145,12 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                                     className={classNames({ 'p-invalid': submitted && !customer.firstName })}
                                 />
                                 {submitted && !customer.firstName && (
-                                    <small className='p-error block'>First name is required.</small>
+                                    <small className='p-error block'>Tên khách hàng là bắt buộc.</small>
                                 )}
                             </div>
                             <div className='field'>
                                 <label htmlFor='lastName' className='font-medium w-full'>
-                                    Last name <RequiredIcon />
+                                    Họ Khách Hàng <RequiredIcon />
                                 </label>
                                 <InputText
                                     id='lastName'
@@ -160,14 +160,14 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                                     className={classNames({ 'p-invalid': submitted && !customer.lastName })}
                                 />
                                 {submitted && !customer.lastName && (
-                                    <small className='p-error block'>Last name is required.</small>
+                                    <small className='p-error block'>Họ khách hàng là bắt buộc.</small>
                                 )}
                             </div>
                         </div>
                         <div className='flex flex-wrap'>
                             <div className='field'>
                                 <label htmlFor='dob' className='font-medium w-full'>
-                                    Date of birth
+                                    Ngày sinh
                                 </label>
                                 <Calendar
                                     inputId='dob'
@@ -177,13 +177,13 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                                     className={classNames({ 'p-invalid': submitted && !customer.dateOfBirth })}
                                 />
                                 {submitted && !customer.dateOfBirth && (
-                                    <small className='p-error block'>Date of birth is required.</small>
+                                    <small className='p-error block'>Ngày sinh là bắt buộc.</small>
                                 )}
                             </div>
                             <div className='field'>
-                                <div className='flex flex-wrap gap-3'>
+                                <div className='field flex flex-wrap gap-3'>
                                     <label htmlFor='name' className='font-medium w-full'>
-                                        Gender
+                                        Giới Tính
                                     </label>
                                     {genders.map((gender) => {
                                         return (
@@ -208,7 +208,7 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                 </div>
                 <div className='w-1/3'>
                     <div className='card mb-4'>
-                        <div className='text-xl font-medium mb-6'>Role</div>
+                        <div className='text-xl font-medium mb-6'>Vai Trò</div>
                         <div className='field'>
                             <Dropdown
                                 value={roles.find((role) => role.id === customer.customerRoles[0])}
@@ -219,12 +219,12 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                             />
                             <div className='flex items-center gap-x-1 mt-2'>
                                 <i className='pi pi-exclamation-circle'></i>
-                                <small className='p-info'>The role determines the customer&apos;s permissions.</small>
+                                <small className='p-info'>Vai trò này quyết định quyền hạn của khách hàng</small>
                             </div>
                         </div>
                     </div>
                     <div className='card'>
-                        <div className='text-xl font-medium mb-6'>Activity</div>
+                        <div className='text-xl font-medium mb-6'>Trạng Thái</div>
                         <div className='field'>
                             <Dropdown
                                 value={activities.find((active) => active.key === customer.active)}
@@ -235,7 +235,7 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                             />
                             <div className='flex items-center gap-x-1 mt-2'>
                                 <i className='pi pi-exclamation-circle'></i>
-                                <small className='p-info'>User&apos;s account status.</small>
+                                <small className='p-info'>Trạng thái tài khoản của người dùng.</small>
                             </div>
                         </div>
                     </div>
@@ -243,8 +243,8 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
             </div>
             <div className='card mt-2'>
                 <div className='flex justify-content-between align-items-center mb-6'>
-                    <div className='text-xl font-medium'>Addresses</div>
-                    <Button label='Add new address' onClick={() => openAddressDialog(null)} />
+                    <div className='text-xl font-medium'>Địa chỉ</div>
+                    <Button label='Thêm địa chỉ mới' onClick={() => openAddressDialog(null)} />
                 </div>
                 <DataTable
                     ref={dt}
@@ -259,9 +259,9 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} addresses'
+                    currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} địa chỉ'
                     globalFilter={globalFilter}
-                    emptyMessage='No addresses found.'
+                    emptyMessage='Không tìm thấy địa chỉ nào'
                     header={header}
                 >
                     <Column
@@ -272,13 +272,13 @@ const CustomerForm = ({ roles, initialData, initAddresses, provinces, customerId
                     />
                     <Column
                         field='name'
-                        header='Name'
+                        header='Tên'
                         body={(rowData: AddressesResponse) => `${rowData.firstName} ${rowData.lastName}`}
                         sortable
                     />
                     <Column field='email' header='Email' sortable />
-                    <Column field='phoneNumber' header='Phone number' sortable />
-                    <Column field='addressDetail' header='Address' sortable />
+                    <Column field='phoneNumber' header='Số Điện Thoại' sortable />
+                    <Column field='addressDetail' header='Địa Chỉ' sortable />
                     <Column body={actionBodyTemplate}></Column>
                 </DataTable>
             </div>

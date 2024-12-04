@@ -60,8 +60,8 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
         )
         toast.current?.show({
             severity: 'success',
-            summary: 'Success',
-            detail: 'Product updated successfully',
+            summary: 'Thành công',
+            detail: 'Sản phẩm đã được cập nhật thành công',
             life: 3000
         })
 
@@ -71,96 +71,96 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
     return (
         <div className='card'>
             <Toast ref={toast} />
-            <h4>Edit Product</h4>
+            <h4>Cập Nhật Sản Phẩm</h4>
             <div className='flex flex-column gap-4'>
                 <div className='flex flex-row gap-4'>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='productName'>
-                            Product Name <RequiredIcon />
+                            Tên Sản Phẩm <RequiredIcon />
                         </label>
                         <InputText
-                            tooltip='Enter the name of the product'
+                            tooltip='Nhập tên sản phẩm'
                             tooltipOptions={{ position: 'bottom' }}
                             id='productName'
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder='Enter product name'
+                            placeholder='Nhập tên sản phẩm'
                             className={classNames({ 'p-invalid': submitted && !name })}
                         />
-                        {submitted && !name && <small className='p-error'>Name is required.</small>}
+                        {submitted && !name && <small className='p-error'>Tên sản phẩm là bắt buộc.</small>}
                     </div>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='weight'>
-                            Weight <RequiredIcon />
+                            Trọng Lượng <RequiredIcon />
                         </label>
                         <InputNumber
                             inputId='weight'
                             value={weight}
                             onValueChange={(e) => setWeight(e.value || 0)}
-                            placeholder='Enter weight'
+                            placeholder='Nhập trọng lượng'
                             mode='decimal'
                             showButtons
                             min={0}
                             suffix='g'
-                            tooltip='Enter the weight of the product in grams'
+                            tooltip='Nhập trọng lượng của sản phẩm tính bằng grams'
                             tooltipOptions={{ position: 'bottom' }}
                             className={classNames({ 'p-invalid': submitted && !weight })}
                         />
-                        {submitted && !weight && <small className='p-error'>Weight is required.</small>}
+                        {submitted && !weight && <small className='p-error'>Trọng lượng là bắt buộc.</small>}
                     </div>
                 </div>
 
                 <div className='flex flex-row gap-4 align-items-center'>
                     <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='category'>Categories</label>
+                        <label htmlFor='category'>Danh Mục</label>
                         <Dropdown
                             inputId='category'
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.value)}
                             options={categories}
-                            placeholder='Select a category'
+                            placeholder='Chọn một danh mục'
                             optionLabel='name'
-                            tooltip='Select the category for the product'
+                            tooltip='Chọn một danh mục cho sản phẩm'
                             tooltipOptions={{ position: 'bottom' }}
                             className={classNames({ 'p-invalid': submitted && !selectedCategory })}
                         />
-                        {submitted && !selectedCategory && <small className='p-error'>Category is required.</small>}
+                        {submitted && !selectedCategory && <small className='p-error'>Danh mục là bắt buộc.</small>}
                     </div>
                     <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='brand'>Manufactures</label>
+                        <label htmlFor='brand'>Nhà Sản Xuất</label>
                         <Dropdown
                             inputId='brand'
                             value={selectedManufacture}
                             onChange={(e) => setSelectedManufacture(e.value)}
                             options={manufacturers}
-                            placeholder='Select a manufacture'
+                            placeholder='Chọn một nhà sản xuất'
                             optionLabel='manufacturerName'
-                            tooltip='Select the manufacturer of the product'
+                            tooltip='Chọn một nhà sản xuất cho sản phẩm'
                             tooltipOptions={{ position: 'bottom' }}
                             className={classNames({ 'p-invalid': submitted && !selectedManufacture })}
                         />
                         {submitted && !selectedManufacture && (
-                            <small className='p-error'>Manufacturer is required.</small>
+                            <small className='p-error'>Nhà sản xuất là bắt buộc.</small>
                         )}
                     </div>
                 </div>
 
                 <div className='flex flex-row gap-4 align-items-center'>
                     <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='description'>Description</label>
+                        <label htmlFor='description'>Mô Tả</label>
                         <Editor
                             id='description'
                             value={text}
                             onTextChange={(e) => setText(e.htmlValue || '')}
                             style={{ height: '100px', width: '100%' }}
-                            placeholder='Enter product description'
+                            placeholder='Nhập mô tả cho sản phẩm'
                         />
                     </div>
                 </div>
 
                 <div>
                     <Link href={`/admin/products/product-add/${product.id}`}>
-                        <Button label='Add Product Details' className='float-right' />
+                        <Button label='Thêm chi tiết sản phẩm' className='float-right' />
                     </Link>
                 </div>
                 <DataTable
@@ -170,19 +170,19 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
                     rows={5}
                     rowsPerPageOptions={[5, 10, 25, 50, 100, 200, 500, 1000]}
                     paginatorTemplate='RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink'
-                    currentPageReportTemplate='{first} to {last} of {totalRecords}'
+                    currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} sản phẩm'
                 >
                     <Column
                         field=''
-                        header='STT'
+                        header='#'
                         body={(rowData, options: { rowIndex: number }) => options.rowIndex + 1}
                     ></Column>
                     <Column field='sku' header='SKU'></Column>
-                    <Column field='name' header='Name'></Column>
-                    <Column field='quantity' header='Quantity'></Column>
-                    <Column field='price' header='Price'></Column>
+                    <Column field='name' header='Tên Sản Phẩm'></Column>
+                    <Column field='quantity' header='Số Lượng'></Column>
+                    <Column field='price' header='Giá'></Column>
                     <Column
-                        header='Image'
+                        header='Hình Ảnh'
                         body={(rowData) => (
                             <Image
                                 src={rowData.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
@@ -193,16 +193,16 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
                         )}
                     />
                     <Column
-                        header='Action'
+                        header='Thao Tác'
                         body={(rowData) => (
                             <Link href={`/admin/products/details/${rowData.id}`}>
-                                <Button>Edit</Button>
+                                <Button>Chỉnh sửa</Button>
                             </Link>
                         )}
                     ></Column>
                 </DataTable>
 
-                <Button label='Save' onClick={handleSave} />
+                <Button label='Lưu' onClick={handleSave} />
             </div>
         </div>
     )

@@ -66,7 +66,7 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                 <div className={cn('flex w-full gap-x-4 flex-1', className)}>
                     <div className='field w-1/3'>
                         <label htmlFor='province' className='font-medium block'>
-                            Province
+                            Tỉnh
                         </label>
                         <Dropdown
                             value={provinces.find((province) => province.code === address.provinceId)}
@@ -85,17 +85,17 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                             }}
                             options={provinces}
                             optionLabel='name'
-                            placeholder='Select a Province'
+                            placeholder='Chọn tỉnh'
                             filter
                             className={(classNames({ 'p-invalid': submitted && !address.provinceId }), 'w-full')}
                         />
                         {submitted && !address.provinceId && (
-                            <small className='p-error block'>Province is required.</small>
+                            <small className='p-error block'>Tỉnh là bắt buộc.</small>
                         )}
                     </div>
                     <div className='field w-1/3'>
                         <label htmlFor='district' className='font-medium block'>
-                            District
+                            Quận
                         </label>
                         <Dropdown
                             value={districts.find((district) => district.code === address.districtId)}
@@ -110,18 +110,18 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                             }}
                             options={districts}
                             optionLabel='name'
-                            placeholder='Select a District'
+                            placeholder='Chọn quận'
                             filter
                             disabled={!address.provinceId}
                             className={(classNames({ 'p-invalid': submitted && !address.districtId }), 'w-full')}
                         />
                         {submitted && !address.districtId && (
-                            <small className='p-error block'>District is required.</small>
+                            <small className='p-error block'>Quận là bắt buộc.</small>
                         )}
                     </div>
                     <div className='field w-1/3'>
                         <label htmlFor='ward' className='font-medium block'>
-                            Ward
+                            Phường
                         </label>
                         <Dropdown
                             value={wards.find((ward) => ward.code === address.wardId)}
@@ -135,7 +135,7 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                             }}
                             options={wards}
                             optionLabel='name'
-                            placeholder='Select a Ward'
+                            placeholder='Chọn phường'
                             filter
                             disabled={!address.districtId}
                             className={(classNames({ 'p-invalid': submitted && !address.wardId }), 'w-full')}
