@@ -94,7 +94,11 @@ export interface OrderResponse {
 
 export interface OrderFilter {
     name?: string
-    paymentMode?: number
-    startDate?: string
-    endDate?: string
+    paymentMode?: number,
+    status?: string,
+    startAmount?: number,
+    endAmount?: number,
+    paymentStatus?: number,
+    startDate?: Date
+    endDate?: Date
 }
