@@ -21,7 +21,6 @@ import { OrderRequest, PaymentMethodType, PaymentModeType, PaymentStatusType } f
 import { CartResponse } from '@/interface/cart.interface'
 import OrderService from '@/service/order.service'
 import { Voucher } from '@/interface/voucher.interface'
-
 import axios from 'axios'
 import { AutoComplete } from 'primereact/autocomplete'
 import VoucherSidebar from './VoucherSidebar'
@@ -60,7 +59,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         phoneNumber: ''
     })
     const [addressDetail, setAddressDetail] = useState<Address | null>(null)
-    const [addressDetailGenerated, setAddressDetailGenerated] = useState<string | ''>('')
     const [customerAddressDialogVisible, setCustomerAddressDialogVisible] = useState<boolean>(false)
     const [addresses, setAddresses] = useState<AddressesResponse[]>([])
     const [selectedAddress, setSelectedAddress] = useState<AddressesResponse | null>(null)
@@ -206,7 +204,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                           firstName: address.firstName,
                           lastName: address.lastName,
                           email: address.email,
-                          addressName: addressDetailGenerated,
+                          addressName: addressDetail?.address || '',
                           provinceId: addressDetail?.provinceId || '',
                           districtId: addressDetail?.districtId || '',
                           wardId: addressDetail?.wardId || '',
@@ -225,7 +223,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 (address && !address.firstName) ||
                 (address && !address.lastName) ||
                 (address && !address.phoneNumber) ||
-                !addressDetailGenerated
+                (address && !address.addressDetail)
             ) {
                 toast.current?.show({
                     severity: 'error',
@@ -276,13 +274,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
 
     const fetchAddress = async () => {
         if (!customer?.id) return
-        const {
-            payload: { items }
-        } = await addressService.getAll(customer.id)
-        setAddress(items[0] || null)
-        if (items[0]?.id) {
-            getAddress(items[0].id)
-            setAddressDetailGenerated(items[0].addressDetail)
+        const { payload: items } = await addressService.getAll(customer.id)
+        setAddress(items.items[0])
+        if (items.items[0]?.id) {
+            getAddress(items.items[0].id)
         }
     }
 
@@ -292,8 +287,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             provinceId: payload.provinceId,
             districtId: payload.districtId,
             wardId: payload.wardId,
-            province: '',
-            district: '',
             address: payload.addressName
         }
         setAddress((prev) => ({
@@ -331,7 +324,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         setCustomerAddressDialogVisible(false)
         if (address.id) {
             getAddress(address.id)
-            setAddressDetailGenerated(address.addressDetail)
         }
     }
 
@@ -388,7 +380,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                   firstName: address.firstName,
                                   lastName: address.lastName,
                                   email: address.email,
-                                  addressName: addressDetailGenerated,
+                                  addressName: addressDetail?.address || '',
                                   provinceId: addressDetail?.provinceId || '',
                                   districtId: addressDetail?.districtId || '',
                                   wardId: addressDetail?.wardId || '',
@@ -436,7 +428,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         addressDetail: ''
                     })
                     setAddressDetail(null)
-                    setAddressDetailGenerated('')
                 }
             })
         }
@@ -585,8 +576,12 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                         Địa Chỉ Chi Tiết
                                     </label>
                                     <InputText
-                                        onChange={(e) => setAddressDetailGenerated(e.target.value)}
-                                        value={addressDetailGenerated || ''}
+                                        onChange={(e) =>
+                                            setAddressDetail((prev) =>
+                                                prev ? { ...prev, address: e.target.value } : null
+                                            )
+                                        }
+                                        value={addressDetail?.address || ''}
                                         id='addressName'
                                         className='w-full'
                                     />
@@ -746,7 +741,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     </dl>
                                     <dl className='flex items-center justify-between gap-4 py-3'>
                                         <dt className='text-base font-normal flex items-center gap-2 text-gray-500 dark:text-gray-400'>
-                                            Thanh toán của khách hàng{' '}
+                                            Thanh toán của khách hàng
                                             <FaIdCard
                                                 className='text-primary-700 text-5xl cursor-pointer'
                                                 onClick={handlePayment}
