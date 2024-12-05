@@ -25,14 +25,14 @@ interface UploadedImage {
 }
 
 const reasons = [
-    'Product damaged, but shipping box OK',
-    'Missing parts of accessories',
-    'Both product and shipping box damaged',
-    'Wrong item was sent',
+    'Sản phẩm bị hư hỏng nhưng hộp vận chuyển vẫn ổn',
+    'Thiếu phụ kiện',
+    'Cả sản phẩm và hộp vận chuyển đều bị hư hỏng\'',
+    'Đã gửi sai mặt hàng',
 ]
 const returnActionOptions = [
-    { label: 'REFUND', value: 'Requesting refund' },
-    { label: 'EXCHANGE', value: 'Requesting exchange' },
+    { label: 'REFUND', value: 'Yêu cầu hoàn tiền' },
+    { label: 'EXCHANGE', value: 'Yêu cầu trả hàng' },
 ];
 const ModalReturnProduct: React.FC<ReturnProductProps> = ({ initialData, onSelectedOrderItems, submitReturnRequest, orderId, customerId }) => {
     const [returnItems, setReturnItems] = useState<ReturnItemRequest[]>([])
@@ -133,7 +133,7 @@ const ModalReturnProduct: React.FC<ReturnProductProps> = ({ initialData, onSelec
         return (
             <>
                 <div className="flex items-center gap-5 mt-4" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <label className="w-auto  font-bold" htmlFor="requestAction">Request Action</label>
+                    <label className="w-auto  font-bold" htmlFor="requestAction">Yêu Cầu Hành Động</label>
                     <SelectButton
                         id="requestAction"
                         value={returnRequest.requestAction}
@@ -144,7 +144,7 @@ const ModalReturnProduct: React.FC<ReturnProductProps> = ({ initialData, onSelec
                 </div>
                 <div className="flex gap-5 mt-4">
                     <div className="flex-1 flex flex-col">
-                        <label className="font-bold" htmlFor="staffNotes">Staff Notes</label>
+                        <label className="font-bold" htmlFor="staffNotes">Ghi Chú Của Nhân Viên</label>
                         <InputTextarea
                             id="staffNotes"
                             value={returnRequest.staffNotes}
@@ -153,7 +153,7 @@ const ModalReturnProduct: React.FC<ReturnProductProps> = ({ initialData, onSelec
                         />
                     </div>
                     <div className="flex-1 flex flex-col">
-                        <label className="font-bold" htmlFor="customerComments">Customer Comments</label>
+                        <label className="font-bold" htmlFor="customerComments">Khách Hành Đánh Giá</label>
                         <InputTextarea
                             id="customerComments"
                             value={returnRequest.customerComments}
@@ -164,14 +164,14 @@ const ModalReturnProduct: React.FC<ReturnProductProps> = ({ initialData, onSelec
                 </div>
 
                 <div className="flex items-center gap-10 mt-4">
-                    <label className="font-bold" htmlFor="reasonForReturn">Reason</label>
+                    <label className="font-bold" htmlFor="reasonForReturn">Lý Do</label>
                     <Dropdown value={returnRequest.reasonForReturn} onChange={(e) => handleReturnRequestChange({ reasonForReturn: e.value })}
                         options={reasons}
-                        placeholder="Choose reason return" style={{ width: '100%' }} />
+                        placeholder="Chọn lý do trả hàng" style={{ width: '100%' }} />
                 </div>
 
                 <div className="flex items-center gap-10 mt-4 mb-4">
-                    <label className="font-bold" htmlFor="reasonForReturn">Total Refund:</label>
+                    <label className="font-bold" htmlFor="reasonForReturn"> Tổng Tiền Hoàn Lại: </label>
                     <label className="">${totalRefund}</label>
                 </div>
             </>
@@ -197,22 +197,22 @@ const ModalReturnProduct: React.FC<ReturnProductProps> = ({ initialData, onSelec
                 resizableColumns
                 showGridlines
             >
-                <Column field="productName" header="Name" />
+                <Column field="productName" header="Tên Sản Phẩm" />
                 <Column header="Quantity"
                     body={bodyQuantity} />
-                <Column field="productPrice" header="Price" />
-                <Column header="Discount Per Item" body={(rowData: OrderItemInfoResponse) =>
+                <Column field="productPrice" header="Giá" />
+                <Column header="Giảm giá mỗi mặt hàng" body={(rowData: OrderItemInfoResponse) =>
                 (
                     <div>
                         ${rowData.discountAmount / rowData.quantity}
                     </div>
                 )
                 } />
-                <Column header="Actual Image"
+                <Column header="Ảnh Thực Tế"
                     body={bodyImage} />
             </DataTable>
             <div > {bodyReturn(returnRequest)}</div>
-            <Button label="Return" onClick={() => submitReturnRequest(mappedData, returnRequest)} />
+            <Button label="Trả Hàng" onClick={() => submitReturnRequest(mappedData, returnRequest)} />
         </>
     )
 }

@@ -20,18 +20,18 @@ const ListReturnItems = ({ initialData }: ReturnItemProps) => {
                 resizableColumns
                 showGridlines
                 paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                currentPageReportTemplate='Showing {first} to {last} of {totalRecords} Return Items'
-                emptyMessage='No Return Items found.'
+                currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} sản phẩm trả'
+                emptyMessage='Không tìm thấy mặt hàng trả lại.'
             >
                 <Column
-                    header="STT"
+                    header="#"
                     body={(rowData, options) => options.rowIndex + 1}
                 ></Column>
-                <Column field="productName" header="Product Name" />
-                <Column field="oldUnitPrice" header="Price" />
-                <Column field="quantity" header="Quantity" />
-                <Column field="discountAmountPerItem" header="Discount" />
-                <Column field="refundTotal" header="Refund Total" />
+                <Column field="productName" header="Tên Sản Phẩm" />
+                <Column field="oldUnitPrice" header="Giá" />
+                <Column field="quantity" header="Số Lượng" />
+                <Column field="discountAmountPerItem" header="Giảm Giá" />
+                <Column field="refundTotal" header="Tổng Đơn Trả" />
             </DataTable>
         </div>
     )

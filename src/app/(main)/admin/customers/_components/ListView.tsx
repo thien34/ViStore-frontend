@@ -29,17 +29,10 @@ const ListView = ({ initialData }: CustomerProps) => {
         return (
             <div className='flex flex-wrap gap-2'>
                 <Button
-                    label='New'
+                    label='Thêm Mới'
                     icon='pi pi-plus'
                     severity='success'
                     onClick={() => router.push('/admin/customers/add')}
-                />
-                <Button
-                    label='Delete'
-                    icon='pi pi-trash'
-                    severity='danger'
-                    // onClick={confirmDeleteSelected}
-                    disabled={!selectedCustomers || !Array.isArray(selectedCustomers) || !selectedCustomers.length}
                 />
             </div>
         )
@@ -52,10 +45,10 @@ const ListView = ({ initialData }: CustomerProps) => {
                     mode='basic'
                     accept='image/*'
                     maxFileSize={1000000}
-                    chooseLabel='Import'
+                    chooseLabel='Nhập File'
                     className='mr-2 inline-block'
                 />
-                <Button label='Export' icon='pi pi-upload' severity='help' onClick={exportCSV} />
+                <Button label='Xuất File' icon='pi pi-upload' severity='help' onClick={exportCSV} />
             </>
         )
     }
@@ -83,13 +76,13 @@ const ListView = ({ initialData }: CustomerProps) => {
 
     const header = (
         <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
-            <h5 className='m-0'>Manage Customers</h5>
+            <h5 className='m-0'>Quản Lý Khách Hàng</h5>
             <span className='block mt-2 md:mt-0 p-input-icon-left'>
                 <i className='pi pi-search' />
                 <InputText
                     type='search'
                     onInput={(e) => setGlobalFilter(e.currentTarget.value)}
-                    placeholder='Search...'
+                    placeholder='Tìm kiếm...'
                 />
             </span>
         </div>
@@ -113,9 +106,9 @@ const ListView = ({ initialData }: CustomerProps) => {
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} customers'
+                    currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} khách hàng'
                     globalFilter={globalFilter}
-                    emptyMessage='No customers found.'
+                    emptyMessage='Không tìm thấy khách hàng nào'
                     header={header}
                 >
                     <Column
@@ -127,13 +120,13 @@ const ListView = ({ initialData }: CustomerProps) => {
                     <Column field='email' header='Email' sortable />
                     <Column
                         field='name'
-                        header='Name'
+                        header='Tên Khách Hàng'
                         body={(rowData: Customer) => `${rowData.firstName} ${rowData.lastName}`}
                         sortable
                     />
-                    <Column field='customerRoles' header='Customer roles' sortable />
-                    <Column field='active' header='Active' sortable />
-                    <Column body={actionBodyTemplate}></Column>
+                    <Column field='customerRoles' header='Vai Trò' sortable />
+                    <Column field='active' header='Trạng Thái' sortable />
+                    <Column header='Thao Tác' body={actionBodyTemplate}></Column>
                 </DataTable>
             </div>
         </>

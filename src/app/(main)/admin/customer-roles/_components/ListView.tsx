@@ -65,16 +65,16 @@ const ListView = ({ initialData }: RoleProps) => {
                 await roleService.create(role)
                 toast.current?.show({
                     severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Role Created',
+                    summary: 'Thành công',
+                    detail: 'Vai trò đã được tạo.',
                     life: 3000
                 })
             } else {
                 await roleService.update(role.id, role)
                 toast.current?.show({
                     severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Role Updated',
+                    summary: 'Thành công',
+                    detail: 'Vai trò đã được cập nhật.',
                     life: 3000
                 })
             }
@@ -86,14 +86,7 @@ const ListView = ({ initialData }: RoleProps) => {
     const leftToolbarTemplate = () => {
         return (
             <div className='flex flex-wrap gap-2'>
-                <Button label='New' icon='pi pi-plus' severity='success' onClick={openNew} />
-                <Button
-                    label='Delete'
-                    icon='pi pi-trash'
-                    severity='danger'
-                    // onClick={confirmDeleteSelected}
-                    disabled={!selectedRoles || !Array.isArray(selectedRoles) || !selectedRoles.length}
-                />
+                <Button label='Thêm Mới' icon='pi pi-plus' severity='success' onClick={openNew} />
             </div>
         )
     }
@@ -105,10 +98,10 @@ const ListView = ({ initialData }: RoleProps) => {
                     mode='basic'
                     accept='image/*'
                     maxFileSize={1000000}
-                    chooseLabel='Import'
+                    chooseLabel='Nhập File'
                     className='mr-2 inline-block'
                 />
-                <Button label='Export' icon='pi pi-upload' severity='help' onClick={exportCSV} />
+                <Button label='Xuất File' icon='pi pi-upload' severity='help' onClick={exportCSV} />
             </>
         )
     }
@@ -130,13 +123,13 @@ const ListView = ({ initialData }: RoleProps) => {
 
     const header = (
         <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
-            <h5 className='m-0'>Manage Roles</h5>
+            <h5 className='m-0'>Quản Lý Vai Trò</h5>
             <span className='block mt-2 md:mt-0 p-input-icon-left'>
                 <i className='pi pi-search' />
                 <InputText
                     type='search'
                     onInput={(e) => setGlobalFilter(e.currentTarget.value)}
-                    placeholder='Search...'
+                    placeholder='Tìm kiếm...'
                 />
             </span>
         </div>
@@ -144,8 +137,8 @@ const ListView = ({ initialData }: RoleProps) => {
 
     const roleDialogFooter = (
         <>
-            <Button label='Cancel' icon='pi pi-times' outlined onClick={hideDialog} />
-            <Button label='Save' icon='pi pi-check' onClick={saveRole} />
+            <Button label='Hủy' icon='pi pi-times' outlined onClick={hideDialog} />
+            <Button label='Lưu' icon='pi pi-check' onClick={saveRole} />
         </>
     )
 
@@ -167,9 +160,9 @@ const ListView = ({ initialData }: RoleProps) => {
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} roles'
+                    currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} vai trò'
                     globalFilter={globalFilter}
-                    emptyMessage='No roles found.'
+                    emptyMessage='Không tìm thấy vai trò nào.'
                     header={header}
                 >
                     <Column
@@ -180,14 +173,15 @@ const ListView = ({ initialData }: RoleProps) => {
                     ></Column>
                     <Column
                         field='name'
-                        header='Name'
+                        header='Tên Vai Trò'
                         sortable
                         headerStyle={{
                             minWidth: '4rem'
                         }}
                     />
-                    <Column field='active' header='Active' />
+                    <Column field='active' header='Đang Hoạt Động' />
                     <Column
+                        header='Thao Tác'
                         body={actionBodyTemplate}
                         style={{
                             maxWidth: '30px'
@@ -198,7 +192,7 @@ const ListView = ({ initialData }: RoleProps) => {
             <Dialog
                 visible={roleDialog}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                header='Role Details'
+                header='Chi Tiết Vai Trò'
                 style={{ width: '30vw' }}
                 modal
                 className='p-fluid'
@@ -207,21 +201,22 @@ const ListView = ({ initialData }: RoleProps) => {
             >
                 <div className='field'>
                     <label htmlFor='name' className='font-bold'>
-                        Name <RequiredIcon />
+                        Tên Vai Trò <RequiredIcon />
                     </label>
                     <InputText
                         id='name'
                         value={role.name}
+                        placeholder='Nhập tên vai trò'
                         onChange={(e) => setRole({ ...role, name: e.target.value })}
                         required
                         autoFocus
                         className={classNames({ 'p-invalid': submitted && !role.name })}
                     />
-                    {submitted && !role.name && <small className='p-error'>Name is required.</small>}
+                    {submitted && !role.name && <small className='p-error'>Tên vai trò là bắt buộc.</small>}
                 </div>
                 <div className='field flex items-center gap-3'>
                     <label htmlFor='active' className='font-bold'>
-                        Active
+                        Đang Hoạt Động
                     </label>
                     <InputSwitch
                         id='active'

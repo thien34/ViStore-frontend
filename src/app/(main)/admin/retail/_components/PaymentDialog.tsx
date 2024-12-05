@@ -28,7 +28,7 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Amount paid cannot be less than the total amount',
+                detail: 'Số tiền thanh toán không được nhỏ hơn tổng số tiền',
                 life: 3000
             })
             return
@@ -37,7 +37,7 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
         toast.current?.show({
             severity: 'success',
             summary: 'Success',
-            detail: 'Payment saved successfully',
+            detail: 'Đã lưu thanh toán thành công',
             life: 3000
         })
         setTimeout(() => {
@@ -50,7 +50,7 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
 
     return (
         <Dialog
-            header='Payment Summary'
+            header='Tóm tắt thanh toán'
             style={{ width: '40vw', marginLeft: '15vw' }}
             visible={visible}
             modal
@@ -60,33 +60,33 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
             <Toast ref={toast} />
             <div className='flex flex-col gap-4 px-4'>
                 <div className='flex justify-between items-center gap-2'>
-                    <div className='text-xl font-medium text-gray-900 dark:text-white'>Total Amount</div>
+                    <div className='text-xl font-medium text-gray-900 dark:text-white'>Tổng số tiền</div>
                     <div className='text-xl font-medium text-primary-700 dark:text-white'>${totalAmount}</div>
                 </div>
                 <div className='flex justify-center items-center gap-2'>
                     <ToggleButton
                         checked={checked == true}
                         onChange={(e) => setChecked(e.value)}
-                        className='text-xl font-medium text-black'
-                        onLabel='Cash'
-                        offLabel='Cash'
+                        className='text-xl font-medium text-black '
+                        onLabel='Tiền mặt'
+                        offLabel='Tiền mặt'
                         style={{ width: '100%' }}
                     />
                     <ToggleButton
                         checked={checked == false}
                         onChange={(e) => setChecked(!e.value)}
                         className='text-xl font-medium text-black'
-                        onLabel='Transfer'
-                        offLabel='Transfer'
+                        onLabel='Chuyển khoản'
+                        offLabel='Chuyển khoản'
                         style={{ width: '100%' }}
                     />
                 </div>
                 <div className='flex flex-col gap-1'>
                     <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>
-                        Amount Customer Paid
+                        Số tiền khách hàng đã thanh toán
                     </label>
                     <InputNumber
-                        placeholder='Enter Amount'
+                        placeholder='Nhập số tiền'
                         className='w-full'
                         value={amountPaidState}
                         min={0}
@@ -95,17 +95,17 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
                     />
                 </div>
                 <div className='flex justify-between items-center gap-2'>
-                    <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>Amount Remaining</label>
+                    <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>Tiền phải trả</label>
                     <div className='text-xl font-medium text-primary-700 dark:text-white'>${amountRemaining}</div>
                 </div>
                 <div className='flex justify-between items-center gap-2'>
                     <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>
-                        Excess Amount (Change)
+                        Tiền thừa
                     </label>
                     <div className='text-xl font-medium text-green-700 dark:text-white'>${amountExcess}</div>
                 </div>
                 <div className='flex justify-end items-center gap-2'>
-                    <Button label='Save' icon='pi pi-save' onClick={onSave} />
+                    <Button label='Lưu' icon='pi pi-save' onClick={onSave} />
                 </div>
             </div>
         </Dialog>

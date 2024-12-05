@@ -69,17 +69,17 @@ const VoucherSidebar = ({ visibleRight, setVisibleRight, handleApplyVoucher }: V
                         <div key={voucher.id} className='bg-white p-4 rounded-lg shadow-lg border border-gray-200'>
                             <h3 className='text-lg font-medium text-gray-800'>{voucher.name}</h3>
                             <p className='text-sm text-gray-600'>
-                                Discount code: <span className='font-bold text-black'>{voucher.couponCode}</span>
+                                Mã giảm giá: <span className='font-bold text-black'>{voucher.couponCode}</span>
                             </p>
                             <p className='text-sm text-gray-600'>
-                                Reduce:{' '}
+                                Giảm bớt:{' '}
                                 {voucher.discountAmount !== null
                                     ? `$${voucher.discountAmount}`
                                     : `${voucher.discountPercentage}%`}
                             </p>
-                            <p className='text-sm text-gray-600'>Applicable to orders from ${voucher.minOderAmount}</p>
+                            <p className='text-sm text-gray-600'>Áp dụng cho đơn hàng từ ${voucher.minOderAmount}</p>
                             {voucher.maxDiscountAmount && (
-                                <p className='text-sm text-gray-600'>Maximum reduction: ${voucher.maxDiscountAmount}</p>
+                                <p className='text-sm text-gray-600'>Giảm tối đa: ${voucher.maxDiscountAmount}</p>
                             )}
                             <div className='mt-4 flex justify-between items-center'>
                                 <button
@@ -130,7 +130,7 @@ const VoucherSidebar = ({ visibleRight, setVisibleRight, handleApplyVoucher }: V
                                                     <div>
                                                         <p className='font-semibold text-lg'>{selectedVoucher.name}</p>
                                                         <p className='text-sm'>
-                                                            Minimum Application ${selectedVoucher.minOderAmount}
+                                                            Áp dụng tối thiểu${selectedVoucher.minOderAmount}
                                                             .00
                                                         </p>
                                                     </div>
@@ -150,7 +150,7 @@ const VoucherSidebar = ({ visibleRight, setVisibleRight, handleApplyVoucher }: V
                                                                     (startDate.getTime() - now.getTime()) /
                                                                         (1000 * 60 * 60 * 24)
                                                                 )
-                                                                return `Take effect later ${timeUntilStart} days`
+                                                                return `Có hiệu lực sau ${timeUntilStart} ngày`
                                                             } else if (
                                                                 startDate &&
                                                                 endDate &&
@@ -161,9 +161,9 @@ const VoucherSidebar = ({ visibleRight, setVisibleRight, handleApplyVoucher }: V
                                                                     (endDate.getTime() - now.getTime()) /
                                                                         (1000 * 60 * 60 * 24)
                                                                 )
-                                                                return `Valid for ${timeUntilEnd} days`
+                                                                return `Hợp lệ cho ${timeUntilEnd} ngày`
                                                             } else {
-                                                                return 'Expired'
+                                                                return 'Hết hạn'
                                                             }
                                                         })()}
                                                     </span>
@@ -171,23 +171,23 @@ const VoucherSidebar = ({ visibleRight, setVisibleRight, handleApplyVoucher }: V
                                             </div>
                                             <div className='p-4'>
                                                 <div className='mb-4'>
-                                                    <p className='font-semibold text-gray-700'>Code expiration date</p>
+                                                    <p className='font-semibold text-gray-700'>Ngày hết hạn mã</p>
                                                     <p className='text-sm text-gray-600'>
                                                         {formatDate(selectedVoucher.startDateUtc)} -{' '}
                                                         {formatDate(selectedVoucher.endDateUtc)}
                                                     </p>
                                                 </div>
                                                 <div className='mb-4'>
-                                                    <p className='font-semibold text-gray-700'>Endow</p>
+                                                    <p className='font-semibold text-gray-700'>Cho</p>
                                                     <p className='text-sm text-gray-600'>
-                                                        Limited number of uses. Hurry up or miss out! Discount{' '}
+                                                        Số lượng sử dụng có hạn. Nhanh lên hoặc bỏ lỡ! Giảm giá{' '}
                                                         {selectedVoucher.discountPercentage ? (
                                                             <>
                                                                 {selectedVoucher.discountPercentage} %
                                                                 {selectedVoucher.maxDiscountAmount && (
                                                                     <>
                                                                         {' '}
-                                                                        - Maximum reduction $
+                                                                        - Giảm tối đa $
                                                                         {selectedVoucher.maxDiscountAmount}
                                                                     </>
                                                                 )}
@@ -195,34 +195,31 @@ const VoucherSidebar = ({ visibleRight, setVisibleRight, handleApplyVoucher }: V
                                                         ) : (
                                                             `$${selectedVoucher.discountAmount}`
                                                         )}{' '}
-                                                        Minimum Application ${selectedVoucher.minOderAmount}.
+                                                        Áp dụng tối thiểu ${selectedVoucher.minOderAmount}.
                                                     </p>
                                                 </div>
                                                 <div className='mb-4'>
                                                     <p className='font-semibold text-gray-700'>
-                                                        Applicable to products
+                                                        Áp dụng cho sản phẩm
                                                     </p>
                                                     <p className='text-sm text-gray-600'>
-                                                        Only applicable on App for certain products and certain users
-                                                        participating in certain promotions.
+                                                        Chỉ áp dụng trên Ứng dụng đối với một số sản phẩm nhất định và một số người dùng nhất định tham gia một số khuyến mãi nhất định.
                                                     </p>
                                                     <ul className='list-disc pl-5 text-sm text-gray-600'>
                                                         <li>
-                                                            Among the selected products, there are some products that
-                                                            are not allowed to run promotions according to the
-                                                            provisions of the law.
+                                                            Trong số các sản phẩm được lựa chọn, có một số sản phẩm không được phép chạy khuyến mại theo quy định của pháp luật.
                                                         </li>
                                                         {selectedVoucher.isPublished ? (
-                                                            <li>This product applies to all eligible orders.</li>
+                                                            <li>Sản phẩm của anh ấy áp dụng cho tất cả các đơn hàng đủ điều kiện.</li>
                                                         ) : (
-                                                            <li>This is a members exclusive product.</li>
+                                                            <li>Đây là sản phẩm độc quyền của thành viên.</li>
                                                         )}
                                                     </ul>
                                                 </div>
 
                                                 <div className='mb-4'>
-                                                    <p className='font-semibold text-gray-700'>Pay</p>
-                                                    <p className='text-sm text-gray-600'>All forms of payment</p>
+                                                    <p className='font-semibold text-gray-700'>Chi trả</p>
+                                                    <p className='text-sm text-gray-600'>Mọi hình thức thanh toán</p>
                                                 </div>
                                             </div>
 

@@ -54,7 +54,7 @@ export default function CustomerDialog({ visible, setVisible, setCustomer }: Pro
                 <InputText
                     type='search'
                     onInput={(e) => setGlobalFilter(e.currentTarget.value)}
-                    placeholder='Search...'
+                    placeholder='Tìm kiếm...'
                 />
             </span>
         </div>
@@ -63,7 +63,7 @@ export default function CustomerDialog({ visible, setVisible, setCustomer }: Pro
         <Dialog
             modal
             draggable={false}
-            header='Customers'
+            header='Khách Hàng'
             visible={visible}
             style={{ width: '70vw', marginLeft: '15vw' }}
             onHide={() => {
@@ -82,19 +82,19 @@ export default function CustomerDialog({ visible, setVisible, setCustomer }: Pro
                 rows={10}
                 rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                currentPageReportTemplate='Showing {first} to {last} of {totalRecords} customers'
+                currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} khách hàng'
                 globalFilter={globalFilter}
-                emptyMessage='No customers found.'
+                emptyMessage='Không tìm thấy khách hàng nào'
                 header={header}
             >
                 <Column field='email' header='Email' sortable />
                 <Column
                     field='name'
-                    header='Name'
+                    header='Tên Khách Hàng'
                     body={(rowData: Customer) => `${rowData.firstName} ${rowData.lastName}`}
                     sortable
                 />
-                <Column header='Action' className='text-center' body={actionBodyTemplate}></Column>
+                <Column header='Thao Tác' className='text-center' body={actionBodyTemplate}></Column>
             </DataTable>
         </Dialog>
     )
