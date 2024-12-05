@@ -4,8 +4,6 @@ import { InputNumber } from 'primereact/inputnumber'
 import { Toast } from 'primereact/toast'
 import { ToggleButton } from 'primereact/togglebutton'
 import { useMemo, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useLocalStorage } from 'primereact/hooks'
 
 type PaymentDialogProps = {
     visible: boolean
@@ -19,8 +17,6 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
     const [checked, setChecked] = useState(true)
     const toast = useRef<Toast>(null)
     const [amountPaidState, setAmountPaidState] = useState(0)
-    const router = useRouter()
-    const [, setAmountPaidLocal] = useLocalStorage<number>(0, 'amountPaid')
 
     const onHide = () => {
         setVisible(false)
@@ -49,12 +45,6 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
         }, 500)
     }
 
-    const onTransfer = () => {
-        setChecked(false)
-        setAmountPaidLocal(totalAmount)
-        router.push('/admin/checkout')
-    }
-
     const amountRemaining = useMemo(() => Math.max(0, totalAmount - amountPaidState), [totalAmount, amountPaidState])
     const amountExcess = useMemo(() => Math.max(0, amountPaidState - totalAmount), [totalAmount, amountPaidState])
 
@@ -75,7 +65,7 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
                 </div>
                 <div className='flex justify-center items-center gap-2'>
                     <ToggleButton
-                        checked={checked}
+                        checked={checked == true}
                         onChange={(e) => setChecked(e.value)}
                         className='text-xl font-medium text-black'
                         onLabel='Cash'
@@ -83,8 +73,8 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
                         style={{ width: '100%' }}
                     />
                     <ToggleButton
-                        checked={!checked}
-                        onChange={onTransfer}
+                        checked={checked == false}
+                        onChange={(e) => setChecked(!e.value)}
                         className='text-xl font-medium text-black'
                         onLabel='Transfer'
                         offLabel='Transfer'
