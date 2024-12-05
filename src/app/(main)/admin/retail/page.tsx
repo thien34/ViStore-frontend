@@ -191,8 +191,8 @@ export default function Retail() {
     return (
         <div className='card'>
             <div className='flex justify-between items-center'>
-                <h2 className=''>Retail Sales</h2>
-                <Button label='Create Bill' onClick={addTab} />
+                <h2 className=''>Bán Lẻ</h2>
+                <Button label='Tạo Hóa Đơn' onClick={addTab} />
             </div>
             {isLoading && (
                 <div className='spinner-container'>

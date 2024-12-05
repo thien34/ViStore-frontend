@@ -17,7 +17,7 @@ const QuantityDialog = ({ visible, setVisible, product, quantity, setQuantity, o
     return (
         <Dialog header={product?.name} visible={visible} style={{ width: '50vw' }} onHide={() => setVisible(false)}>
             <div>
-                <span className='text-lg font-semibold text-gray-600'>Quantity Available: {product?.quantity}</span>
+                <span className='text-lg font-semibold text-gray-600'>Số lượng có sẵn: {product?.quantity}</span>
                 {product?.attributes.map((attribute) => (
                     <div key={attribute.id} className='flex items-center gap-2 p-2 mb-2 rounded-lg bg-gray-50'>
                         <span className='font-semibold text-gray-700 min-w-[50px]'>{attribute.name}:</span>
@@ -40,7 +40,7 @@ const QuantityDialog = ({ visible, setVisible, product, quantity, setQuantity, o
                     />
                 </div>
                 <div className='flex justify-end mt-2'>
-                    <Button label='Save' onClick={onSave} />
+                    <Button label='Lưu' onClick={onSave} />
                 </div>
             </div>
         </Dialog>

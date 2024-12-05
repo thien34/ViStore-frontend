@@ -43,7 +43,7 @@ const ModalInput = ({ totalCost, value, onChange }: ModalInpuProps) => {
                 <InputText
                     value={initialValue.toString()}
                     onClick={() => setModalVisible(true)}
-                    placeholder="Click to enter value"
+                    placeholder="Click để nhập giá trị"
                     readOnly
                 />
             </div>
@@ -55,7 +55,7 @@ const ModalInput = ({ totalCost, value, onChange }: ModalInpuProps) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '15px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                         <label htmlFor="valueInput" style={{ fontSize: '14px', fontWeight: 'bold', color: '#555' }}>
-                            Return Fee
+                            Phí Trả Hàng
                         </label>
                         <InputText
                             id="valueInput"
@@ -67,13 +67,13 @@ const ModalInput = ({ totalCost, value, onChange }: ModalInpuProps) => {
                                     setSecondaryValue(inputValue ?? 0);
                                 }
                             }}
-                            placeholder="Enter value"
+                            placeholder="Nhập giá trị"
                             style={{ padding: '10px', fontSize: '14px', border: '1px solid #ddd', borderRadius: '5px' }}
                         />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <label htmlFor="unitSwitch" style={{ fontSize: '14px', color: '#555', margin: 0 }}>
-                            Use Percentage
+                            Sử Dụng Phần Trăm
                         </label>
                         <InputSwitch
                             id="unitSwitch"
@@ -83,8 +83,8 @@ const ModalInput = ({ totalCost, value, onChange }: ModalInpuProps) => {
                     </div>
                 </div>
                 <div className="flex justify-content-end" style={{ marginTop: '20px' }}>
-                    <Button label="Cancel" className="p-button-text" onClick={() => setModalVisible(false)} />
-                    <Button label="Confirm" onClick={handleConfirm} />
+                    <Button label="Hủy" className="p-button-text" onClick={() => setModalVisible(false)} />
+                    <Button label="Xác Nhận" onClick={handleConfirm} />
                 </div>
             </Dialog>
         </div>

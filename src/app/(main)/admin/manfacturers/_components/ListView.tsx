@@ -65,7 +65,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Successful',
-                    detail: 'Manufacturer Created',
+                    detail: 'Nhà sản xuất đã tạo thành công',
                     life: 3000
                 })
             } else {
@@ -73,7 +73,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Successful',
-                    detail: 'Manufacturer Updated',
+                    detail: 'Nhà sản xuất đã cập nhật thành công',
                     life: 3000
                 })
             }
@@ -86,15 +86,6 @@ const ListView = ({ initialData }: ManufacturerProps) => {
         return (
             <div className='flex flex-wrap gap-2'>
                 <Button label='New' icon='pi pi-plus' severity='success' onClick={openNew} />
-                <Button
-                    label='Delete'
-                    icon='pi pi-trash'
-                    severity='danger'
-                    // onClick={confirmDeleteSelected}
-                    disabled={
-                        !selectedManufacturers || !Array.isArray(selectedManufacturers) || !selectedManufacturers.length
-                    }
-                />
             </div>
         )
     }
@@ -106,10 +97,10 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     mode='basic'
                     accept='image/*'
                     maxFileSize={1000000}
-                    chooseLabel='Import'
+                    chooseLabel='Nhập File'
                     className='mr-2 inline-block'
                 />
-                <Button label='Export' icon='pi pi-upload' severity='help' onClick={exportCSV} />
+                <Button label='Xuất File' icon='pi pi-upload' severity='help' onClick={exportCSV} />
             </>
         )
     }
@@ -137,13 +128,13 @@ const ListView = ({ initialData }: ManufacturerProps) => {
 
     const header = (
         <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
-            <h5 className='m-0'>Manage Manufacturers</h5>
+            <h5 className='m-0'>Quản lý Nhà Sản Xuất</h5>
             <span className='block mt-2 md:mt-0 p-input-icon-left'>
                 <i className='pi pi-search' />
                 <InputText
                     type='search'
                     onInput={(e) => setGlobalFilter(e.currentTarget.value)}
-                    placeholder='Search...'
+                    placeholder='Tìm kiếm...'
                 />
             </span>
         </div>
@@ -151,8 +142,8 @@ const ListView = ({ initialData }: ManufacturerProps) => {
 
     const manufacturerDialogFooter = (
         <>
-            <Button label='Cancel' icon='pi pi-times' outlined onClick={hideDialog} />
-            <Button label='Save' icon='pi pi-check' onClick={saveManufacturer} />
+            <Button label='Hủy' icon='pi pi-times' outlined onClick={hideDialog} />
+            <Button label='Lưu' icon='pi pi-check' onClick={saveManufacturer} />
         </>
     )
 
@@ -174,9 +165,9 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} manfacturers'
+                    currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} nhà sản xuất'
                     globalFilter={globalFilter}
-                    emptyMessage='No manufacturers found.'
+                    emptyMessage='Không tìm thấy nhà sản xuất nào'
                     header={header}
                 >
                     <Column
@@ -187,13 +178,13 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     ></Column>
                     <Column
                         field='name'
-                        header='Name'
+                        header='Tên Nhà Sản Xuất'
                         sortable
                         headerStyle={{
                             minWidth: '4rem'
                         }}
                     />
-                    <Column field='description' header='Description' />
+                    <Column field='description' header='Mô Tả' />
                     <Column
                         body={actionBodyTemplate}
                         style={{
@@ -205,7 +196,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
             <Dialog
                 visible={manufacturerDialog}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                header='Manfacture Details'
+                header='Chi Tiết Nhà Sản Xuất'
                 style={{ width: '30vw' }}
                 modal
                 className='p-fluid'
