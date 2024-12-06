@@ -441,16 +441,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     return (
         <div className='space-y-4 w-full'>
             <div className='card'>
-                <div className='flex justify-between items-center'>
-                    {checked && <h3 className='text-2xl font-bold'>Thông Tin Vận Chuyển</h3>}
-                    <h3></h3>
-                    <h3 className='text-2xl font-bold'>Tóm Tắt Thanh Toán</h3>
-                </div>
-                <div className='space-y-4  mt-2 flex justify-between'>
-                    <div className='w-2/3'>
-                        {/* TODO: Add customer details */}
+                <div className='flex justify-between gap-x-8'>
+                    <div className='w-[45%]'>
+                        <h3 className='text-2xl font-bold'>Thông Tin Khách Hàng</h3>
                         <ConfirmDialog />
-
                         <>
                             <div className='flex justify-between'>
                                 <div className='flex items-center justify-between gap-4 py-3'>
@@ -481,10 +475,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 </div>
                             </div>
                             <hr className='border-collapse mt-0 border-gray-300' />
-                            <div className='flex flex-wrap justify-content-between w-full'>
-                                <div className='field w-full md:w-[49%]'>
+                            <div className='flex flex-col md:flex-row justify-between gap-4 w-full'>
+                                <div className='field w-full md:w-1/2'>
                                     <label htmlFor='firstName' className='font-medium block'>
-                                        Tên Khách Hàng
+                                        Tên
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -501,9 +495,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                         className='w-full'
                                     />
                                 </div>
-                                <div className='field w-full md:w-[49%]'>
+                                <div className='field w-full md:w-1/2'>
                                     <label htmlFor='lastName' className='font-medium block'>
-                                        Họ Khách Hàng
+                                        Họ
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -589,179 +583,165 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             )}
                         </>
                     </div>
-                    <div className='w-1/2'>
-                        <div className='mt-6 w-full space-y-6 sm:mt-8 lg:mt-0 lg:max-w-xs xl:max-w-md float-end'>
-                            <div className='flow-root'>
-                                <div className='-my-3 divide-y divide-gray-200 dark:divide-gray-800'>
-                                    <div className='flex items-center justify-between gap-4 py-3'>
-                                        <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Vận Chuyển
-                                        </label>
-                                        <InputSwitch
-                                            checked={checked}
-                                            onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
-                                        />
-                                    </div>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <div className='flex items-center justify-center gap-3'>
-                                            <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                                Phiếu Giảm Giá
-                                            </dt>
-                                            <div className='flex items-center gap-3'>
-                                                <AutoComplete
-                                                    id='couponCode'
-                                                    className='w-4/5'
-                                                    value={couponCode}
-                                                    onInput={handleInputChange}
-                                                    onKeyDown={handleKeyDown}
-                                                    placeholder='Nhập mã giảm giá'
-                                                />
-                                                <Button
-                                                    icon='pi pi-thumbtack'
-                                                    onClick={validateCouponCode}
-                                                    loading={loading}
-                                                    disabled={loading || couponCodes.length === 0}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <Button onClick={() => setVisibleRight(true)} icon='pi pi-ticket'></Button>
-                                        <VoucherSidebar
-                                            visibleRight={visibleRight}
-                                            setVisibleRight={setVisibleRight}
-                                            customer={customer}
-                                            handleApplyVoucher={handleApplyVoucher}
-                                        />
-                                    </dl>
-                                    {validVouchers.length > 0 || couponCodes.length > 0 || message ? (
-                                        <dl className='bg-white p-4 rounded-md shadow-sm max-w-md mx-auto mt-3 border border-gray-200'>
-                                            {message && (
-                                                <div className='mt-2 text-xs text-red-600 font-medium border-l-4 border-red-600 pl-2 py-1 bg-red-50 rounded-sm'>
-                                                    {message}
-                                                </div>
-                                            )}
-
-                                            {validVouchers.length > 0 && (
-                                                <div className='mt-3'>
-                                                    <h3 className='text-sm font-semibold text-green-700 mb-2'>
-                                                        Voucher hợp lệ:
-                                                    </h3>
-                                                    <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-green-200 rounded-md p-2'>
-                                                        {validVouchers.map((voucher: Voucher, index) => (
-                                                            <li
-                                                                key={index}
-                                                                className='flex items-center justify-between px-2 py-1 rounded-md border border-green-500 bg-green-50 hover:bg-green-100 transition-colors text-xs'
-                                                            >
-                                                                <span className='font-semibold text-green-700'>
-                                                                    {voucher.couponCode}
-                                                                </span>
-                                                                <button
-                                                                    onClick={() => handleRemoveValidVoucher(index)}
-                                                                    className='text-red-500 hover:text-red-700 ml-1'
-                                                                >
-                                                                    ×
-                                                                </button>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            )}
-
-                                            {couponCodes.length > 0 && (
-                                                <div className='mt-4'>
-                                                    <h3 className='text-sm font-semibold text-blue-700 mb-2'>
-                                                        Mã phiếu giảm giá đã nhập:
-                                                    </h3>
-                                                    <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2'>
-                                                        {couponCodes.map((code, index) => (
-                                                            <li
-                                                                key={index}
-                                                                className='flex items-center justify-between px-2 py-1 rounded-md border border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors text-xs'
-                                                            >
-                                                                <span className='font-medium text-gray-700'>
-                                                                    {code}
-                                                                </span>
-                                                                <button
-                                                                    onClick={() => handleRemoveCouponCode(index)}
-                                                                    className='text-red-500 hover:text-red-700 ml-1'
-                                                                >
-                                                                    ×
-                                                                </button>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            )}
-
-                                            {validVouchers.length === 0 && couponCodes.length === 0 && (
-                                                <div className='mt-3 text-xs text-gray-500 text-center font-medium'>
-                                                    Không áp dụng giảm giá.
-                                                </div>
-                                            )}
-                                        </dl>
-                                    ) : null}
-
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Tổng phụ
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${orderTotals.subtotal.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Chi phí vận chuyển
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${orderTotals.shippingCost.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Giảm giá
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${totalDiscount.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Tổng cộng
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            $
-                                            {(
-                                                orderTotals.subtotal +
-                                                orderTotals.shippingCost +
-                                                orderTotals.tax -
-                                                totalDiscount
-                                            ).toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal flex items-center gap-2 text-gray-500 dark:text-gray-400'>
-                                            Thanh toán của khách hàng
-                                            <FaIdCard
-                                                className='text-primary-700 text-5xl cursor-pointer'
-                                                onClick={handlePayment}
-                                            />
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${amountPaid.toFixed(2)}
-                                        </dd>
-                                    </dl>
+                    <div className='w-[55%]'>
+                        <h3 className='text-2xl font-bold'>Thông Tin Đơn Hàng</h3>
+                        <div className='divide-y divide-gray-200 dark:divide-gray-800'>
+                            <div className='flex items-center justify-between gap-4 py-3'>
+                                <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                    Vận Chuyển
+                                </label>
+                                <InputSwitch
+                                    checked={checked}
+                                    onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
+                                />
+                            </div>
+                            <div className='flex justify-between gap-3 py-3'>
+                                <div className='flex items-center justify-center gap-3'>
+                                    <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                        Phiếu Giảm Giá
+                                    </label>
+                                    <AutoComplete
+                                        id='couponCode'
+                                        size={12}
+                                        value={couponCode}
+                                        onInput={handleInputChange}
+                                        onKeyDown={handleKeyDown}
+                                        placeholder='Nhập mã giảm giá'
+                                    />
+                                    <Button
+                                        icon='pi pi-thumbtack'
+                                        onClick={validateCouponCode}
+                                        loading={loading}
+                                        disabled={loading || couponCodes.length === 0}
+                                    />
                                 </div>
+                                <Button onClick={() => setVisibleRight(true)} icon='pi pi-ticket' />
                             </div>
-                            <div className='space-y-3'>
-                                <button
-                                    type='submit'
-                                    className='flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800'
-                                    onClick={handleOrder}
-                                >
-                                    Tiến hành thanh toán
-                                </button>
-                            </div>
+                            <VoucherSidebar
+                                visibleRight={visibleRight}
+                                setVisibleRight={setVisibleRight}
+                                customer={customer}
+                                handleApplyVoucher={handleApplyVoucher}
+                            />
+                            {validVouchers.length > 0 || couponCodes.length > 0 || message ? (
+                                <dl className='bg-white p-4 rounded-md shadow-sm max-w-md mx-auto mt-3 border border-gray-200'>
+                                    {message && (
+                                        <div className='mt-2 text-xs text-red-600 font-medium border-l-4 border-red-600 pl-2 py-1 bg-red-50 rounded-sm'>
+                                            {message}
+                                        </div>
+                                    )}
+
+                                    {validVouchers.length > 0 && (
+                                        <div className='mt-3'>
+                                            <h3 className='text-sm font-semibold text-green-700 mb-2'>
+                                                Voucher hợp lệ:
+                                            </h3>
+                                            <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-green-200 rounded-md p-2'>
+                                                {validVouchers.map((voucher: Voucher, index) => (
+                                                    <li
+                                                        key={index}
+                                                        className='flex items-center justify-between px-2 py-1 rounded-md border border-green-500 bg-green-50 hover:bg-green-100 transition-colors text-xs'
+                                                    >
+                                                        <span className='font-semibold text-green-700'>
+                                                            {voucher.couponCode}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => handleRemoveValidVoucher(index)}
+                                                            className='text-red-500 hover:text-red-700 ml-1'
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {couponCodes.length > 0 && (
+                                        <div className='mt-4'>
+                                            <h3 className='text-sm font-semibold text-blue-700 mb-2'>
+                                                Mã phiếu giảm giá đã nhập:
+                                            </h3>
+                                            <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2'>
+                                                {couponCodes.map((code, index) => (
+                                                    <li
+                                                        key={index}
+                                                        className='flex items-center justify-between px-2 py-1 rounded-md border border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors text-xs'
+                                                    >
+                                                        <span className='font-medium text-gray-700'>{code}</span>
+                                                        <button
+                                                            onClick={() => handleRemoveCouponCode(index)}
+                                                            className='text-red-500 hover:text-red-700 ml-1'
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {validVouchers.length === 0 && couponCodes.length === 0 && (
+                                        <div className='mt-3 text-xs text-gray-500 text-center font-medium'>
+                                            Không áp dụng giảm giá.
+                                        </div>
+                                    )}
+                                </dl>
+                            ) : null}
+
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Tổng phụ</dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${orderTotals.subtotal.toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                    Chi phí vận chuyển
+                                </dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${orderTotals.shippingCost.toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Giảm giá</dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${totalDiscount.toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Tổng cộng</dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    $
+                                    {(
+                                        orderTotals.subtotal +
+                                        orderTotals.shippingCost +
+                                        orderTotals.tax -
+                                        totalDiscount
+                                    ).toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal flex items-center gap-2 text-gray-500 dark:text-gray-400'>
+                                    Thanh toán của khách hàng
+                                    <FaIdCard
+                                        className='text-primary-700 text-5xl cursor-pointer'
+                                        onClick={handlePayment}
+                                    />
+                                </dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${amountPaid.toFixed(2)}
+                                </dd>
+                            </dl>
+                        </div>
+                        <div className='space-y-3'>
+                            <button
+                                type='submit'
+                                className='flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800'
+                                onClick={handleOrder}
+                            >
+                                Tiến hành thanh toán
+                            </button>
                         </div>
                     </div>
                 </div>
