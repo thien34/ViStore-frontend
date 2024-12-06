@@ -59,7 +59,7 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
             customerId: order?.customerId,
             orderId: order?.orderId,
             reasonForReturn: '',
-            requestAction: 'Requesting exchange',
+            requestAction: 'Yêu Cầu Đổi Trả',
             totalReturnQuantity: 0,
             customerComments: '',
             staffNotes: '',
@@ -74,9 +74,9 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
     }
     const onChangeRequestAction = (check: boolean) => {
         if (check == false) {
-            handleReturnRequestChange({ requestAction: 'Requesting exchange' });
+            handleReturnRequestChange({ requestAction: 'Yêu Cầu Đổi Trả' });
         } else {
-            handleReturnRequestChange({ requestAction: 'Requesting refunds' });
+            handleReturnRequestChange({ requestAction: 'Yêu Cầu Hoàn Lại Tiền' });
         }
     }
 
@@ -150,19 +150,19 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
             const returnResponse = await returnProductService.createReturnRequest(returnRequest);
 
             if (returnResponse.status !== 200) {
-                throw new Error('Failed to create return request');
+                throw new Error('Yêu cầu trả hàng thất bại');
             }
 
             toast.current?.show({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Create Return Request Success'
+                detail: 'Gửi yêu cầu trả hàng thành công'
             });
 
             const returnResponsePayload = returnResponse.payload as { id: number, orderId: number };
 
             if (!returnResponsePayload || !returnResponsePayload.id || !returnResponsePayload.orderId) {
-                throw new Error('Create return request failed: returnRequest or id not found');
+                throw new Error('Tạo yêu cầu trả lại không thành công: không tìm thấy returnRequest hoặc id');
             }
 
             const returnRequestId = returnResponsePayload.id;
@@ -179,10 +179,10 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Success',
-                    detail: 'Create Return Item Success'
+                    detail: 'Tạo thành công mặt hàng trả'
                 });
             } else {
-                throw new Error('Create return item failed');
+                throw new Error('Tao thất bại mặt hàng trả');
             }
 
             const returnInvoiceResponse = await returnProductService.createReturnInvoice(returnInvoiceReq);
@@ -190,13 +190,13 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
             if (returnInvoiceResponse.status === 200) {
                 toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Create Return Invoice Success' });
             } else {
-                throw new Error('Create return invoice failed');
+                throw new Error('Tạo hóa đơn trả thất bại');
             }
         } catch (error) {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: (error as Error).message || 'An error occurred during the return request process'
+                detail: (error as Error).message || 'Đã xảy ra lỗi trong quá trình yêu cầu trả lại'
             });
         }
         fetchNewData();
@@ -211,15 +211,15 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
             <>  <Toast ref={toast} />
                 <div className="card p-fluid">
                     {order && (
-                        <label htmlFor="" className='font-bold mb-5'>RETURN / {order.billCode} - {order.firstName + ' ' + order.lastName}</label>
+                        <label htmlFor="" className='font-bold mb-5'>TRẢ HÀNG/ {order.billCode} - {order.firstName + ' ' + order.lastName}</label>
                     )}
                     <div className="field grid mt-2">
                         <label htmlFor="name3" className="font-bold col-12 mb-2 md:col-4 md:mb-0">
-                            EXCHANGE
+                           ĐỔI HÀNG
                         </label>
                         <div className="col-12 md:col-4">
                             <InputSwitch
-                                checked={returnRequest.requestAction == 'Requesting refunds'}
+                                checked={returnRequest.requestAction == 'Đang yêu cầu trả hàng'}
                                 onChange={(e) => onChangeRequestAction(e.value)} />
                         </div>
                     </div>
@@ -246,7 +246,7 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
                             onChange={(e) => handleReturnRequestChange({ staffNotes: e.target.value })}
                             rows={2}
                         />
-                        <label className='font-bold' htmlFor="username">Staff Notes</label>
+                        <label className='font-bold' htmlFor="username">Ghi Chú Của Nhân Viên</label>
                     </div>
                     <div className="field grid p-float-label ">
                         <InputTextarea
@@ -255,17 +255,17 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
                             onChange={(e) => handleReturnRequestChange({ customerComments: e.target.value })}
                             rows={2}
                         />
-                        <label className='font-bold' htmlFor="username">Customer Comments</label>
+                        <label className='font-bold' htmlFor="username">Khách Hàng Đánh Giá</label>
                     </div>
                     <div className="field grid mt-2">
-                        <label className="font-bold" htmlFor="reasonForReturn">Reason</label>
+                        <label className="font-bold" htmlFor="reasonForReturn">Lý Do</label>
                         <Dropdown value={returnRequest.reasonForReturn} onChange={(e) => handleReturnRequestChange({ reasonForReturn: e.target.value })}
                             options={reasons}
-                            placeholder="Choose reason return" style={{ width: '100%' }} />
+                            placeholder="Chọn lý do trả hàng " style={{ width: '100%' }} />
                     </div>
                     <div className="field grid mt-2">
                         <label htmlFor="name3" className="font-bold col-12 mb-2 md:col-8 md:mb-0">
-                            Total Quantity :
+                            Tổng đơn trả:
                         </label>
                         <div className="col-12 md:col-4 text-right">
                             <label className="font-bold">{returnRequest.totalReturnQuantity}</label>
@@ -274,14 +274,14 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
 
                     <div className="field grid mt-2">
                         <label htmlFor="name3" className="font-bold col-12 mb-2 md:col-8 md:mb-0">
-                            Refund Customer
+                            Hoàn Tiền Cho Khách Hàng
                         </label>
                         <div className="col-12 md:col-4 text-right">
                             <label className="font-bold">{refundCustomer}$</label>
                         </div>
                     </div>
                     <div className="flex align-items-center">
-                        <Button label="Submit" onClick={handleSubmit} disabled={disableSubmit()} className="p-button-success" />
+                        <Button label="Xác Nhận" onClick={handleSubmit} disabled={disableSubmit()} className="p-button-success" />
                     </div>
                 </div>
             </>
@@ -291,7 +291,7 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
         <>
             <div>
                 <div className='flex justify-content-end'>
-                    <Button label="Create New Return Invoice" className="mb-2 " icon="pi pi-plus" onClick={openListModal} />
+                    <Button label="Tạo Hóa Đơn Trả" className="mb-2 " icon="pi pi-plus" onClick={openListModal} />
                 </div>
                 <div className="grid">
                     <div className="col-12 md:col-8 h-auto ">
@@ -304,18 +304,18 @@ const returnGoods = ({ openListModal, order, initialData, fetchNewData }: Return
                                 resizableColumns
                                 scrollable tableStyle={{ minWidth: '50rem', minHeight: '300px' }}
                             >
-                                <Column field='productName' header="Product Name"></Column>
-                                <Column header="Quantity"
+                                <Column field='productName' header="Tên Sản Phẩm"></Column>
+                                <Column header="Số Lượng"
                                     body={bodyQuantity} />
-                                <Column field='productPrice' header="Price"></Column>
-                                <Column header="Discount Per Item" body={(rowData: OrderItemInfoResponse) =>
+                                <Column field='productPrice' header="Giá"></Column>
+                                <Column header="Giảm giá mỗi đơn hàng " body={(rowData: OrderItemInfoResponse) =>
                                 (
                                     <div>
                                         {rowData.discountAmount / rowData.quantity}$
                                     </div>
                                 )
                                 } />
-                                <Column header="Total" body={(rowData: OrderItemInfoResponse) =>
+                                <Column header="Tổng" body={(rowData: OrderItemInfoResponse) =>
                                 (
                                     <div>
                                         {rowData.quantity * rowData.productPrice}$

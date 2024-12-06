@@ -33,7 +33,7 @@ export default function CustomerAddressDialog({
                 <InputText
                     type='search'
                     onInput={(e) => setGlobalFilter(e.currentTarget.value)}
-                    placeholder='Search...'
+                    placeholder='Tìm kiếm...'
                 />
             </span>
         </div>
@@ -55,7 +55,7 @@ export default function CustomerAddressDialog({
 
     return (
         <Dialog
-            header='Customer Address'
+            header='Địa Chỉ Khách Hàng'
             modal
             draggable={false}
             visible={visible}
@@ -78,21 +78,21 @@ export default function CustomerAddressDialog({
                 rows={10}
                 rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                currentPageReportTemplate='Showing {first} to {last} of {totalRecords} addresses'
+                currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} địa chỉ'
                 globalFilter={globalFilter}
-                emptyMessage='No addresses found.'
+                emptyMessage='Không có địa chỉ nào.'
                 header={header}
             >
                 <Column
                     field='name'
-                    header='Name'
+                    header='Tên'
                     body={(rowData: AddressesResponse) => `${rowData.firstName} ${rowData.lastName}`}
                     sortable
                 />
                 <Column field='email' header='Email' sortable />
-                <Column field='phoneNumber' header='Phone number' sortable />
-                <Column field='addressDetail' header='Address' sortable />
-                <Column field='id' header='Action' body={actionBodyTemplate}></Column>
+                <Column field='phoneNumber' header='Số Điện Thoại' sortable />
+                <Column field='addressDetail' header='Địa Chỉ' sortable />
+                <Column field='id' header='Thao Tác' body={actionBodyTemplate}></Column>
             </DataTable>
         </Dialog>
     )

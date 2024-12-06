@@ -68,8 +68,8 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
             await categoryService.update(category.id, category)
             toast.current?.show({
                 severity: 'success',
-                summary: 'Successful',
-                detail: 'Category Updated',
+                summary: 'Thành công',
+                detail: 'Danh mục đã được cập nhật',
                 life: 3000
             })
         }
@@ -91,8 +91,8 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                 await categoryService.create(category)
                 toast.current?.show({
                     severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Category Created',
+                    summary: 'Thành công',
+                    detail: 'Danh mục đã được tạo',
                     life: 3000
                 })
             } else {
@@ -109,8 +109,8 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                 await categoryService.update(category.id, category)
                 toast.current?.show({
                     severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Category Updated',
+                    summary: 'Thành công',
+                    detail: 'Danh mục đã được cập nhật',
                     life: 3000
                 })
             }
@@ -123,14 +123,7 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
     const leftToolbarTemplate = () => {
         return (
             <div className='flex flex-wrap gap-2'>
-                <Button label='New' icon='pi pi-plus' severity='success' onClick={openNew} />
-                <Button
-                    label='Delete'
-                    icon='pi pi-trash'
-                    severity='danger'
-                    // onClick={confirmDeleteSelected}
-                    disabled={!selectedCategories || !Array.isArray(selectedCategories) || !selectedCategories.length}
-                />
+                <Button label='Thêm Mới' icon='pi pi-plus' severity='success' onClick={openNew} />
             </div>
         )
     }
@@ -142,10 +135,10 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                     mode='basic'
                     accept='image/*'
                     maxFileSize={1000000}
-                    chooseLabel='Import'
+                    chooseLabel='Nhập File'
                     className='mr-2 inline-block'
                 />
-                <Button label='Export' icon='pi pi-upload' severity='help' onClick={exportCSV} />
+                <Button label='Xuất File' icon='pi pi-upload' severity='help' onClick={exportCSV} />
             </>
         )
     }
@@ -180,13 +173,13 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
 
     const header = (
         <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
-            <h5 className='m-0'>Manage Categories</h5>
+            <h5 className='m-0'>Quản Lý Danh Mục</h5>
             <span className='block mt-2 md:mt-0 p-input-icon-left'>
                 <i className='pi pi-search' />
                 <InputText
                     type='search'
                     onInput={(e) => setGlobalFilter(e.currentTarget.value)}
-                    placeholder='Search...'
+                    placeholder='Tìm kiếm...'
                 />
             </span>
         </div>
@@ -194,8 +187,8 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
 
     const categoryDialogFooter = (
         <>
-            <Button label='Cancel' icon='pi pi-times' outlined onClick={hideDialog} />
-            <Button label='Save' icon='pi pi-check' onClick={saveCategory} />
+            <Button label='Hủy' icon='pi pi-times' outlined onClick={hideDialog} />
+            <Button label='Lưu' icon='pi pi-check' onClick={saveCategory} />
         </>
     )
 
@@ -217,9 +210,9 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} categories'
+                    currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} danh mục'
                     globalFilter={globalFilter}
-                    emptyMessage='No categories found.'
+                    emptyMessage='Không tìm thấy danh mục nào.'
                     header={header}
                 >
                     <Column
@@ -232,7 +225,7 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                         className='flex justify-center h-full'
                         field='image'
                         align={'center'}
-                        header='Image'
+                        header='Hình Ảnh'
                         body={imageBodyTemplate}
                         headerStyle={{
                             width: '8rem'
@@ -240,14 +233,15 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                     />
                     <Column
                         field='name'
-                        header='Name'
+                        header='Tên Danh Mục'
                         sortable
                         headerStyle={{
                             minWidth: '15rem'
                         }}
                     />
-                    <Column field='description' header='Description' sortable />
+                    <Column field='description' header='Mô Tả' sortable />
                     <Column
+                        header='Thao Tác'
                         body={actionBodyTemplate}
                         style={{
                             width: '30px'
@@ -258,7 +252,7 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
             <Dialog
                 visible={categoryDialog}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
-                header='Category Details'
+                header='Chi Tiết Danh Mục'
                 style={{ width: '36vw' }}
                 modal
                 className='p-fluid'
@@ -270,31 +264,33 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                     <div className=''>
                         <div className='field'>
                             <label htmlFor='name' className='font-bold'>
-                                Name <RequiredIcon />
+                                Tên Danh Mục <RequiredIcon />
                             </label>
                             <InputText
                                 id='name'
                                 value={category.name}
+                                placeholder='Nhập tên danh mục'
                                 onChange={(e) => setCategory({ ...category, name: e.target.value })}
                                 required
                                 autoFocus
                                 className={classNames({ 'p-invalid': submitted && !category.name })}
                             />
-                            {submitted && !category.name && <small className='p-error'>Name is required.</small>}
+                            {submitted && !category.name && <small className='p-error'>Tên danh mục là bắt buộc.</small>}
                         </div>
                         <div className='field'>
                             <label htmlFor='description' className='font-bold'>
-                                Description
+                                Mô Tả
                             </label>
                             <InputText
                                 id='description'
                                 value={category.description}
+                                placeholder='Nhập mô tả'
                                 onChange={(e) => setCategory({ ...category, description: e.target.value })}
                             />
                         </div>
                         <div className='field'>
                             <label htmlFor='categoryParent' className='font-bold'>
-                                Category parent
+                                Danh Mục Gốc
                             </label>
                             <TreeSelect
                                 inputId='categoryParent'
@@ -304,7 +300,7 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                                 }
                                 options={nodes}
                                 filter
-                                placeholder='Select Item'
+                                placeholder='Chọn danh mục'
                                 showClear
                             ></TreeSelect>
                         </div>
@@ -314,6 +310,7 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                     mode='basic'
                     name='image'
                     className='mt-4 ml-4'
+                    chooseLabel='Chọn'
                     url='http://localhost:8080/api/admin/picture/upload-image'
                     accept='image/*'
                     maxFileSize={1000000}

@@ -29,8 +29,6 @@ export interface Address {
     provinceId: string
     districtId: string
     wardId: string
-    province: string
-    district: string
     address: string
 }
 

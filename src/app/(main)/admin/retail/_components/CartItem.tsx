@@ -13,7 +13,7 @@ interface CartItemProps {
     onQuantityChange: () => void
 }
 
-const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange }) => {
+const CartItem = ({ cart, onDelete, onQuantityChange }: CartItemProps) => {
     const [quantity, setQuantity] = useState(cart.quantity)
     const toast = useRef<Toast>(null)
 
@@ -49,7 +49,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange })
             toast.current?.show({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Quantity updated successfully!',
+                detail: 'Số lượng được cập nhật thành công',
                 life: 3000
             })
             onQuantityChange()
@@ -58,7 +58,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange })
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: error instanceof Error ? error.message : 'An error occurred',
+                detail: error instanceof Error ? error.message : 'Đã xảy ra lỗi',
                 life: 3000
             })
             return false

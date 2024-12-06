@@ -20,7 +20,7 @@ const ReturnInvoiceModal: React.FC<ReturnInvoiceModalProps> = ({ visible, onHide
         setReturnItem(returnInvoiceData.returnItems);
         setVisibleModal(visible);
     }, [returnInvoiceData, visible]);
-    
+
     const totalCostProduct = returnItem.reduce((total, item: ReturnItem) => {
         return total + item.refundTotal;
     }, 0);
@@ -36,7 +36,7 @@ const ReturnInvoiceModal: React.FC<ReturnInvoiceModalProps> = ({ visible, onHide
                 <div className="space-y-2">
                     <div className="flex items-center">
                         <label className="font-medium text-gray-700 w-1/3">STORE:</label>
-                        <span className="text-gray-600">VISTORE - VN</span>
+                        <span className="text-gray-600">ViStore - VN</span>
                     </div>
                     <div className="flex items-start">
                         <label className="font-medium text-gray-700 w-1/3">ADDRESS:</label>
@@ -78,16 +78,16 @@ const ReturnInvoiceModal: React.FC<ReturnInvoiceModalProps> = ({ visible, onHide
                     <Column header="STT" body={(rowData) => {
                         return <span>{returnInvoiceData.returnItems.indexOf(rowData) + 1}</span>;
                     }} />
-                    <Column field="productName" header="Product Name" />
-                    <Column field="quantity" header="Quantity" />
-                    <Column field="oldUnitPrice" header="Price" />
-                    <Column field="discountAmountPerItem" header="Discount Per Item" />
-                    <Column field="refundTotal" header="Total" />
+                    <Column field="productName" header="Tên Sản Phẩm" />
+                    <Column field="quantity" header="Số Lượng" />
+                    <Column field="oldUnitPrice" header="Giá" />
+                    <Column field="discountAmountPerItem" header="Giảm Giá Mỗi Đơn Hàng" />
+                    <Column field="refundTotal" header="Tổng" />
                 </DataTable>
 
                 <div className="flex justify-between gap-4 mt-6">
-                    <Button label="Close" icon="pi pi-times" onClick={onHide} className="flex-1" />
-                    <Button label="Print" icon="pi pi-print" onClick={() => console.log('Invoice Confirmed')} className="flex-1" />
+                    <Button label="Hủy" icon="pi pi-times" onClick={onHide} className="flex-1" />
+                    <Button label="In Hóa Đơn" icon="pi pi-print" onClick={() => console.log('Invoice Confirmed')} className="flex-1" />
                 </div>
             </div>
         </Dialog>

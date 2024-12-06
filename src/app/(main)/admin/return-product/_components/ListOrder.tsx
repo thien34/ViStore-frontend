@@ -25,7 +25,7 @@ const ListOrder = ({ initialData, setOrderModalClose, setOrderItem, setOrder }: 
             setOrderItemInfo(data);
             return data;
         } catch (error) {
-            console.error("Error fetching order items:", error);
+            console.error("Lỗi khi thêm đơn hàng", error);
         }
     }
 
@@ -38,7 +38,7 @@ const ListOrder = ({ initialData, setOrderModalClose, setOrderItem, setOrder }: 
 
         } catch (error) {
             setVisible(true);
-            console.error('Error fetch order items data:', error);
+            console.error('Lỗi khi thêm dữ liệu đơn hàng:', error);
         }
     }
 
@@ -64,7 +64,7 @@ const ListOrder = ({ initialData, setOrderModalClose, setOrderItem, setOrder }: 
     const listOrderItems = (rowData: CustomerOrderResponse) => {
         return (
             <>
-                <Button label="Select" icon="pi pi-verified" onClick={() => returnOrder(rowData)} />
+                <Button label="Chọn" icon="pi pi-verified" onClick={() => returnOrder(rowData)} />
             </>
         )
     }
@@ -82,26 +82,26 @@ const ListOrder = ({ initialData, setOrderModalClose, setOrderItem, setOrder }: 
                 rows={10}
                 rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                currentPageReportTemplate='Showing {first} to {last} of {totalRecords} Orders'
-                emptyMessage='No Orders found.'
+                currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} đơn hàng'
+                emptyMessage='Không tìm thấy đơn hàng nào'
 
             >
-                <Column field='orderId' header='Order' />
-                <Column field='billCode' header='CODE' />
+                <Column field='orderId' header='Đơn Hàng' />
+                <Column field='billCode' header='Mã Hóa Đơn' />
                 <Column
-                    header='Date'
+                    header='Ngày Đặt Hàng'
                     field="orderDate"
                     sortable
                     body={(rowData) => convertDateToFormat(rowData.orderDate)}
                 />
                 <Column
-                    header="Customer"
+                    header="Khách Hàng"
                     body={(rowData) => `${rowData.firstName} ${rowData.lastName}`}
                 />
                 <Column
                     field="orderTotal"
                     body={(rowData) => `${rowData.orderTotal}$`}
-                    header="Total" />
+                    header="Tổng Đơn Hàng" />
                 <Column body={
                     listOrderItems
                 } />
