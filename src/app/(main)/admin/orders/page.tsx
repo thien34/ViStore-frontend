@@ -4,7 +4,7 @@ import OrderList from './_components/OrderList'
 import { useMountEffect } from 'primereact/hooks'
 import { OrderFilter, OrderResponse } from '@/interface/order.interface'
 import OrderService from '@/service/order.service'
-import OrderFilterTaskbar from './_components/OrderFilter'
+import OrderStatusTaskbar from './_components/OrderStatusTasbar'
 
 export default function Orders() {
     const [orders, setOrders] = useState<OrderResponse[]>([])
@@ -20,20 +20,17 @@ export default function Orders() {
     useEffect(() => {
         fetchData()
     }, [filter])
-    const applyFilter = () => {
-        fetchData()
-    }
-    const cancelFilter = () => {
-        setFilter({})
-        fetchData()
-    }
+
     return (
         <>
             <div className='card'>
                 <h3 className='text-xl font-bold'>Manage Orders</h3>
             </div>
-            <div className='card' >
+            {/* <div className='card' >
                 <OrderFilterTaskbar cancelFilter={cancelFilter} applyFilter={applyFilter} orderFilter={filter} setFilter={setFilter} />
+            </div> */}
+            <div className="card w-full">
+                <OrderStatusTaskbar orderResponse={orders} setFilter={setFilter} filter={filter} />
             </div>
             <div className='card'>
                 <OrderList orders={orders} />
