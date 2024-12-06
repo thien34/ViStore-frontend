@@ -11,6 +11,7 @@ import { LayoutContext } from '@/components/layout/context/layoutcontext'
 
 const LoginPage = () => {
     const [password, setPassword] = useState('')
+    const [email, setEmail] = useState('')
     const [checked, setChecked] = useState(false)
     const { layoutConfig } = useContext(LayoutContext)
 
@@ -19,7 +20,23 @@ const LoginPage = () => {
         'surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden',
         { 'p-input-filled': layoutConfig.inputStyle === 'filled' }
     )
+    const validate = () => {
+        if (email.length === 0) {
+            return false
+        }
+        if (password.length === 0) {
+            return false
+        }
 
+        return true
+    }
+
+    const onLogin = () => {
+        if (validate()) {
+            console.log("OK")
+            router.push('/')
+        } else console.log("NOT OK")
+    }
     return (
         <div className={containerClassName}>
             <div className='flex flex-column align-items-center justify-content-center'>
@@ -49,7 +66,9 @@ const LoginPage = () => {
                             <InputText
                                 id='email1'
                                 type='text'
+                                value={email}
                                 placeholder='Email address'
+                                onChange={(e) => setEmail(e.target.value)}
                                 className='w-full md:w-30rem mb-5'
                                 style={{ padding: '1rem' }}
                             />
@@ -87,7 +106,7 @@ const LoginPage = () => {
                             <Button
                                 label='Sign In'
                                 className='w-full p-3 text-xl'
-                                onClick={() => router.push('/')}
+                                onClick={onLogin}
                             ></Button>
                         </div>
                     </div>

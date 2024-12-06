@@ -1,11 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import OrderList from './_components/OrderList'
 import { useMountEffect } from 'primereact/hooks'
 import { OrderFilter, OrderResponse } from '@/interface/order.interface'
 import OrderService from '@/service/order.service'
 import OrderFilterTaskbar from './_components/OrderFilter'
-import { Button } from 'primereact/button'
 
 export default function Orders() {
     const [orders, setOrders] = useState<OrderResponse[]>([])
@@ -18,7 +17,9 @@ export default function Orders() {
     useMountEffect(() => {
         fetchData()
     })
-
+    useEffect(() => {
+        fetchData()
+    }, [filter])
     const applyFilter = () => {
         fetchData()
     }

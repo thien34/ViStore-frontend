@@ -21,12 +21,12 @@ const OrderTotalCostRange = ({ totalCost, setTotalCostRange, setVisible }: Props
         <>
             <div className="p-d-flex p-flex-column p-align-center w-19rem mb-4 ">
                 <div className="flex justify-between w-full mb-2">
-                    <label htmlFor="left" className="text-left">${value[0]}</label>
-                    <label htmlFor="right" className="text-right">${value[1]}</label>
+                    <label htmlFor="left" className="text-left">{value[0]}đ</label>
+                    <label htmlFor="right" className="text-right">{value[1]}đ</label>
                 </div>
                 <Slider
                     value={value}
-                    max={5000}
+                    max={500000}
                     onChange={(e) => onChangeRange(e.value as [number, number])}
                     className="w-full"
                     range
