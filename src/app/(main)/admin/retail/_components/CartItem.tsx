@@ -13,7 +13,7 @@ interface CartItemProps {
     onQuantityChange: () => void
 }
 
-const CartItem: React.FC<CartItemProps> = ({ cart, onDelete, onQuantityChange }) => {
+const CartItem = ({ cart, onDelete, onQuantityChange }: CartItemProps) => {
     const [quantity, setQuantity] = useState(cart.quantity)
     const toast = useRef<Toast>(null)
 
