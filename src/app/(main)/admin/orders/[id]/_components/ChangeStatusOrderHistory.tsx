@@ -13,7 +13,8 @@ interface ChangeStatusOrderHistoryProps {
     reason: string
     setReason: (reason: string) => void
     handleConfirmPrevious: () => void
-    cancelOrder: (reason: string) => void
+
+    setVisible: (visible: boolean) => void
 }
 
 export default function ChangeStatusOrderHistory({
@@ -24,7 +25,7 @@ export default function ChangeStatusOrderHistory({
     reason,
     setReason,
     handleConfirmPrevious,
-    cancelOrder
+    setVisible
 }: ChangeStatusOrderHistoryProps) {
     const handleConfirm = () => {
         handleConfirmNext()
@@ -47,10 +48,8 @@ export default function ChangeStatusOrderHistory({
                             type='button'
                             severity='danger'
                             label='Hủy Đơn Hàng'
-                            onClick={() => cancelOrder(reason)}
-                            disabled={
-                                latestStatus !== OrderStatusType.CREATED && latestStatus !== OrderStatusType.PENDING
-                            }
+                            onClick={() => setVisible(true)}
+                            disabled={latestStatus > OrderStatusType.CONFIRMED}
                         />
                     </div>
                     <Button
@@ -67,7 +66,7 @@ export default function ChangeStatusOrderHistory({
                         onClick={() => handleConfirmPrevious()}
                         className='ms-auto flex items-center gap-2 bg-gray-200 text-gray-500 hover:bg-gray-300 border-none font-semibold'
                     >
-                        <FaArrowLeft /> Previous Status
+                        <FaArrowLeft /> Trở Lại
                     </Button>
                 </div>
             </div>
@@ -83,9 +82,9 @@ export default function ChangeStatusOrderHistory({
                     setReason('')
                 }}
             >
-                <h4>Lý Do Trả Hàng</h4>
+                <h4>Nội dung</h4>
                 <InputTextarea
-                    placeholder='Nhập lý do ...'
+                    placeholder='Nhập nội dung ...'
                     className='w-full h-32'
                     minLength={30}
                     maxLength={255}

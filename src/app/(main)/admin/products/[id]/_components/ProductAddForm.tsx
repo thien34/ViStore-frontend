@@ -196,7 +196,7 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
                         header='Thao Tác'
                         body={(rowData) => (
                             <Link href={`/admin/products/details/${rowData.id}`}>
-                                <Button>Chỉnh sửa</Button>
+                                <Button icon='pi pi-pencil' rounded outlined />
                             </Link>
                         )}
                     ></Column>

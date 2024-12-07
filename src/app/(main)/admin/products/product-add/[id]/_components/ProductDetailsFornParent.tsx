@@ -1,6 +1,6 @@
 'use client'
 import { ProductResponseDetails } from '@/interface/Product'
-import { ProductAttributeName } from '@/interface/productAttribute.interface'
+import { ProductAttribute, ProductAttributeName } from '@/interface/productAttribute.interface'
 import AttributeValueService from '@/service/AttributeValueService'
 import PictureService from '@/service/PictureService'
 import ProductService from '@/service/ProducrService'
@@ -20,6 +20,9 @@ import QRCode from 'react-qr-code'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import RequiredIcon from '@/components/icon/RequiredIcon'
+import productAttributeService from '@/service/productAttribute.service'
+import { useMountEffect } from 'primereact/hooks'
+import AtbDialog from '../../../add/_components/AtbDialog'
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
     selectedValues: string | undefined
@@ -27,7 +30,6 @@ type AttributeRow = {
 
 type Props = {
     product?: ProductResponseDetails | typeof initialFormData
-    productAttributes: ProductAttributeName[]
     id: string
     name: string
 }
@@ -49,8 +51,11 @@ const initialFormData: ProductResponseDetails = {
     largestDiscountPercentage: 0,
     weight: 0
 }
-
-const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes, id, name }) => {
+const emptyProductAttribute: ProductAttribute = {
+    name: '',
+    description: ''
+}
+const ProductDetailsFormParent: React.FC<Props> = ({ product, id, name }) => {
     const [formData, setFormData] = useState<ProductResponseDetails>(
         (product as ProductResponseDetails) || initialFormData
     )
@@ -60,12 +65,23 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
     const fileInputRef = useRef<HTMLInputElement>(null)
     const toast = useRef<Toast>(null)
     const router = useRouter()
+    const [submitted, setSubmitted] = useState(false)
+    const [productAttribute, setProductAttribute] = useState<ProductAttribute>(emptyProductAttribute)
+    const [atbDialogVisible, setAtbDialogVisible] = useState(false)
+    const [productAttributes, setProductAttributes] = useState<ProductAttributeName[]>([])
     const [attributeRows, setAttributeRows] = useState<AttributeRow[]>(
         product?.attributes?.map((attr) => ({
             selectedAttribute: { id: attr.id, name: attr.name },
             selectedValues: attr.value
         })) || []
     )
+    useMountEffect(() => {
+        fetchAttributes()
+    })
+    const fetchAttributes = async () => {
+        const response = await productAttributeService.getListName()
+        setProductAttributes(response.payload)
+    }
     const [errors, setErrors] = useState({
         sku: '',
         price: '',
@@ -90,16 +106,16 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
             isValid = false
         }
 
-        if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 0) {
-            newErrors.price = 'Giá phải lớn hơn 0'
+        if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 10000) {
+            newErrors.price = 'Giá phải lớn hơn 10,000'
             isValid = false
         }
-        if (!formData.quantity || isNaN(Number(formData.quantity)) || formData.quantity <= 0) {
+        if (!formData.quantity || isNaN(Number(formData.quantity)) || formData.quantity < 0) {
             newErrors.quantity = 'Số lượng phải lớn hơn 0'
             isValid = false
         }
-        if (!formData.productCost || isNaN(Number(formData.productCost)) || formData.productCost <= 0) {
-            newErrors.productCost = 'Giá nhập phải lớn hơn 0'
+        if (!formData.productCost || isNaN(Number(formData.productCost)) || formData.productCost <= 10000) {
+            newErrors.productCost = 'Giá nhập phải lớn hơn 10,000'
             isValid = false
         }
 
@@ -118,6 +134,15 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
     const handleSave = async () => {
         const isValid = validateFields()
         if (Object.keys(isValid).length > 0) {
+            return
+        }
+        if (!isValid) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Vui lòng điền vào tất cả các trường bắt buộc',
+                life: 3000
+            })
             return
         }
         const filteredAttributes = attributeRows
@@ -246,6 +271,38 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
         setItems(fetchedValues.filter((item) => item.toLowerCase().includes(event.query.toLowerCase())))
     }
 
+    const saveProductAttribute = async () => {
+        setSubmitted(true)
+        if (productAttribute.name.trim()) {
+            if (!productAttribute.id) {
+                await productAttributeService
+                    .create(productAttribute)
+                    .then(() => {
+                        toast.current?.show({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Thuộc tính sản phẩm đã được thêm thành công',
+                            life: 3000
+                        })
+                        hideDialog()
+                    })
+                    .catch((error) => {
+                        toast.current?.show({
+                            severity: 'error',
+                            summary: 'Error',
+                            detail: error.message,
+                            life: 3000
+                        })
+                    })
+            }
+        }
+    }
+    const hideDialog = () => {
+        setSubmitted(false)
+        setProductAttribute(emptyProductAttribute)
+        setAtbDialogVisible(false)
+        fetchAttributes()
+    }
     return (
         <div className='card'>
             <Toast ref={toast} />
@@ -268,7 +325,8 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                                         style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}
                                     ></i>
                                     <div>
-                                        Cảnh báo: Sản phẩm này hiện đang được giảm giá và không thể chỉnh sửa giá cho đến khi giảm giá kết thúc.    
+                                        Cảnh báo: Sản phẩm này hiện đang được giảm giá và không thể chỉnh sửa giá cho
+                                        đến khi giảm giá kết thúc.
                                     </div>
                                 </div>
                             }
@@ -443,13 +501,29 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                                 <Dropdown
                                     value={attributeRows[index].selectedAttribute}
                                     options={[
+                                        { id: 'add-new', name: '+ Thêm  thuộc tính' },
                                         ...getAvailableAttributes(),
                                         ...productAttributes.filter((attr) => attr.id === row.selectedAttribute?.id)
                                     ]}
+                                    itemTemplate={(option) => (
+                                        <div
+                                            className={
+                                                option.id === 'add-new'
+                                                    ? 'text-green-600 rounded-lg bg-yellow-300 font-semibold text-center border-t border-gray-200 hover:bg-yellow-500'
+                                                    : 'text-gray-800'
+                                            }
+                                        >
+                                            {option.name}
+                                        </div>
+                                    )}
                                     onChange={(e) => {
-                                        const updatedRows = [...attributeRows]
-                                        updatedRows[index].selectedAttribute = e.value
-                                        setAttributeRows(updatedRows)
+                                        if (e.value.id === 'add-new') {
+                                            setAtbDialogVisible(true)
+                                        } else {
+                                            const updatedRows = [...attributeRows]
+                                            updatedRows[index].selectedAttribute = e.value
+                                            setAttributeRows(updatedRows)
+                                        }
                                     }}
                                     optionLabel='name'
                                     placeholder='Chọn một thuộc tính'
@@ -488,6 +562,16 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, productAttributes,
                     </AccordionTab>
                 </Accordion>
                 <Button label='Save' onClick={handleSave} />
+                <AtbDialog
+                    visible={atbDialogVisible}
+                    setVisible={setAtbDialogVisible}
+                    productAttribute={productAttribute}
+                    setProductAttribute={setProductAttribute}
+                    submitted={submitted}
+                    setSubmitted={setSubmitted}
+                    hideDialog={hideDialog}
+                    saveProductAttribute={saveProductAttribute}
+                />
             </div>
         </div>
     )

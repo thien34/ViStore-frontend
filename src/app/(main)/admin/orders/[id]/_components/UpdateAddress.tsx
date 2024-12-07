@@ -11,12 +11,15 @@ import { Dropdown } from 'primereact/dropdown'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { classNames } from 'primereact/utils'
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 interface FormProps {
     provinces: Province[]
     customerId: number
-    fetchAdresses: () => Promise<void>
+    visible: boolean
+    setVisible: (visible: boolean) => void
+    idAddress: number | null
+    hideDialog: () => void
 }
 
 const emtyAddress: AddressRequest = {
@@ -33,23 +36,15 @@ const emtyAddress: AddressRequest = {
 
 const domains = ['@gmail.com', '@yahoo.com', '@outlook.com', '@hotmail.com']
 
-const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormProps, ref) => {
+const UpdateAddress = ({ provinces, customerId, visible, setVisible, idAddress, hideDialog }: FormProps) => {
     const toast = useRef<Toast>(null)
-    const [addressDialog, setAddressDialog] = useState(false)
     const [submitted, setSubmitted] = useState(false)
     const [items, setItems] = useState<string[]>([])
     const [address, setAddress] = useState<AddressRequest>(emtyAddress)
     const [districts, setDistricts] = useState<Province[]>([])
     const [wards, setWards] = useState<Province[]>([])
 
-    const hideDialog = () => {
-        setSubmitted(false)
-        setAddressDialog(false)
-        setDistricts([])
-        setWards([])
-    }
-
-    const openNew = async (idAddress: number | null) => {
+    const fetchData = useCallback(async () => {
         if (idAddress) {
             const { payload: address } = await addressService.getById(idAddress)
             setAddress(address)
@@ -61,16 +56,13 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                 const { payload: wards } = await wardService.getAll(address.districtId)
                 setWards(wards)
             }
-        } else {
-            setAddress(emtyAddress)
         }
         setSubmitted(false)
-        setAddressDialog(true)
-    }
+    }, [idAddress])
 
-    useImperativeHandle(ref, () => ({
-        openNew
-    }))
+    useEffect(() => {
+        fetchData()
+    }, [idAddress, fetchData])
 
     const search = (event: AutoCompleteCompleteEvent) => {
         setItems(domains.map((item) => event.query + item))
@@ -111,7 +103,6 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
                 })
             }
             hideDialog()
-            fetchAdresses()
         }
     }
 
@@ -125,14 +116,14 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
         <>
             <Toast ref={toast} />
             <Dialog
-                visible={addressDialog}
+                visible={visible}
                 breakpoints={{ '960px': '75vw', '641px': '90vw' }}
                 header='Chi tiết địa chỉ'
                 style={{ width: '45vw' }}
                 modal
                 className='p-fluid'
                 footer={addressDialogFooter}
-                onHide={hideDialog}
+                onHide={() => setVisible(false)}
             >
                 <div className='flex w-full gap-x-5'>
                     <div className='field w-full'>
@@ -275,6 +266,5 @@ const AddressForm = forwardRef(({ provinces, customerId, fetchAdresses }: FormPr
             </Dialog>
         </>
     )
-})
-AddressForm.displayName = 'AddressForm'
-export default AddressForm
+}
+export default UpdateAddress
