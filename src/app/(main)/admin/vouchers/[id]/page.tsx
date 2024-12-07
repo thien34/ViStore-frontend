@@ -25,6 +25,7 @@ const VoucherUpdate = () => {
     const [fromDate, setFromDate] = useState<Date | null>(null)
     const [toDate, setToDate] = useState<Date | null>(null)
     const [isCumulative, setIsCumulative] = useState(false)
+    const [usageCount, setUsageCount] = useState(0)
     const [limitationTimes, setLimitationTimes] = useState(0)
     const [perCustomerLimit, setPerCustomerLimit] = useState(1)
     const [comments, setComments] = useState('')
@@ -82,7 +83,8 @@ const VoucherUpdate = () => {
             name: discountName,
             startDateUtc: fromDate?.toISOString(),
             endDateUtc: toDate?.toISOString(),
-            maxUsageCount: limitationTimes
+            maxUsageCount: limitationTimes,
+            comment: comments
         }
         try {
             await axios.put(`http://localhost:8080/api/admin/vouchers/${params.id}`, updatedVoucher)
@@ -119,6 +121,7 @@ const VoucherUpdate = () => {
             setToDate(new Date(voucherData.endDateUtc))
             setIsCumulative(voucherData.isCumulative ?? false)
             setLimitationTimes(voucherData.limitationTimes ?? 1)
+            setUsageCount(voucherData.usageCount ?? 0)
             setPerCustomerLimit(voucherData.discountLimitationId ?? 1)
             setComments(voucherData.comment ?? '')
             setSelectedCustomers(voucherData.appliedCustomers ?? [])
@@ -254,6 +257,7 @@ const VoucherUpdate = () => {
                                     Max Discount Amount
                                 </label>
                                 <InputNumber
+                                    disabled
                                     id='maxDiscountAmount'
                                     value={maxDiscountAmount}
                                     prefix='$'
@@ -317,6 +321,7 @@ const VoucherUpdate = () => {
                     </div>
                     <div className='my-4'>
                         <Checkbox
+                            disabled={limitationTimes !== usageCount || isExpired}
                             id='ingredient'
                             onChange={(e) => setIsCumulative(e.checked ?? false)}
                             checked={isCumulative}
@@ -354,7 +359,7 @@ const VoucherUpdate = () => {
                     </div>
                     <div className='flex justify-center gap-2 items-center space-x-2 my-3'>
                         <InputTextarea
-                            disabled
+                            disabled={isExpired}
                             value={comments}
                             onChange={(e) => setComments(e.target.value)}
                             placeholder='Comments'

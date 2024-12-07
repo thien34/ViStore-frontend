@@ -24,7 +24,8 @@ const VoucherSidebar = ({ visibleRight, setVisibleRight, handleApplyVoucher }: V
 
     const fetchVouchers = async () => {
         const vouchersData = await voucherService.getAllIsPublished()
-        setVouchers(vouchersData)
+        const filteredVouchers = vouchersData.filter((voucher: Voucher) => voucher.usageCount > 0)
+        setVouchers(filteredVouchers)
     }
 
     useMountEffect(() => {
@@ -127,48 +128,55 @@ const VoucherSidebar = ({ visibleRight, setVisibleRight, handleApplyVoucher }: V
                                                             preview
                                                         />
                                                     </div>
-                                                    <div>
+                                                    <div className='flex-grow'>
                                                         <p className='font-semibold text-lg'>{selectedVoucher.name}</p>
                                                         <p className='text-sm'>
-                                                            Minimum Application ${selectedVoucher.minOderAmount}
-                                                            .00
+                                                            Minimum Application ${selectedVoucher.minOderAmount}.00
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <p className='text-xs mt-2 flex items-center gap-2'>
-                                                    <span className='bg-white text-orange-500 px-2 py-1 rounded-full'>
-                                                        {(() => {
-                                                            const now = new Date()
-                                                            const startDate = selectedVoucher.startDateUtc
-                                                                ? new Date(selectedVoucher.startDateUtc)
-                                                                : null
-                                                            const endDate = selectedVoucher.endDateUtc
-                                                                ? new Date(selectedVoucher.endDateUtc)
-                                                                : null
-                                                            if (startDate && now < startDate) {
-                                                                const timeUntilStart = Math.ceil(
-                                                                    (startDate.getTime() - now.getTime()) /
-                                                                        (1000 * 60 * 60 * 24)
-                                                                )
-                                                                return `Take effect later ${timeUntilStart} days`
-                                                            } else if (
-                                                                startDate &&
-                                                                endDate &&
-                                                                now >= startDate &&
-                                                                now <= endDate
-                                                            ) {
-                                                                const timeUntilEnd = Math.ceil(
-                                                                    (endDate.getTime() - now.getTime()) /
-                                                                        (1000 * 60 * 60 * 24)
-                                                                )
-                                                                return `Valid for ${timeUntilEnd} days`
-                                                            } else {
-                                                                return 'Expired'
-                                                            }
-                                                        })()}
-                                                    </span>
-                                                </p>
+                                                <div className='flex gap-4 items-center'>
+                                                    <p className='text-xs mt-2 flex items-center gap-2'>
+                                                        <span className='bg-white text-orange-500 px-2 py-1 rounded-full'>
+                                                            {(() => {
+                                                                const now = new Date()
+                                                                const startDate = selectedVoucher.startDateUtc
+                                                                    ? new Date(selectedVoucher.startDateUtc)
+                                                                    : null
+                                                                const endDate = selectedVoucher.endDateUtc
+                                                                    ? new Date(selectedVoucher.endDateUtc)
+                                                                    : null
+                                                                if (startDate && now < startDate) {
+                                                                    const timeUntilStart = Math.ceil(
+                                                                        (startDate.getTime() - now.getTime()) /
+                                                                            (1000 * 60 * 60 * 24)
+                                                                    )
+                                                                    return `Take effect later ${timeUntilStart} days`
+                                                                } else if (
+                                                                    startDate &&
+                                                                    endDate &&
+                                                                    now >= startDate &&
+                                                                    now <= endDate
+                                                                ) {
+                                                                    const timeUntilEnd = Math.ceil(
+                                                                        (endDate.getTime() - now.getTime()) /
+                                                                            (1000 * 60 * 60 * 24)
+                                                                    )
+                                                                    return `Valid for ${timeUntilEnd} days`
+                                                                } else {
+                                                                    return 'Expired'
+                                                                }
+                                                            })()}
+                                                        </span>
+                                                        <span className='bg-white text-orange-500 px-2 py-1 rounded-full'>
+                                                            {selectedVoucher.isCumulative
+                                                                ? 'Cumulative'
+                                                                : 'Non-cumulative'}
+                                                        </span>
+                                                    </p>
+                                                </div>
                                             </div>
+
                                             <div className='p-4'>
                                                 <div className='mb-4'>
                                                     <p className='font-semibold text-gray-700'>Code expiration date</p>

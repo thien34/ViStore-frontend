@@ -117,6 +117,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
             couponCode: formattedCouponCode,
             selectedCustomerIds: selectedCustomers.map((customer) => customer.id),
             isPublished: isPublished,
+            isBirthday: false,
             discountLimitationId: discountLimitationType,
             limitationTimes: limitationTimes,
             perCustomerLimit: perCustomerLimit,
@@ -235,9 +236,10 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                 isValid = false
             }
         }
-        if (value != null && minOrderAmount >= value) {
-            newErrors.value = 'Voucher value cannot exceed minimum order amount.';
-            isValid = false;
+        const validDiscountPercentage = !usePercentage && value != null ? value : 0
+        if (minOrderAmount >= 0 && validDiscountPercentage > 0.69 * minOrderAmount) {
+            newErrors.value = 'Voucher value cannot exceed 69% of the minimum order amount.'
+            isValid = false
         }
         const limitationTimeValid = limitationTimes != null ? limitationTimes : 0
         if (limitationTimeValid <= 0 || limitationTimeValid > 1000000) {

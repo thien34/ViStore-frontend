@@ -200,7 +200,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (!billId) return
         const validVoucherIds = validVouchers.map((voucher: Voucher) => voucher.id).filter((id) => id !== undefined)
         CartService.getCart(billId).then(async (res: CartResponse[]) => {
-            const totalOrder = orderTotals.total - totalDiscount;
+            const totalOrder = orderTotals.total - totalDiscount
+            const totalOrderDiscount = orderTotals.subtotal - totalDiscount
             const order: OrderRequest = {
                 customerId: customer?.id || 1,
                 orderGuid: billId,
@@ -212,7 +213,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
                 paymentMode: PaymentModeType.IN_STORE,
                 orderSubtotal: orderTotals.subtotal,
-                orderSubtotalDiscount: totalDiscount,
+                orderSubtotalDiscount: totalOrderDiscount,
                 orderShipping: orderTotals.shippingCost,
                 orderDiscount: totalDiscount,
                 orderTotal: totalOrder,
@@ -366,9 +367,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     }
 
     const handleOrder = async () => {
-        debugger
         const billId = localStorage.getItem('billIdCurrent')
         if (!billId) return
+        validateCouponCode();
         if (!validateAddress()) return
         if (!validateDiscount()) return
         if (!validatePayment()) return
@@ -383,7 +384,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             defaultFocus: 'reject',
             accept: () => {
                 CartService.getCart(billId).then(async (res: CartResponse[]) => {
-                    const totalOrder = orderTotals.total - totalDiscount;
+                    const totalOrder = orderTotals.total - totalDiscount
+                    const totalOrderDiscount = orderTotals.subtotal - totalDiscount
                     const order: OrderRequest = {
                         customerId: customer?.id || 1,
                         orderGuid: billId,
@@ -396,7 +398,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
                         paymentMode: PaymentModeType.IN_STORE,
                         orderSubtotal: orderTotals.subtotal,
-                        orderSubtotalDiscount: totalDiscount,
+                        orderSubtotalDiscount: totalOrderDiscount,
                         orderShipping: orderTotals.shippingCost,
                         orderDiscount: totalDiscount,
                         orderTotal: totalOrder,
@@ -429,21 +431,29 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             : null,
                         idVouchers: validVoucherIds
                     }
-                    OrderService.createOrder(order).then(async (res) => {
-                        if (res.status === 200) {
-                            toast.current?.show({
-                                severity: 'success',
-                                summary: 'Success',
-                                detail: 'Order created successfully'
-                            })
-                            await new Promise((resolve) => setTimeout(resolve, 1000))
+                    OrderService.createOrder(order)
+                        .then(async (res) => {
+                            if (res.status === 200) {
+                                toast.current?.show({
+                                    severity: 'success',
+                                    summary: 'Success',
+                                    detail: 'Order created successfully'
+                                })
+                                await new Promise((resolve) => setTimeout(resolve, 1000))
 
-                            localStorage.removeItem('billIdCurrent')
-                            setCustomer(null)
-                            await CartService.deleteBill(billId)
-                            await fetchBill()
-                        }
-                    })
+                                localStorage.removeItem('billIdCurrent')
+                                setCustomer(null)
+                                await CartService.deleteBill(billId)
+                                await fetchBill()
+                            }
+                        })
+                        .catch((error) => {
+                            toast.current?.show({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: error instanceof Error ? error.message : 'Đã xảy ra lỗi'
+                            })
+                        })
                 })
             }
         })

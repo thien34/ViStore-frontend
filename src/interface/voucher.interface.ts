@@ -1,5 +1,4 @@
 export interface Voucher {
-    [x: string]: number
     id?: number
     name: string
     comment: string
@@ -20,6 +19,7 @@ export interface Voucher {
     minOderAmount: number
     isPublished: boolean
     perCustomerLimit: number
+    usageCount: number
 }
 
 export interface Vouchers {
