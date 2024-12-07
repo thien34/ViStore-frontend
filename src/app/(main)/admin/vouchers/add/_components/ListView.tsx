@@ -117,7 +117,6 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
             couponCode: formattedCouponCode,
             selectedCustomerIds: selectedCustomers.map((customer) => customer.id),
             isPublished: isPublished,
-            isBirthday: false,
             discountLimitationId: discountLimitationType,
             limitationTimes: limitationTimes,
             perCustomerLimit: perCustomerLimit,

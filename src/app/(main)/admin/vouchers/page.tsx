@@ -18,8 +18,6 @@ import Spinner from '@/components/spinner/Spinner'
 import discountService from '@/service/discount.service'
 import { Image } from 'primereact/image'
 import axios from 'axios'
-import { Dropdown } from 'primereact/dropdown'
-import { TabPanel, TabView } from 'primereact/tabview'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -31,23 +29,33 @@ const ListView = () => {
     const [filteredDiscounts, setFilteredDiscounts] = useState<Voucher[]>([])
     const toast = useRef<Toast>(null)
     const [loading, setLoading] = useState(true)
-    const [activeTab, setActiveTab] = useState<'birthday' | 'nonBirthday'>('nonBirthday')
-    const [discountPercentageBirthday, setDiscountPercentageBirthday] = useState<number>(0)
-    const fetchDiscounts = async (isBirthday: boolean) => {
-        try {
-            setLoading(true)
-            const response = await voucherService.getAll(isBirthday)
-            setDiscounts(response)
-            setFilteredDiscounts(response)
-        } catch (error) {
-            console.error('Error fetching discounts:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
     useEffect(() => {
-        fetchDiscounts(activeTab === 'birthday')
-    }, [activeTab])
+        const fetchDiscounts = async () => {
+            try {
+                setLoading(true)
+                const response = await voucherService.getAll()
+                setDiscounts(response)
+                setFilteredDiscounts(response)
+            } catch (error) {
+                console.error('Error fetching discounts:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchDiscounts()
+    }, [])
+
+    const leftToolbarTemplate = () => (
+        <div className='flex flex-wrap gap-2 my-5'>
+            <Link href='/admin/vouchers/add'>
+                <Button label='Add new discount' icon='pi pi-plus' severity='success' />
+            </Link>
+            <Link href='/admin/vouchers/default-birthday-voucher'>
+                <Button label='Update default birthday voucher' icon='pi pi-plus' severity='info' />
+            </Link>
+        </div>
+    )
+
     const formatDiscountAndStock = (rowData: Voucher) => {
         const isPercentage = rowData.usePercentage
         const stockClassName = classNames(
@@ -75,108 +83,6 @@ const ListView = () => {
             </div>
         )
     }
-    const isCumulativeTemplate = (rowData: Voucher) => {
-        return (
-            <Tag
-                severity={rowData.isCumulative ? 'success' : 'danger'}
-                icon={rowData.isCumulative ? 'pi pi-check' : 'pi pi-times'}
-                value={rowData.isCumulative ? 'True' : 'False'}
-            />
-        )
-    }
-    useEffect(() => {
-        const fetchBirthdayDiscount = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/api/admin/vouchers/birthday-discount')
-                setDiscountPercentageBirthday(response.data)
-            } catch (error) {
-                console.error('Error fetching birthday discount:', error)
-            }
-        }
-
-        fetchBirthdayDiscount()
-    }, [])
-
-    async function handleUpdateBirthdayDiscount(percentage: number) {
-        try {
-            await axios.post('http://localhost:8080/api/admin/vouchers/birthday', {
-                discountPercentageBirthday: percentage
-            })
-        } catch (error) {
-            console.error('Error updating birthday discount:', error)
-            throw error
-        }
-    }
-    const confirmUpdateDiscount = () => {
-        confirmDialog({
-            message: `Are you sure you want to update the discount percentage to ${discountPercentageBirthday}%?`,
-            header: 'Confirm Update',
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: 'Yes, Update',
-            rejectLabel: 'No, Cancel',
-            accept: async () => {
-                setLoading(true)
-                try {
-                    await handleUpdateBirthdayDiscount(discountPercentageBirthday)
-                    toast.current?.show({
-                        severity: 'success',
-                        summary: 'Success',
-                        detail: 'Discount percentage updated successfully',
-                        life: 3000
-                    })
-                } catch (error) {
-                    console.error('Error updating birthday discount:', error)
-                    toast.current?.show({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Failed to update discount percentage',
-                        life: 3000
-                    })
-                } finally {
-                    setLoading(false)
-                }
-            }
-        })
-    }
-
-    const leftToolbarTemplate = () => (
-        <div className='flex flex-wrap gap-2 my-5'>
-            <Link href='/admin/vouchers/add'>
-                <Button label='Add new discount' icon='pi pi-plus' severity='success' />
-            </Link>
-        </div>
-    )
-    const percentageOptions = Array.from({ length: 50 }, (_, index) => ({
-        label: (index + 1).toString(),
-        value: index + 1
-    }))
-    const rightToolbarTemplate = () => (
-        <div className='flex flex-wrap gap-2 my-5'>
-            <div className='flex items-center'>
-                <label htmlFor='percentageInput' className='mr-2'>
-                    Discount %:
-                </label>
-                <Dropdown
-                    id='percentageSelect'
-                    value={discountPercentageBirthday}
-                    options={percentageOptions}
-                    onChange={(e) => setDiscountPercentageBirthday(e.value)}
-                    placeholder='Select discount percentage'
-                    className='w-20rem'
-                />
-
-                <span className='ml-2'>%</span>
-            </div>
-
-            <Button
-                label={loading ? 'Updating...' : 'Discount Percentage Default'}
-                icon='pi pi-refresh'
-                severity='warning'
-                onClick={confirmUpdateDiscount}
-                disabled={loading}
-            />
-        </div>
-    )
 
     const statusBodyTemplate = (discount: Voucher) => {
         const { severity, icon } = getStatus(discount.status)
@@ -214,12 +120,7 @@ const ListView = () => {
 
         return (
             <div className='flex items-center gap-2'>
-                <Image
-                    src={imageUrl}
-                    alt='Discount Type'
-                    className='w-4rem h-4rem mt-2'
-                    style={{ borderRadius: '50%' }}
-                />
+                <Image src={imageUrl} alt='Discount Type' className='w-4rem h-4rem' style={{ borderRadius: '50%' }} />
                 <div>
                     <div>{rowData.name}</div>
                     <div style={{ fontSize: '0.85em', color: '#888' }}>
@@ -229,39 +130,6 @@ const ListView = () => {
             </div>
         )
     }
-    const tabContent = (isBirthday: boolean) => (
-        <DataTable
-            scrollable
-            value={filteredDiscounts}
-            paginator
-            rows={6}
-            rowsPerPageOptions={[10, 25, 50]}
-            paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-            dataKey='id'
-            currentPageReportTemplate='Showing {first} to {last} of {totalRecords} entries'
-            emptyMessage='No discounts found.'
-        >
-            <Column header='Voucher Name | Voucher Code' frozen body={voucherInfoTemplate} />
-            <Column header='Status' body={statusBodyTemplate} />
-            <Column header='Discount Value' body={formatDiscountAndStock} />
-            <Column header='Type' body={typeBodyTemplate} />
-            <Column
-                header='Limitation Times'
-                body={(rowData) => (rowData.limitationTimes ? rowData.limitationTimes : 'Infinite')}
-            />
-            <Column header='Usage Count' field='usageCount' />
-            <Column header='Is Cumulative' body={isCumulativeTemplate} />
-            <Column
-                header='Time of Discount Code'
-                body={(rowData) => {
-                    const startTime = vietnamTime(rowData.startDateUtc)
-                    const endTime = vietnamTime(rowData.endDateUtc)
-                    return `${startTime} - ${endTime}`
-                }}
-            />
-            {activeTab === 'nonBirthday' && <Column header='Actions' body={editAndExpiredButtonTemplate} />}
-        </DataTable>
-    )
 
     const editAndExpiredButtonTemplate = (rowData: Voucher) => {
         return (
@@ -327,7 +195,15 @@ const ListView = () => {
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Yes, Cancel',
             rejectLabel: 'No, Keep',
-            accept: () => handleCancelDiscount(promotionId)
+            accept: () => handleCancelDiscount(promotionId),
+            reject: () => {
+                toast.current?.show({
+                    severity: 'info',
+                    summary: 'Cancelled',
+                    detail: 'Action cancelled.',
+                    life: 3000
+                })
+            }
         })
     }
 
@@ -378,6 +254,35 @@ const ListView = () => {
             }
         })
     }
+    const isCumulativeTemplate = (rowData: Voucher) => {
+        return (
+            <Tag
+                severity={rowData.isCumulative ? 'success' : 'danger'}
+                icon={rowData.isCumulative ? 'pi pi-check' : 'pi pi-times'}
+                value={rowData.isCumulative ? 'True' : 'False'}
+            />
+        )
+    }
+    async function handleGenerateBirthdayVouchers() {
+        try {
+            debugger
+            await axios.post('http://localhost:8080/api/admin/vouchers/generate-birthday-vouchers')
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Birthday Vouchers generated successfully',
+                life: 3000
+            })
+        } catch (error) {
+            console.error('Error generating birthday vouchers:', error)
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to generate birthday vouchers',
+                life: 3000
+            })
+        }
+    }
 
     return (
         <>
@@ -385,19 +290,41 @@ const ListView = () => {
             <ConfirmDialog />
             <Spinner isLoading={loading} />
             <div className='card'>
-                <TabView
-                    activeIndex={activeTab === 'birthday' ? 1 : 0}
-                    onTabChange={(e) => setActiveTab(e.index === 1 ? 'birthday' : 'nonBirthday')}
+                {leftToolbarTemplate()}
+                <Button className='my-4' onClick={handleGenerateBirthdayVouchers}>
+                    Generate Birthday Vouchers
+                </Button>
+                <DataTable
+                    scrollable
+                    value={filteredDiscounts}
+                    paginator
+                    rows={6}
+                    rowsPerPageOptions={[10, 25, 50]}
+                    paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
+                    dataKey='id'
+                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} entries'
+                    emptyMessage='No discounts found.'
                 >
-                    <TabPanel header='Non-Birthday Discounts'>
-                        <div>{leftToolbarTemplate()}</div>
-                        {tabContent(false)}
-                    </TabPanel>
-                    <TabPanel header='Birthday Discounts'>
-                        <div>{rightToolbarTemplate()}</div>
-                        {tabContent(true)}
-                    </TabPanel>
-                </TabView>
+                    <Column header='Voucher Name | Voucher Code' frozen body={voucherInfoTemplate} />
+                    <Column header='Status' body={statusBodyTemplate} />
+                    <Column header='Discount Value' body={formatDiscountAndStock} />
+                    <Column header='Type' body={typeBodyTemplate} />
+                    <Column
+                        header='Limitation Times'
+                        body={(rowData) => (rowData.limitationTimes ? rowData.limitationTimes : 'Infinite')}
+                    />
+                    <Column header='Usage Count' field='usageCount' />
+                    <Column header='Is Cumulative' body={isCumulativeTemplate} />
+                    <Column
+                        header='Time of Discount Code'
+                        body={(rowData) => {
+                            const startTime = vietnamTime(rowData.startDateUtc)
+                            const endTime = vietnamTime(rowData.endDateUtc)
+                            return `${startTime} - ${endTime}`
+                        }}
+                    />
+                    <Column header='Actions' body={editAndExpiredButtonTemplate} />
+                </DataTable>
             </div>
         </>
     )
