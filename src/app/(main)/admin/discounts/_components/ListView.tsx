@@ -87,7 +87,7 @@ const ListView = () => {
     const leftToolbarTemplate = () => (
         <div className='flex flex-wrap gap-2 my-5'>
             <Link href='/admin/discounts/add'>
-                <Button label='Add new discount' icon='pi pi-plus' severity='success' />
+                <Button label='Thêm giảm giá mới' icon='pi pi-plus' severity='success' />
             </Link>
         </div>
     )
@@ -105,7 +105,7 @@ const ListView = () => {
                 options={statuses}
                 onChange={(e: DropdownChangeEvent) => options.filterCallback(e.value, options.index)}
                 itemTemplate={statusItemTemplate}
-                placeholder='Select One'
+                placeholder='Chọn một'
                 className='p-column-filter'
                 showClear
             />
@@ -191,8 +191,8 @@ const ListView = () => {
 
     const openCancelConfirmDialog = (promotionId: string) => {
         confirmDialog({
-            message: 'Are you sure you want to cancel this promotion?',
-            header: 'Confirm Cancel',
+            message: 'Bạn có chắc chắn muốn hủy khuyến mãi này không?',
+            header: 'Xác nhận hủy',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Yes, Cancel',
             rejectLabel: 'No, Keep',
@@ -223,14 +223,14 @@ const ListView = () => {
             toast.current?.show({
                 severity: 'success',
                 summary: 'Status Updated',
-                detail: 'Promotion marked as expired and end date set to now!',
+                detail: 'Khuyến mại được đánh dấu là đã hết hạn và ngày kết thúc được đặt thành bây giờ!',
                 life: 3000
             })
         } catch (error) {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Error marking promotion as expired',
+                detail: 'Lỗi đánh dấu khuyến mại là đã hết hạn',
                 life: 3000
             })
         }
@@ -238,8 +238,8 @@ const ListView = () => {
 
     const openConfirmDialog = (promotionId: string) => {
         confirmDialog({
-            message: 'Are you sure you want to mark this promotion as expired?',
-            header: 'Confirm',
+            message: 'Bạn có chắc chắn muốn đánh dấu khuyến mãi này là đã hết hạn không?',
+            header: 'Xác Nhận',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Yes',
             rejectLabel: 'No',
@@ -260,37 +260,37 @@ const ListView = () => {
             <Toast ref={toast} />
             <ConfirmDialog />
             <div className='card'>
-                <Card title='Search' className='mb-4'>
+                <Card title='Tìm Kiếm' className='mb-4'>
                     <div className='p-fluid grid formgrid'>
                         <div className='field col-12 md:col-4'>
-                            <label htmlFor='startDate'>Start Date</label>
+                            <label htmlFor='startDate'>Ngày Bắt Đầu</label>
                             <Calendar
                                 id='startDate'
                                 value={searchParams.startDate}
                                 onChange={(e) => setSearchParams({ ...searchParams, startDate: e.value })}
                                 dateFormat='dd/mm/yy'
                                 showIcon
-                                placeholder='Select Start Date'
+                                placeholder='Chọn ngày bắt đầu'
                             />
                         </div>
                         <div className='field col-12 md:col-4'>
-                            <label htmlFor='endDate'>End Date</label>
+                            <label htmlFor='endDate'>Ngày Kết Thúc</label>
                             <Calendar
                                 id='endDate'
                                 value={searchParams.endDate}
                                 onChange={(e) => setSearchParams({ ...searchParams, endDate: e.value })}
                                 dateFormat='dd/mm/yy'
                                 showIcon
-                                placeholder='Select End Date'
+                                placeholder='Chọn ngày kết thúc'
                             />
                         </div>
                         <div className='field col-12 md:col-4'>
-                            <label htmlFor='discountName'>Discount Name</label>
+                            <label htmlFor='discountName'>Tên Giảm Giá</label>
                             <InputText
                                 id='discountName'
                                 value={searchParams.discountName}
                                 onChange={(e) => setSearchParams({ ...searchParams, discountName: e.target.value })}
-                                placeholder='Enter Discount Name'
+                                placeholder='Nhập tên giảm giá'
                             />
                         </div>
                         <div className='field col-12'>
@@ -310,7 +310,7 @@ const ListView = () => {
                             />
                         </div>
                         <div className='col-12 text-right'>
-                            <Button label='Search' icon='pi pi-search' onClick={handleSearch} className='mt-3' />
+                            <Button label='Tìm Kiếm' icon='pi pi-search' onClick={handleSearch} className='mt-3' />
                         </div>
                     </div>
                 </Card>
@@ -324,26 +324,26 @@ const ListView = () => {
                     rowsPerPageOptions={[10, 25, 50]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
                     dataKey='id'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} entries'
-                    emptyMessage='No discounts found.'
+                    currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} giảm giá'
+                    emptyMessage='Không tim thấy giảm giá nào'
                 >
-                    <Column field='name' header='Discount Name' sortable />
-                    <Column header='Discount Value' body={formatDiscountAndStock} />
+                    <Column field='name' header='Tên Giảm Giá' sortable />
+                    <Column header='Giá Trị Giảm Giá ' body={formatDiscountAndStock} />
                     <Column
                         field='startDateUtc'
-                        header='Start Date'
+                        header='Ngày Bắt Đầu'
                         body={(rowData) => vietnamTime(rowData.startDateUtc)}
                         sortable
                     />
                     <Column
                         field='endDateUtc'
-                        header='End Date'
+                        header='Ngày Kết Thúc'
                         body={(rowData) => vietnamTime(rowData.endDateUtc)}
                         sortable
                     />
                     <Column
                         field='status'
-                        header='Status'
+                        header='Trạng Thái'
                         body={statusBodyTemplate}
                         sortable
                         filter
@@ -353,7 +353,7 @@ const ListView = () => {
                         filterMenuStyle={{ width: '14rem' }}
                         style={{ width: '15%' }}
                     ></Column>
-                    <Column body={editAndExpiredButtonTemplate} header='Actions' />
+                    <Column body={editAndExpiredButtonTemplate} header='Thao Tác' />
                 </DataTable>
             </div>
         </>

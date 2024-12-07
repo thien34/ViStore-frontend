@@ -16,7 +16,7 @@ export default function ProductPage() {
                 const data = await ProductService.getAllProducts()
                 setProducts(data)
             } catch (error) {
-                console.error('Failed to fetch products:', error)
+                console.error('Không thể gọi sản phẩm:', error)
             } finally {
                 setIsLoading(false)
             }

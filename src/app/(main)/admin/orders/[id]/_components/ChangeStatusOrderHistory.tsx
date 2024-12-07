@@ -37,7 +37,7 @@ export default function ChangeStatusOrderHistory({
                         <Button
                             type='button'
                             severity='success'
-                            label='Confirm Delivery'
+                            label='Xác Nhận Giao Hàng'
                             onClick={() => setVisibleConfirm(true)}
                             disabled={
                                 latestStatus === OrderStatusType.COMPLETED || latestStatus === OrderStatusType.CANCELLED
@@ -46,7 +46,7 @@ export default function ChangeStatusOrderHistory({
                         <Button
                             type='button'
                             severity='danger'
-                            label='Cancel Order'
+                            label='Hủy Đơn Hàng'
                             onClick={() => cancelOrder(reason)}
                             disabled={
                                 latestStatus !== OrderStatusType.CREATED && latestStatus !== OrderStatusType.PENDING
@@ -72,9 +72,9 @@ export default function ChangeStatusOrderHistory({
                 </div>
             </div>
             <Dialog
-                header='Confirm Delivery'
+                header='Xác Nhận Giao Hàng'
                 visible={visibleConfirm}
-                footer={<Button type='button' label='Confirm' onClick={handleConfirm} />}
+                footer={<Button type='button' label='Xác Nhận' onClick={handleConfirm} />}
                 position='top'
                 style={{ width: '30vw' }}
                 onHide={() => {
@@ -83,9 +83,9 @@ export default function ChangeStatusOrderHistory({
                     setReason('')
                 }}
             >
-                <h4>Reason</h4>
+                <h4>Lý Do Trả Hàng</h4>
                 <InputTextarea
-                    placeholder='Enter reason here...'
+                    placeholder='Nhập lý do ...'
                     className='w-full h-32'
                     minLength={30}
                     maxLength={255}

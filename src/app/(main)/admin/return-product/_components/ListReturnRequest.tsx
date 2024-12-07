@@ -43,10 +43,10 @@ const ListReturnRequests = ({ initialData }: ReturnRequestProps) => {
     const actionBodyTemplate = (rowData: ReturnRequest) => {
         return (
             <>
-                <Button label="Show" icon="pi pi-expand" onClick={() => setVisible(true)} />
+                <Button label="Hiển thị" icon="pi pi-expand" onClick={() => setVisible(true)} />
                 <Dialog header="Header" visible={visible} style={{ width: '50vw' }} onHide={() => { if (!visible) return; setVisible(false); }} >
                     <p className="m-0">
-                        LIST RETURN ITEMS
+                        DANH SÁCH HÀNG TRẢ LẠI
                     </p>
                 </Dialog>
             </>
@@ -66,8 +66,8 @@ const ListReturnRequests = ({ initialData }: ReturnRequestProps) => {
                 rows={10}
                 rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                currentPageReportTemplate='Showing {first} to {last} of {totalRecords} Return Requests'
-                emptyMessage='No Return Requests found.'
+                currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} yêu cầu trả hàng'
+                emptyMessage='Không tìm thấy yêu cầu trả hàng'
             >
                 {/* <Column
                     selectionMode='multiple'
@@ -76,12 +76,12 @@ const ListReturnRequests = ({ initialData }: ReturnRequestProps) => {
                     }}
                 ></Column> */}
                 <Column
-                    header="Customer"
+                    header="Khách Hàng"
                     body={(rowData) => `${rowData.firstName} ${rowData.lastName}`}
                 />
-                <Column field='reasonForReturn' header='Reason' />
-                <Column field='requestAction' header='Request Action' />
-                <Column field='returnRequestStatusId' header='Status'
+                <Column field='reasonForReturn' header='Lý Do' />
+                <Column field='requestAction' header='Yêu Cầu Hành Động' />
+                <Column field='returnRequestStatusId' header='Trạng Thái'
                     body={(rowData: ReturnRequest) => {
                         return (
                             <div>
@@ -90,7 +90,7 @@ const ListReturnRequests = ({ initialData }: ReturnRequestProps) => {
                         )
                     }}
                 />
-                <Column header='Actions'
+                <Column header='Thao Tác'
                     body={actionBodyTemplate}
                 />
             </DataTable>

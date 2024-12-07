@@ -21,7 +21,6 @@ import { OrderRequest, PaymentMethodType, PaymentModeType, PaymentStatusType } f
 import { CartResponse } from '@/interface/cart.interface'
 import OrderService from '@/service/order.service'
 import { Voucher } from '@/interface/voucher.interface'
-
 import axios from 'axios'
 import { AutoComplete } from 'primereact/autocomplete'
 import VoucherSidebar from './VoucherSidebar'
@@ -61,7 +60,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         phoneNumber: ''
     })
     const [addressDetail, setAddressDetail] = useState<Address | null>(null)
-    const [addressDetailGenerated, setAddressDetailGenerated] = useState<string | ''>('')
     const [customerAddressDialogVisible, setCustomerAddressDialogVisible] = useState<boolean>(false)
     const [addresses, setAddresses] = useState<AddressesResponse[]>([])
     const [selectedAddress, setSelectedAddress] = useState<AddressesResponse | null>(null)
@@ -94,7 +92,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'You cannot apply more than one voucher without selecting a customer.'
+                    detail: 'Bạn không thể áp dụng nhiều hơn một phiếu giảm giá nếu không chọn một khách hàng.'
                 })
                 return
             }
@@ -111,7 +109,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             setAmountPaidLocal(orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount)
 
             if (validVoucherList.length === 0) {
-                setMessage('No valid vouchers found.')
+                setMessage('Không tìm thấy phiếu giảm giá hợp lệ.')
             }
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -143,7 +141,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Please select a customer before adding a voucher.'
+                detail: 'Vui lòng chọn một khách hàng trước khi thêm phiếu giảm giá.'
             })
             return
         }
@@ -151,7 +149,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'You cannot apply more than one voucher without selecting a customer.'
+                detail: 'Bạn không thể áp dụng nhiều hơn một phiếu giảm giá nếu không chọn một khách hàng.'
             })
             return
         }
@@ -219,7 +217,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 orderTotal: totalOrder,
                 refundedAmount: 0,
                 paidDateUtc: '',
-                billCode: 'Bill' + numberBill,
+                billCode: 'Hóa Đơn' + numberBill,
                 deliveryMode: checked ? 0 : 1,
                 orderItems: res.map((item) => ({
                     productId: item.productResponse.id,
@@ -237,7 +235,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                           firstName: address.firstName,
                           lastName: address.lastName,
                           email: address.email,
-                          addressName: addressDetailGenerated,
+                          addressName: addressDetail?.address || '',
                           provinceId: addressDetail?.provinceId || '',
                           districtId: addressDetail?.districtId || '',
                           wardId: addressDetail?.wardId || '',
@@ -256,12 +254,12 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 (address && !address.firstName) ||
                 (address && !address.lastName) ||
                 (address && !address.phoneNumber) ||
-                !addressDetailGenerated
+                (address && !address.addressDetail)
             ) {
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Please select an address'
+                    detail: 'Vui lòng chọn một địa chỉ'
                 })
                 return false
             }
@@ -274,7 +272,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'You cannot apply more than one voucher without selecting a customer.'
+                detail: 'Bạn không thể áp dụng nhiều hơn một phiếu giảm giá nếu không chọn một khách hàng.'
             })
             return
         }
@@ -282,7 +280,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Combination vouchers can only combine a maximum of 2 vouchers.'
+                detail: 'Phiếu giảm giá kết hợp chỉ có thể kết hợp tối đa 2 phiếu.'
             })
             return
         }
@@ -294,7 +292,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Please enter the correct amount'
+                detail: 'Vui lòng nhập số tiền chính xác'
             })
             return false
         }
@@ -307,13 +305,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
 
     const fetchAddress = async () => {
         if (!customer?.id) return
-        const {
-            payload: { items }
-        } = await addressService.getAll(customer.id)
-        setAddress(items[0] || null)
-        if (items[0]?.id) {
-            getAddress(items[0].id)
-            setAddressDetailGenerated(items[0].addressDetail)
+        const { payload: items } = await addressService.getAll(customer.id)
+        setAddress(items.items[0])
+        if (items.items[0]?.id) {
+            getAddress(items.items[0].id)
         }
     }
 
@@ -323,8 +318,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             provinceId: payload.provinceId,
             districtId: payload.districtId,
             wardId: payload.wardId,
-            province: '',
-            district: '',
             address: payload.addressName
         }
         setAddress((prev) => ({
@@ -362,7 +355,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         setCustomerAddressDialogVisible(false)
         if (address.id) {
             getAddress(address.id)
-            setAddressDetailGenerated(address.addressDetail)
         }
     }
 
@@ -378,8 +370,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             .filter((id): id is number => id !== undefined)
 
         confirmDialog({
-            message: 'Are you sure you want to proceed with this order?',
-            header: 'Order Confirmation',
+            message: 'Bạn có chắc muốn tiếp tục đơn hàng này không?',
+            header: 'Xác Nhận Đơn Hàng',
             icon: 'pi pi-exclamation-triangle',
             defaultFocus: 'reject',
             accept: () => {
@@ -404,7 +396,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         orderTotal: totalOrder,
                         refundedAmount: 0,
                         paidDateUtc: '',
-                        billCode: 'Bill' + numberBill,
+                        billCode: 'Hóa Đơn' + numberBill,
                         deliveryMode: checked ? 0 : 1,
                         orderItems: res.map((item) => ({
                             productId: item.productResponse.id,
@@ -422,7 +414,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                   firstName: address.firstName,
                                   lastName: address.lastName,
                                   email: address.email,
-                                  addressName: addressDetailGenerated,
+                                  addressName: addressDetail?.address || '',
                                   provinceId: addressDetail?.provinceId || '',
                                   districtId: addressDetail?.districtId || '',
                                   wardId: addressDetail?.wardId || '',
@@ -462,8 +454,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const onCheckRetail = () => {
         if (customer) {
             confirmDialog({
-                message: 'Are you sure you want to retail?',
-                header: 'Confirmation',
+                message: 'Bạn có chắc muốn bán lẻ không?',
+                header: 'Xác Nhận',
                 icon: 'pi pi-exclamation-triangle',
                 defaultFocus: 'accept',
                 accept: () => {
@@ -478,7 +470,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         addressDetail: ''
                     })
                     setAddressDetail(null)
-                    setAddressDetailGenerated('')
                 }
             })
         }
@@ -492,21 +483,15 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     return (
         <div className='space-y-4 w-full'>
             <div className='card'>
-                <div className='flex justify-between items-center'>
-                    {checked && <h3 className='text-2xl font-bold'>Shipping Information</h3>}
-                    <h3></h3>
-                    <h3 className='text-2xl font-bold'>Payment Summary</h3>
-                </div>
-                <div className='space-y-4  mt-2 flex justify-between'>
-                    <div className='w-2/3'>
-                        {/* TODO: Add customer details */}
+                <div className='flex justify-between gap-x-8'>
+                    <div className='w-[45%]'>
+                        <h3 className='text-2xl font-bold'>Thông Tin Khách Hàng</h3>
                         <ConfirmDialog />
-
                         <>
                             <div className='flex justify-between'>
                                 <div className='flex items-center justify-between gap-4 py-3'>
                                     <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                        Retail
+                                        Bán Lẻ
                                     </label>
                                     <InputSwitch checked={!customer ? true : false} onChange={() => onCheckRetail()} />
                                 </div>
@@ -515,7 +500,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
 
                                     <FaUserPlus
                                         onClick={() => setCustomerDialogVisible(true)}
-                                        data-pr-tooltip='Pick Customer'
+                                        data-pr-tooltip='Chọn Khách Hàng'
                                         className='text-primary-700 text-5xl cursor-pointer customer-tooltip '
                                     />
                                     {customer != null && checked && (
@@ -532,10 +517,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 </div>
                             </div>
                             <hr className='border-collapse mt-0 border-gray-300' />
-                            <div className='flex flex-wrap justify-content-between w-full'>
-                                <div className='field w-full md:w-[49%]'>
+                            <div className='flex flex-col md:flex-row justify-between gap-4 w-full'>
+                                <div className='field w-full md:w-1/2'>
                                     <label htmlFor='firstName' className='font-medium block'>
-                                        First name
+                                        Tên
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -552,9 +537,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                         className='w-full'
                                     />
                                 </div>
-                                <div className='field w-full md:w-[49%]'>
+                                <div className='field w-full md:w-1/2'>
                                     <label htmlFor='lastName' className='font-medium block'>
-                                        Last name
+                                        Họ
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -575,7 +560,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             <div className='flex flex-wrap justify-content-between w-full'>
                                 <div className='field w-full md:w-[49%]'>
                                     <label htmlFor='phoneNumber' className='font-medium block'>
-                                        Phone number
+                                        Số Điện Thoại
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -594,7 +579,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 </div>
                                 <div className='field w-full md:w-[49%]'>
                                     <label htmlFor='note' className='font-medium block'>
-                                        Note
+                                        Ghi Chú
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -624,11 +609,15 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             {checked && (
                                 <div className='field w-full'>
                                     <label htmlFor='addressName' className='font-medium block'>
-                                        Address detail
+                                        Địa Chỉ Chi Tiết
                                     </label>
                                     <InputText
-                                        onChange={(e) => setAddressDetailGenerated(e.target.value)}
-                                        value={addressDetailGenerated || ''}
+                                        onChange={(e) =>
+                                            setAddressDetail((prev) =>
+                                                prev ? { ...prev, address: e.target.value } : null
+                                            )
+                                        }
+                                        value={addressDetail?.address || ''}
                                         id='addressName'
                                         className='w-full'
                                     />
@@ -636,57 +625,53 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             )}
                         </>
                     </div>
-                    <div className='w-1/2'>
-                        <div className='mt-6 w-full space-y-6 sm:mt-8 lg:mt-0 lg:max-w-xs xl:max-w-md float-end'>
-                            <div className='flow-root'>
-                                <div className='-my-3 divide-y divide-gray-200 dark:divide-gray-800'>
-                                    <div className='flex items-center justify-between gap-4 py-3'>
-                                        <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Delivery
-                                        </label>
-                                        <InputSwitch
-                                            checked={checked}
-                                            onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
-                                        />
-                                    </div>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <div className='flex items-center justify-center gap-3'>
-                                            <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                                Coupon
-                                            </dt>
-                                            <div className='flex items-center gap-3'>
-                                                <AutoComplete
-                                                    id='couponCode'
-                                                    className='w-4/5'
-                                                    value={couponCode}
-                                                    onInput={handleInputChange}
-                                                    onKeyDown={handleKeyDown}
-                                                    placeholder='Enter coupon codes'
-                                                />
-                                                <Button
-                                                    icon='pi pi-thumbtack'
-                                                    onClick={validateCouponCode}
-                                                    loading={loading}
-                                                    disabled={loading || couponCodes.length === 0}
-                                                />
-                                            </div>
+                    <div className='w-[55%]'>
+                        <h3 className='text-2xl font-bold'>Thông Tin Đơn Hàng</h3>
+                        <div className='divide-y divide-gray-200 dark:divide-gray-800'>
+                            <div className='flex items-center justify-between gap-4 py-3'>
+                                <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                    Vận Chuyển
+                                </label>
+                                <InputSwitch
+                                    checked={checked}
+                                    onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
+                                />
+                            </div>
+                            <div className='flex justify-between gap-3 py-3'>
+                                <div className='flex items-center justify-center gap-3'>
+                                    <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                        Phiếu Giảm Giá
+                                    </label>
+                                    <AutoComplete
+                                        id='couponCode'
+                                        size={12}
+                                        value={couponCode}
+                                        onInput={handleInputChange}
+                                        onKeyDown={handleKeyDown}
+                                        placeholder='Nhập mã giảm giá'
+                                    />
+                                    <Button
+                                        icon='pi pi-thumbtack'
+                                        onClick={validateCouponCode}
+                                        loading={loading}
+                                        disabled={loading || couponCodes.length === 0}
+                                    />
+                                </div>
+                                <Button onClick={() => setVisibleRight(true)} icon='pi pi-ticket' />
+                            </div>
+                            <VoucherSidebar
+                                visibleRight={visibleRight}
+                                setVisibleRight={setVisibleRight}
+                                customer={customer}
+                                handleApplyVoucher={handleApplyVoucher}
+                            />
+                            {validVouchers.length > 0 || couponCodes.length > 0 || message ? (
+                                <dl className='bg-white p-4 rounded-md shadow-sm max-w-md mx-auto mt-3 border border-gray-200'>
+                                    {message && (
+                                        <div className='mt-2 text-xs text-red-600 font-medium border-l-4 border-red-600 pl-2 py-1 bg-red-50 rounded-sm'>
+                                            {message}
                                         </div>
-
-                                        <Button onClick={() => setVisibleRight(true)} icon='pi pi-ticket'></Button>
-                                        <VoucherSidebar
-                                            visibleRight={visibleRight}
-                                            setVisibleRight={setVisibleRight}
-                                            customer={customer}
-                                            handleApplyVoucher={handleApplyVoucher}
-                                        />
-                                    </dl>
-                                    {validVouchers.length > 0 || couponCodes.length > 0 || message ? (
-                                        <dl className='bg-white p-4 rounded-md shadow-sm max-w-md mx-auto mt-3 border border-gray-200'>
-                                            {message && (
-                                                <div className='mt-2 text-xs text-red-600 font-medium border-l-4 border-red-600 pl-2 py-1 bg-red-50 rounded-sm'>
-                                                    {message}
-                                                </div>
-                                            )}
+                                    )}
 
                                             {validVouchers.length > 0 && (
                                                 <div className='mt-4'>
@@ -785,75 +770,67 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                                 </div>
                                             )}
 
-                                            {validVouchers.length === 0 && couponCodes.length === 0 && (
-                                                <div className='mt-3 text-xs text-gray-500 text-center font-medium'>
-                                                    No discount applied.
-                                                </div>
-                                            )}
-                                        </dl>
-                                    ) : null}
+                                    {validVouchers.length === 0 && couponCodes.length === 0 && (
+                                        <div className='mt-3 text-xs text-gray-500 text-center font-medium'>
+                                            Không áp dụng giảm giá.
+                                        </div>
+                                    )}
+                                </dl>
+                            ) : null}
 
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Subtotal
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${orderTotals.subtotal.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Shipping Cost
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${orderTotals.shippingCost.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Discount
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${totalDiscount.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Total
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            $
-                                            {(
-                                                orderTotals.subtotal +
-                                                orderTotals.shippingCost +
-                                                orderTotals.tax -
-                                                totalDiscount
-                                            ).toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal flex items-center gap-2 text-gray-500 dark:text-gray-400'>
-                                            Customer Payment{' '}
-                                            <FaIdCard
-                                                className='text-primary-700 text-5xl cursor-pointer'
-                                                onClick={handlePayment}
-                                            />
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${amountPaid.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                </div>
-                            </div>
-                            <div className='space-y-3'>
-                                <button
-                                    type='submit'
-                                    className='flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800'
-                                    onClick={handleOrder}
-                                >
-                                    Proceed to Payment
-                                </button>
-                            </div>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Tổng phụ</dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${orderTotals.subtotal.toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                    Chi phí vận chuyển
+                                </dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${orderTotals.shippingCost.toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Giảm giá</dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${totalDiscount.toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Tổng cộng</dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    $
+                                    {(
+                                        orderTotals.subtotal +
+                                        orderTotals.shippingCost +
+                                        orderTotals.tax -
+                                        totalDiscount
+                                    ).toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal flex items-center gap-2 text-gray-500 dark:text-gray-400'>
+                                    Thanh toán của khách hàng
+                                    <FaIdCard
+                                        className='text-primary-700 text-5xl cursor-pointer'
+                                        onClick={handlePayment}
+                                    />
+                                </dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${amountPaid.toFixed(2)}
+                                </dd>
+                            </dl>
+                        </div>
+                        <div className='space-y-3'>
+                            <button
+                                type='submit'
+                                className='flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800'
+                                onClick={handleOrder}
+                            >
+                                Tiến hành thanh toán
+                            </button>
                         </div>
                     </div>
                 </div>

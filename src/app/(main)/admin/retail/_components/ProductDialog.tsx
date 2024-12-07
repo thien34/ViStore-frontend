@@ -37,17 +37,17 @@ const ProductDialog = ({
                 <Button
                     type='button'
                     icon='pi pi-filter-slash'
-                    label='Clear'
+                    label='Làm Mới'
                     outlined
                     onClick={() => setFilters({ global: { value: null, matchMode: FilterMatchMode.CONTAINS } })}
                 />
-                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder='Keyword Search' />
+                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder='Tìm kiếm từ khóa' />
             </div>
         )
     }
     return (
         <Dialog
-            header='Search Product'
+            header='Tìm Sản Phẩm'
             contentStyle={{ overflowY: 'visible', flexGrow: '0' }}
             visible={visible}
             style={{ width: '1300px' }}
@@ -59,12 +59,12 @@ const ProductDialog = ({
                 rows={5}
                 filters={filters}
                 header={renderHeader()}
-                emptyMessage='No products found.'
+                emptyMessage='Không tìm thấy sản phẩm nào.'
                 onFilter={onFilter}
             >
                 <Column
                     field='imageUrl'
-                    header='Image'
+                    header='Hình Ảnh'
                     body={(rowData) => (
                         <div className='relative'>
                             <Image
@@ -81,13 +81,13 @@ const ProductDialog = ({
                         </div>
                     )}
                 />
-                <Column field='name' header='Product Name' />
+                <Column field='name' header='Tên Sản Phẩm' />
                 <Column field='sku' header='SKU' />
-                <Column field='categoryName' header='Category' />
-                <Column field='manufacturerName' header='Manufacturer' />
+                <Column field='categoryName' header='Danh Mục' />
+                <Column field='manufacturerName' header='Nhà Sản Xuất' />
                 <Column
                     field='price'
-                    header='Price'
+                    header='Giá'
                     body={(rowData: ProductResponse) => (
                         <div className='flex gap-2 items-center'>
                             {rowData.discountPrice ? (
@@ -101,10 +101,10 @@ const ProductDialog = ({
                         </div>
                     )}
                 />
-                <Column field='quantity' header='Quantity' />
+                <Column field='quantity' header='Số lượng' />
 
                 <Column
-                    header='Action'
+                    header='Thao Tác'
                     body={(rowData) => (
                         <FaCartPlus
                             onClick={() => addProductToCart(rowData)}

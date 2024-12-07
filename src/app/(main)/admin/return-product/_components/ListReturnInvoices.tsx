@@ -35,7 +35,7 @@ const ListReturnInvoices = ({ initialData }: ReturnInvoiceProps) => {
     const actionBodyTemplate = (rowData: ReturnInvoice) => {
         return (
             <>
-                <Button label="Show" icon="pi pi-expand" onClick={() => setModalVisible(true)} />
+                <Button label="Hiển Thị" icon="pi pi-expand" onClick={() => setModalVisible(true)} />
                 <ReturnInvoiceModal visible={modalVisible} onHide={() => { if (!modalVisible) return; setModalVisible(false); }} returnInvoiceData={rowData} />
             </>
         )
@@ -54,8 +54,8 @@ const ListReturnInvoices = ({ initialData }: ReturnInvoiceProps) => {
                 rows={10}
                 rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                currentPageReportTemplate='Showing {first} to {last} of {totalRecords} Return Invoices'
-                emptyMessage='No Return Invoices found.'
+                currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} hóa đơn trả'
+                emptyMessage='Không tìm thấy hóa đơn trả nào'
             >
                 <Column
                     selectionMode='multiple'
@@ -64,16 +64,16 @@ const ListReturnInvoices = ({ initialData }: ReturnInvoiceProps) => {
                     }}
                 ></Column>
                 <Column
-                    header="Customer"
+                    header="Khách Hàng"
                     body={(rowData) => `${rowData.firstName} ${rowData.lastName}`}
                 />
-                <Column field='billCode' header='Order' />
-                <Column field='refundAmount' header='Refund Amount'
+                <Column field='billCode' header='Hóa Đơn' />
+                <Column field='refundAmount' header='Tiền Hoàn'
                     body={(rowData: ReturnInvoice) => {
                         return `${rowData.refundAmount}$`
                     }}
                 />
-                <Column header='Action' body={actionBodyTemplate} />
+                <Column header='Thao Tác' body={actionBodyTemplate} />
             </DataTable>
         </div>
     )

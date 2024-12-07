@@ -144,7 +144,7 @@ export default function ProductListComponent({
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Quantity cannot be 0',
+                detail: 'Số lượng không thể bằng 0',
                 life: 1000
             })
             return
@@ -163,13 +163,13 @@ export default function ProductListComponent({
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Success',
-                    detail: 'Product added to cart successfully',
+                    detail: 'Sản phẩm được thêm vào giỏ hàng thành công',
                     life: 1000
                 })
                 fetchCart()
             })
             .catch((error) => {
-                console.error('Error adding product to cart:', error)
+                console.error('Lỗi thêm sản phẩm vào giỏ hàng:', error)
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
@@ -182,7 +182,7 @@ export default function ProductListComponent({
     function handleCartItemDelete(cart: CartResponse, event: React.MouseEvent<HTMLElement>): void {
         confirmPopup({
             target: event.currentTarget,
-            message: 'Are you sure you want to delete this item from the cart?',
+            message: 'Bạn có chắc chắn muốn xóa mặt hàng này khỏi giỏ hàng không?',
             icon: 'pi pi-info-circle',
             acceptLabel: 'Yes',
             rejectLabel: 'No',
@@ -192,13 +192,13 @@ export default function ProductListComponent({
                         toast.current?.show({
                             severity: 'success',
                             summary: 'Success',
-                            detail: 'Delete cart item successfully',
+                            detail: 'Xóa giỏ hàng thành công',
                             life: 1000
                         })
                         fetchCart()
                     })
                     .catch((error) => {
-                        console.error('Error deleting cart item:', error)
+                        console.error('Lỗi xóa mục giỏ hàng:', error)
                     })
             }
         })
@@ -213,7 +213,7 @@ export default function ProductListComponent({
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'QR code not found',
+                detail: 'Không tìm thấy mã QR',
                 life: 1000
             })
         }
@@ -228,12 +228,12 @@ export default function ProductListComponent({
     return (
         <div>
             <div className='flex justify-between'>
-                <h4>Product Order</h4>
+                <h4>Đặt hàng sản phẩm</h4>
                 <div className='flex gap-2'>
                     <Button onClick={() => setVisibleScan(true)}>
                         <BsQrCodeScan />
                     </Button>
-                    <Button onClick={() => onOpenProductDialog()}>Add Product</Button>
+                    <Button onClick={() => onOpenProductDialog()}>Thêm Sản Phẩm</Button>
                 </div>
             </div>
 

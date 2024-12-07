@@ -62,23 +62,23 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
         let isValid = true
 
         if (!formData.sku.trim()) {
-            newErrors.sku = 'SKU is required'
+            newErrors.sku = 'SKU là bắt buộc'
             isValid = false
         }
         if (!formData.name.trim()) {
-            newErrors.name = 'Product name is required'
+            newErrors.name = 'Tên sản phẩm là bắt buộc'
             isValid = false
         }
         if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 0) {
-            newErrors.price = 'Price must be greater than 0'
+            newErrors.price = 'Giá phải lớn hơn 0'
             isValid = false
         }
         if (!formData.quantity || isNaN(Number(formData.quantity)) || formData.quantity <= 0) {
-            newErrors.quantity = 'Quantity must be greater than 0'
+            newErrors.quantity = 'Số lượng phải lớn hơn 0'
             isValid = false
         }
         if (!formData.productCost || isNaN(Number(formData.productCost)) || formData.productCost <= 0) {
-            newErrors.productCost = 'Product cost must be greater than 0'
+            newErrors.productCost = 'Giá nhập phải lớn hơn 0'
             isValid = false
         }
 
@@ -86,7 +86,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
             return row.selectedAttribute && !row.selectedValues
         })
         if (missingAttributes.length > 0) {
-            newErrors.attributes = 'Please select all attributes for each combination'
+            newErrors.attributes = 'Vui lòng chọn tất cả các thuộc tính cho mỗi kết hợp'
             isValid = false
         }
 
@@ -103,7 +103,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Please fill in all required fields',
+                detail: 'Vui lòng điền vào tất cả các trường bắt buộc',
                 life: 3000
             })
             return
@@ -120,7 +120,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Please add at least one attribute',
+                detail: 'Vui lòng điền vào tất cả các trường bắt buộc',
                 life: 3000
             })
             return
@@ -151,11 +151,11 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
             toast.current?.show({
                 severity: 'success',
                 summary: 'Successful',
-                detail: 'Product updated successfully!',
+                detail: 'Sản phẩm đã được cập nhật thành công',
                 life: 3000
             })
         } catch (error) {
-            console.error('Failed to update product:', error)
+            console.error('Không cập nhật được sản phẩm:', error)
         }
     }
 
@@ -180,7 +180,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                     setDiscount(sortedDiscounts[0]) // Set the highest discount
                 }
             } catch (error) {
-                console.error('Error fetching discounts: ', error)
+                console.error('Lỗi khi lấy chiết khấu: ', error)
             }
         }
 
@@ -199,7 +199,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
 
             return uniqueNames
         } catch (error) {
-            console.error('Error fetching attribute values:', error)
+            console.error('Lỗi khi lấy giá trị thuộc tính:', error)
             return []
         }
     }
@@ -230,7 +230,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
     return (
         <div className='card'>
             <Toast ref={toast} />
-            <h4>Edit Product Details</h4>
+            <h4>Cập Nhật Chi Tiết Sản Phẩm</h4>
             <div className='flex flex-column gap-4'>
                 {discount && (
                     <div className='mb-3'>
@@ -249,8 +249,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                         style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}
                                     ></i>
                                     <div>
-                                        Warning: This product is currently on discount and cannot be edited price until
-                                        the discount ends.
+                                        Cảnh báo: Sản phẩm này hiện đang được giảm giá và không thể chỉnh sửa giá cho đến khi giảm giá kết thúc.
                                     </div>
                                 </div>
                             }
@@ -264,14 +263,14 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 SKU <RequiredIcon />
                             </label>
                             <InputText
-                                tooltip='Enter the SKU for the product'
+                                tooltip='Nhập SKU cho sản phẩm'
                                 id='sku'
                                 tooltipOptions={{ position: 'bottom' }}
                                 className={errors.sku ? 'p-invalid' : ''}
                                 value={formData.sku}
                                 onChange={(e) => {
                                     if (e.target.value.trim() === '') {
-                                        setErrors({ ...errors, sku: 'SKU is required' })
+                                        setErrors({ ...errors, sku: 'SKU là bắt buộc' })
                                     } else {
                                         setErrors({ ...errors, sku: '' })
                                     }
@@ -281,7 +280,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                             {errors.sku && <small className='p-error'>{errors.sku}</small>}
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
-                            <label htmlFor='name'>Product Name</label>
+                            <label htmlFor='name'>Tên Sản Phẩm</label>
                             <InputText
                                 id='name'
                                 tooltipOptions={{ position: 'bottom' }}
@@ -289,7 +288,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 value={formData.name}
                                 onChange={(e) => {
                                     if (e.target.value.trim() === '') {
-                                        setErrors({ ...errors, name: 'Product name is required' })
+                                        setErrors({ ...errors, name: 'Tên sản phẩm là bắt buộc' })
                                     } else {
                                         setErrors({ ...errors, name: '' })
                                     }
@@ -303,16 +302,16 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                     <div className='flex flex-row gap-4 mt-2'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='price'>
-                                Price <RequiredIcon />
+                                Giá <RequiredIcon />
                             </label>
                             <InputNumber
-                                tooltip='Enter product price'
+                                tooltip='Nhập giá sản phẩm'
                                 inputId='price'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.price}
                                 onValueChange={(e) => {
                                     if (e.value && e.value <= 0) {
-                                        setErrors({ ...errors, price: 'Price must be greater than 0' })
+                                        setErrors({ ...errors, price: 'Giá phải lớn hơn 0' })
                                     } else {
                                         setErrors({ ...errors, price: '' })
                                     }
@@ -333,16 +332,16 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='productCost' className='mb-2'>
-                                Product Cost <RequiredIcon />
+                                Giá  Nhập <RequiredIcon />
                             </label>
                             <InputNumber
-                                tooltip='Enter the cost of the product'
+                                tooltip='Nhập giá nhập cho sản phẩm'
                                 itemID='productCost'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.productCost}
                                 onValueChange={(e) => {
                                     if (e.value && e.value <= 0) {
-                                        setErrors({ ...errors, productCost: 'Product cost must be greater than 0' })
+                                        setErrors({ ...errors, productCost: 'Giá nhập phải lớn hơn 0' })
                                     } else {
                                         setErrors({ ...errors, productCost: '' })
                                     }
@@ -364,16 +363,16 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                     <div className='flex flex-row gap-4 mt-2'>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='quantity'>
-                                Quantity <RequiredIcon />
+                                Số Lượng <RequiredIcon />
                             </label>
                             <InputNumber
-                                tooltip='Enter the quantity of the product'
+                                tooltip='Nhập số lượng cho sản phẩm'
                                 inputId='quantity'
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.quantity}
                                 onValueChange={(e) => {
                                     if (e.value && e.value <= 0) {
-                                        setErrors({ ...errors, quantity: 'Quantity must be greater than 0' })
+                                        setErrors({ ...errors, quantity: 'Số lượng phải lớn hơn 0' })
                                     } else {
                                         setErrors({ ...errors, quantity: '' })
                                     }
@@ -441,7 +440,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                         setAttributeRows(updatedRows)
                                     }}
                                     optionLabel='name'
-                                    placeholder='Select an attribute'
+                                    placeholder='Chọn một thuộc tính'
                                     className='w-[200px]'
                                     style={{ minWidth: '200px', width: '200px', maxWidth: '200px' }}
                                 />
@@ -452,7 +451,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                         updatedRows[index].selectedValues = e.value
                                         setAttributeRows(updatedRows)
                                     }}
-                                    placeholder='Enter values'
+                                    placeholder='Nhập giá trị'
                                     className='w-52'
                                     suggestions={items}
                                     completeMethod={(event) => {
@@ -464,7 +463,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                     dropdown
                                 />
                                 <Button
-                                    tooltip='Delete'
+                                    tooltip='Xóa'
                                     onClick={() => removeAttributeRow(index)}
                                     className='pi pi-trash bg-gray-500 h-[3rem]'
                                 />
@@ -472,7 +471,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                         ))}
                         <Button onClick={addAttributeRow} className='flex items-center mb-5'>
                             <i className={PrimeIcons.PLUS}></i>
-                            <span className='ml-2'>Add attribute</span>
+                            <span className='ml-2'>Thêm thuộc tính</span>
                         </Button>
                     </AccordionTab>
                 </Accordion>

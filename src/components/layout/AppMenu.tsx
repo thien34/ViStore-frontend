@@ -11,98 +11,98 @@ const AppMenu = () => {
 
     const model: AppMenuItem[] = [
         {
-            label: 'Home',
-            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+            label: 'Trang Chủ',
+            items: [{ label: 'Tổng Quan', icon: 'pi pi-fw pi-home', to: '/' }]
         },
         {
-            label: 'Retail',
-            items: [{ label: 'Retail Sales', icon: 'pi pi-fw pi-shop', to: '/admin/retail' }]
+            label: 'Bán Hàng',
+            items: [{ label: 'Tại Quầy', icon: 'pi pi-fw pi-shop', to: '/admin/retail' }]
         },
         {
-            label: 'Catalog',
+            label: 'Danh Mục',
             items: [
-                { label: 'Products', icon: 'pi pi-fw pi-box', to: '/admin/products' },
-                { label: 'Categories', icon: 'pi pi-fw pi-objects-column', to: '/admin/categories' },
-                { label: 'Manufacturers', icon: 'pi pi-fw pi-sitemap', to: '/admin/manfacturers' },
-                { label: 'Product tags', icon: 'pi pi-fw pi-bookmark', to: '/admin/product-tags' },
-                { label: 'Product attributes', icon: 'pi pi-fw pi-th-large', to: '/admin/product-attributes' },
+                { label: 'Sản Phẩm', icon: 'pi pi-fw pi-box', to: '/admin/products' },
+                { label: 'Danh Mục', icon: 'pi pi-fw pi-objects-column', to: '/admin/categories' },
+                { label: 'Nhà Sản Xuất', icon: 'pi pi-fw pi-sitemap', to: '/admin/manfacturers' },
+                { label: 'Nhãn Sản Phẩm', icon: 'pi pi-fw pi-bookmark', to: '/admin/product-tags' },
+                { label: 'Thuộc Tính Sản Phẩm', icon: 'pi pi-fw pi-th-large', to: '/admin/product-attributes' },
                 {
-                    label: 'Specification attributes',
+                    label: 'Thuộc Tính Đặc Tả',
                     icon: 'pi pi-fw pi-mobile',
                     to: '/uikit/button'
                 },
                 {
-                    label: 'Discounts',
+                    label: 'Giảm Giá',
                     icon: 'pi pi-fw pi-dollar',
                     items: [
                         {
-                            label: 'Sales',
+                            label: 'Bán Hàng',
                             icon: 'pi pi-fw pi-tags',
                             to: '/admin/discounts'
                         },
                         {
-                            label: 'Vouchers',
+                            label: 'Phiếu Giảm Giá',
                             icon: 'pi pi-fw pi-receipt',
                             to: '/admin/vouchers'
                         }
                     ]
                 },
-                { label: 'Customers', icon: 'pi pi-fw pi-users', to: '/admin/customers' },
-                { label: 'Customer roles', icon: 'pi pi-fw pi-key', to: '/admin/customer-roles' }
+                { label: 'Khách Hàng', icon: 'pi pi-fw pi-users', to: '/admin/customers' },
+                { label: 'Vai trò', icon: 'pi pi-fw pi-key', to: '/admin/customer-roles' }
             ]
         },
         {
-            label: 'Orders',
+            label: 'Đặt Hàng',
             items: [
-                { label: 'Orders', icon: 'pi pi-fw pi-table', to: '/admin/orders' },
-                { label: 'Return Goods', icon: 'pi pi-fw pi-list', to: '/admin/return-product' },
-                { label: 'Recurring payments', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
-                { label: 'Carts & Wishlists', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' }
+                { label: 'Đặt Hàng', icon: 'pi pi-fw pi-table', to: '/admin/orders' },
+                { label: 'Trả hàng', icon: 'pi pi-fw pi-list', to: '/admin/return-product' },
+                { label: 'Thanh Toán Định Kỳ', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
+                { label: 'Giỏ hàng & Danh sách yêu thích', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' }
             ]
         },
         {
-            label: 'Pages',
+            label: 'Trang',
             icon: 'pi pi-fw pi-briefcase',
             to: '/pages',
             items: [
                 {
-                    label: 'Auth',
+                    label: '',
                     icon: 'pi pi-fw pi-user',
                     items: [
                         {
-                            label: 'Login',
+                            label: 'Đăng Nhập',
                             icon: 'pi pi-fw pi-sign-in',
                             to: '/auth/login'
                         },
                         {
-                            label: 'Error',
+                            label: 'Lỗi',
                             icon: 'pi pi-fw pi-times-circle',
                             to: '/auth/error'
                         },
                         {
-                            label: 'Access Denied',
+                            label: 'Từ Chối',
                             icon: 'pi pi-fw pi-lock',
                             to: '/auth/access'
                         }
                     ]
                 },
                 {
-                    label: 'Not Found',
+                    label: 'Không Tìm Thấy',
                     icon: 'pi pi-fw pi-exclamation-circle',
                     to: '/pages/notfound'
                 }
             ]
         },
         {
-            label: 'Get Started',
+            label: 'Bắt Đầu',
             items: [
                 {
-                    label: 'Documentation',
+                    label: 'Tài Liệu',
                     icon: 'pi pi-fw pi-question',
                     to: '/documentation'
                 },
                 {
-                    label: 'View Source',
+                    label: 'Xem Nguồn',
                     icon: 'pi pi-fw pi-search',
                     url: 'https://github.com/thien34',
                     target: '_blank'
