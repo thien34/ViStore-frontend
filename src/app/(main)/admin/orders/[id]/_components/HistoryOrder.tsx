@@ -6,6 +6,9 @@ import { OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
 import { Button } from 'primereact/button'
 import { Dialog } from 'primereact/dialog'
 import { useState } from 'react'
+import { DataTable } from 'primereact/datatable'
+import { Column } from 'primereact/column'
+import { Tag } from 'primereact/tag'
 
 const statusConfig = {
     [OrderStatusType.CREATED]: { label: 'Tạo', icon: FaRegCalendarCheck, color: 'blue' },
@@ -30,10 +33,73 @@ interface Props {
 export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
     const [visible, setVisible] = useState(false)
     const [notes, setNotes] = useState('')
+    const [historyVisible, setHistoryVisible] = useState(false)
 
     const handleViewNotes = (note: string) => {
         setNotes(note)
         setVisible(true)
+    }
+
+    const renderStatus = (rowData: OrderStatusHistoryResponse) => {
+        const config = statusConfig[rowData.status as keyof typeof statusConfig] || {
+            label: 'Trạng thái không xác định',
+            icon: FaBug,
+            color: 'gray'
+        }
+
+        const currentIndex = orderStatusHistoryResponses.findIndex((item) => item.id === rowData.id)
+        const previousStatus = currentIndex !== 0 ? orderStatusHistoryResponses[currentIndex + 1]?.status : null
+
+        return (
+            <div className='flex items-center gap-2'>
+                {previousStatus && (
+                    <>
+                        <Tag
+                            value={statusConfig[previousStatus as keyof typeof statusConfig]?.label}
+                            severity={getSeverity(previousStatus)}
+                        />
+                        <span className='font-bold'>→</span>
+                    </>
+                )}
+                <Tag value={config.label} severity={getSeverity(rowData.status)} />
+            </div>
+        )
+    }
+    const getSeverity = (orderStatus: OrderStatusType) => {
+        switch (orderStatus) {
+            case OrderStatusType.PENDING:
+                return 'info'
+            case OrderStatusType.CONFIRMED:
+            case OrderStatusType.DELIVERED:
+            case OrderStatusType.COMPLETED:
+            case OrderStatusType.PAID:
+                return 'success'
+            case OrderStatusType.SHIPPING_PENDING:
+            case OrderStatusType.SHIPPING_CONFIRMED:
+            case OrderStatusType.DELIVERING:
+                return 'warning'
+            case OrderStatusType.CANCELLED:
+                return 'danger'
+            default:
+                return 'info'
+        }
+    }
+    const renderDate = (rowData: OrderStatusHistoryResponse) => {
+        return (
+            <div>
+                {new Date(rowData.updatedDate).toLocaleString('vi-VN', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                })}
+            </div>
+        )
+    }
+    const renderIndex = (rowData: OrderStatusHistoryResponse) => {
+        return <div>{orderStatusHistoryResponses.findIndex((item) => item.id === rowData.id) + 1}</div>
     }
     return (
         <>
@@ -48,15 +114,16 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                         }
                         return (
                             <Event key={status.id} color={config.color} icon={config.icon}>
-                                <Title className='text-[15px] mb-2 mx-5 w-full'>{config.label}</Title>
+                                <Title className='text-[12px] mb-2 mx-5 w-full'>{config.label}</Title>
                                 <div className='flex flex-col'>
                                     <Subtitle>
-                                        {new Date(status.paidDate).toLocaleString('en-US', {
+                                        {new Date(status.paidDate).toLocaleString('vi-VN', {
                                             year: 'numeric',
-                                            month: 'short',
+                                            month: 'numeric',
                                             day: 'numeric',
                                             hour: '2-digit',
-                                            minute: '2-digit'
+                                            minute: '2-digit',
+                                            hour12: false
                                         })}
                                     </Subtitle>
                                 </div>
@@ -69,22 +136,12 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                         )
                     })}
                 </Timeline>
-                {/* <Button
-                    disabled={
-                        latestStatus === OrderStatusType.SHIPPING_CONFIRMED ||
-                        latestStatus === OrderStatusType.DELIVERING ||
-                        latestStatus === OrderStatusType.DELIVERED ||
-                        latestStatus === OrderStatusType.COMPLETED ||
-                        latestStatus === OrderStatusType.CANCELLED ||
-                        latestStatus === OrderStatusType.CREATED ||
-                        latestStatus === OrderStatusType.PAID ||
-                        latestStatus === OrderStatusType.PENDING
-                    }
-                    onClick={() => handleConfirmPrevious()}
-                    className='ms-auto flex items-center gap-2 mt-5 bg-gray-200 text-gray-500 hover:bg-gray-300 border-none font-semibold'
+                <Button
+                    onClick={() => setHistoryVisible(true)}
+                    className='ms-auto flex items-center gap-2 mt-5 bg-blue-500 text-white hover:bg-blue-600 border-none font-semibold'
                 >
-                    <FaArrowLeft /> Previous Status
-                </Button> */}
+                    Lịch sử đơn hàng
+                </Button>
                 <Dialog
                     visible={visible}
                     modal
@@ -97,6 +154,27 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                     }}
                 >
                     <p className='m-0'>{notes}</p>
+                </Dialog>
+                <Dialog
+                    visible={historyVisible}
+                    modal
+                    header='Lịch sử đơn hàng'
+                    position='top'
+                    style={{ width: '70rem' }}
+                    onHide={() => {
+                        if (!historyVisible) return
+                        setHistoryVisible(false)
+                    }}
+                >
+                    <DataTable value={orderStatusHistoryResponses} showGridlines>
+                        <Column field='#' header='' body={renderIndex}></Column>
+                        <Column field='createdBy' header='Người tạo'></Column>
+                        <Column field='createdDate' header='Thời gian' body={renderDate}></Column>
+                        <Column field='updatedBy' header='Người cập nhật'></Column>
+                        <Column field='updatedDate' header='Thời gian' body={renderDate}></Column>
+                        <Column field='status' header='Trạng thái' body={renderStatus}></Column>
+                        <Column field='notes' header='Nội dung'></Column>
+                    </DataTable>
                 </Dialog>
             </div>
         </>

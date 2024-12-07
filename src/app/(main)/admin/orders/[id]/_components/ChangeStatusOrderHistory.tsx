@@ -13,7 +13,8 @@ interface ChangeStatusOrderHistoryProps {
     reason: string
     setReason: (reason: string) => void
     handleConfirmPrevious: () => void
-    cancelOrder: (reason: string) => void
+
+    setVisible: (visible: boolean) => void
 }
 
 export default function ChangeStatusOrderHistory({
@@ -24,7 +25,7 @@ export default function ChangeStatusOrderHistory({
     reason,
     setReason,
     handleConfirmPrevious,
-    cancelOrder
+    setVisible
 }: ChangeStatusOrderHistoryProps) {
     const handleConfirm = () => {
         handleConfirmNext()
@@ -47,7 +48,7 @@ export default function ChangeStatusOrderHistory({
                             type='button'
                             severity='danger'
                             label='Hủy Đơn Hàng'
-                            onClick={() => cancelOrder(reason)}
+                            onClick={() => setVisible(true)}
                             disabled={latestStatus > OrderStatusType.CONFIRMED}
                         />
                     </div>

@@ -1,5 +1,5 @@
 import { Button } from 'primereact/button'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaEdit, FaRegCalendarCheck, FaRegCheckCircle, FaRegClock, FaTimesCircle, FaTruck } from 'react-icons/fa'
 import OrderService from '@/service/order.service'
 import { CustomerOrderResponse } from '@/interface/orderItem.interface'
@@ -8,12 +8,17 @@ import { useMountEffect } from 'primereact/hooks'
 import { OrderStatusType } from '@/interface/order.interface'
 import { Tag } from 'primereact/tag'
 import { IconType } from 'react-icons'
-import { Dialog } from 'primereact/dialog'
-
-const CustomerOrderInfo = () => {
-    const [customerOrder, setCustomerOrder] = useState<CustomerOrderResponse>()
+import { Province } from '@/interface/address.interface'
+import provinceService from '@/service/province.service'
+import UpdateAddress from './UpdateAddress'
+type CustomerOrderInfoProps = {
+    customerOrder: CustomerOrderResponse
+    setCustomerOrder: (customerOrder: CustomerOrderResponse) => void
+}
+const CustomerOrderInfo = ({ customerOrder, setCustomerOrder }: CustomerOrderInfoProps) => {
     const { id } = useParams()
     const [visible, setVisible] = useState(false)
+    const [provinces, setProvinces] = useState<Province[]>([])
 
     useMountEffect(() => {
         getCustomerOrder()
@@ -34,11 +39,50 @@ const CustomerOrderInfo = () => {
         [OrderStatusType.COMPLETED]: { label: 'Thành công', icon: FaRegCheckCircle, color: 'darkblue' },
         [OrderStatusType.CANCELLED]: { label: 'Đã hủy', icon: FaTimesCircle, color: 'red' }
     }
+    useEffect(() => {
+        fetchProvinces()
+    }, [])
+    const fetchProvinces = async () => {
+        const { payload: provinces } = await provinceService.getAll()
+        setProvinces(provinces)
+    }
+    const openAddressDialog = () => {
+        setVisible(true)
+    }
+    const hideDialog = () => {
+        setVisible(false)
+        getCustomerOrder()
+    }
+    const getSeverity = (orderStatus: OrderStatusType) => {
+        switch (orderStatus) {
+            case OrderStatusType.PENDING:
+                return 'info'
+            case OrderStatusType.CONFIRMED:
+            case OrderStatusType.DELIVERED:
+            case OrderStatusType.COMPLETED:
+            case OrderStatusType.PAID:
+                return 'success'
+            case OrderStatusType.SHIPPING_PENDING:
+            case OrderStatusType.SHIPPING_CONFIRMED:
+            case OrderStatusType.DELIVERING:
+                return 'warning'
+            case OrderStatusType.CANCELLED:
+                return 'danger'
+            default:
+                return 'info'
+        }
+    }
     return (
         <div className='card'>
             <div className='flex justify-between items-center'>
                 <h4> Thông tin đơn hàng </h4>
-                <Button type='button' label='Cập Nhật' icon={<FaEdit />} />
+                <Button
+                    disabled={(customerOrder?.orderStatusType ?? 0) > 3}
+                    onClick={openAddressDialog}
+                    type='button'
+                    label='Cập Nhật'
+                    icon={<FaEdit />}
+                />
             </div>
             <hr className='my-2 border-gray-400' />
             <div className='grid grid-cols-3 gap-4 justify-items-center justify-between mt-4'>
@@ -58,6 +102,7 @@ const CustomerOrderInfo = () => {
                         <div className=''>
                             <span>Trạng Thái Đơn Hàng: </span>
                             <Tag
+                                severity={getSeverity(customerOrder?.orderStatusType ?? OrderStatusType.CREATED)}
                                 value={
                                     customerOrder?.orderStatusType !== undefined
                                         ? statusConfig[customerOrder.orderStatusType as OrderStatusType]?.label || ''
@@ -83,6 +128,7 @@ const CustomerOrderInfo = () => {
                         <div className=''>
                             <span>Trạng thái đơn hàng: </span>
                             <Tag
+                                severity={getSeverity(customerOrder?.orderStatusType ?? OrderStatusType.CREATED)}
                                 value={
                                     customerOrder?.orderStatusType !== undefined
                                         ? statusConfig[customerOrder.orderStatusType as OrderStatusType]?.label || ''
@@ -93,17 +139,15 @@ const CustomerOrderInfo = () => {
                     </>
                 )}
             </div>
-            <Dialog
-                header='Cập Nhật Địa Chỉ'
+
+            <UpdateAddress
+                provinces={provinces}
+                customerId={customerOrder?.customerId ?? 1}
                 visible={visible}
-                style={{ width: '50vw' }}
-                onHide={() => {
-                    if (!visible) return
-                    setVisible(false)
-                }}
-            >
-                <p className='m-0'></p>
-            </Dialog>
+                setVisible={setVisible}
+                idAddress={customerOrder?.id ?? null}
+                hideDialog={hideDialog}
+            />
         </div>
     )
 }

@@ -21,6 +21,10 @@ export interface OrderStatusHistoryResponse {
     status: number
     notes: string
     paidDate: string
+    createdBy: string
+    updatedBy: string
+    createdDate: string
+    updatedDate: string
 }
 
 export interface CustomerOrder {
@@ -32,6 +36,8 @@ export interface CustomerOrder {
 }
 
 export interface CustomerOrderResponse {
+    id: number
+    customerId: number
     billId: string;
     firstName: string;
     lastName: string;
