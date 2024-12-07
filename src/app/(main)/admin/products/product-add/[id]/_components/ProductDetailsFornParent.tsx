@@ -106,16 +106,16 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, id, name }) => {
             isValid = false
         }
 
-        if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 0) {
-            newErrors.price = 'Giá phải lớn hơn 0'
+        if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 10000) {
+            newErrors.price = 'Giá phải lớn hơn 10,000'
             isValid = false
         }
-        if (!formData.quantity || isNaN(Number(formData.quantity)) || formData.quantity <= 0) {
+        if (!formData.quantity || isNaN(Number(formData.quantity)) || formData.quantity < 0) {
             newErrors.quantity = 'Số lượng phải lớn hơn 0'
             isValid = false
         }
-        if (!formData.productCost || isNaN(Number(formData.productCost)) || formData.productCost <= 0) {
-            newErrors.productCost = 'Giá nhập phải lớn hơn 0'
+        if (!formData.productCost || isNaN(Number(formData.productCost)) || formData.productCost <= 10000) {
+            newErrors.productCost = 'Giá nhập phải lớn hơn 10,000'
             isValid = false
         }
 
@@ -134,6 +134,15 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, id, name }) => {
     const handleSave = async () => {
         const isValid = validateFields()
         if (Object.keys(isValid).length > 0) {
+            return
+        }
+        if (!isValid) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Vui lòng điền vào tất cả các trường bắt buộc',
+                life: 3000
+            })
             return
         }
         const filteredAttributes = attributeRows

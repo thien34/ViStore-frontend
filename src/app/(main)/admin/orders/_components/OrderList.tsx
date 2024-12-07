@@ -1,6 +1,6 @@
 'use client'
 
-import { OrderResponse, OrderStatusType, PaymentMethodType, PaymentModeType } from '@/interface/order.interface'
+import { OrderResponse, OrderStatusType } from '@/interface/order.interface'
 import Link from 'next/dist/client/link'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
@@ -70,28 +70,16 @@ export default function OrderList({ orders }: Props) {
         }
     }
 
-    const paymentMethodBody = (row: OrderResponse) => {
-        switch (row.paymentMethod) {
-            case PaymentMethodType.Cash:
-                return <Tag value='Cash' severity='info' />
-            case PaymentMethodType.BankTransfer:
-                return <Tag value='Bank Transfer' severity='info' />
-            case PaymentMethodType.Cod:
-                return <Tag value='Cash on Delivery' severity='info' />
-            default:
-                return <Tag value={PaymentMethodType[row.paymentMethod]} />
-        }
-    }
-    const paymentModeBody = (row: OrderResponse) => {
-        switch (row.paymentMode) {
-            case PaymentModeType.Online:
-                return <Tag value='Online' severity='info' />
-            case PaymentModeType.IN_STORE:
-                return <Tag value='In Store' severity='info' />
-            default:
-                return <Tag value={PaymentModeType[row.paymentMode]} />
-        }
-    }
+    // const paymentModeBody = (row: OrderResponse) => {
+    //     switch (row.paymentMode) {
+    //         case PaymentModeType.Online:
+    //             return <Tag value='Online' severity='info' />
+    //         case PaymentModeType.IN_STORE:
+    //             return <Tag value='In Store' severity='info' />
+    //         default:
+    //             return <Tag value={PaymentModeType[row.paymentMode]} />
+    //     }
+    // }
 
     const orderDetailBody = (row: OrderResponse) => {
         return (
@@ -115,10 +103,15 @@ export default function OrderList({ orders }: Props) {
                 <Column align='center' field='billCode' header='Mã Hóa Đơn' />
                 <Column align='center' field='customerName' header='Khách Hàng' body={customerNameBody} />
                 <Column align='center' field='orderStatus' header='Trạng Thái' body={orderStatusBody} />
-                <Column align='center' field='totalItem' header='Tổng Sản Phẩm' />
-                <Column align='center' field='orderTotal' header='Tổng Tiền' body={(row) => `$${row.orderTotal} `} />
-                <Column align='center' field='paymentMethod' header='Phương Thức Thanh Toán' body={paymentMethodBody} />
-                <Column align='center' field='paymentMode' header='Hình Thức Thanh Toán' body={paymentModeBody} />
+                {/* <Column align='center' field='totalItem' header='Tổng Sản Phẩm' /> */}
+                <Column
+                    align='center'
+                    field='orderTotal'
+                    header='Tổng Tiền'
+                    body={(row) => `${row.orderTotal.toLocaleString('vi-VN')}₫`}
+                />
+                {/* <Column align='center' field='paymentMethod' header='Phương Thức Thanh Toán' body={paymentMethodBody} /> */}
+                {/* <Column align='center' field='paymentMode' header='Hình Thức Thanh Toán' body={paymentModeBody} /> */}
                 <Column
                     align='center'
                     field='paidDateUtc'

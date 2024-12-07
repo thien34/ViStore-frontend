@@ -44,5 +44,7 @@ export interface CustomerOrderResponse {
     phoneNumber: string
     delivery: string
     orderStatusType: number
+    paymentStatusType: number
+    paymentMethod: number
 }
 

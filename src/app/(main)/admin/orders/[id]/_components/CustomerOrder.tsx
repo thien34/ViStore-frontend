@@ -5,7 +5,7 @@ import OrderService from '@/service/order.service'
 import { CustomerOrderResponse } from '@/interface/orderItem.interface'
 import { useParams } from 'next/dist/client/components/navigation'
 import { useMountEffect } from 'primereact/hooks'
-import { OrderStatusType } from '@/interface/order.interface'
+import { OrderStatusType, PaymentMethodType, PaymentModeType } from '@/interface/order.interface'
 import { Tag } from 'primereact/tag'
 import { IconType } from 'react-icons'
 import { Province } from '@/interface/address.interface'
@@ -72,6 +72,28 @@ const CustomerOrderInfo = ({ customerOrder, setCustomerOrder }: CustomerOrderInf
                 return 'info'
         }
     }
+    const paymentMethodBody = (paymentMethod: number) => {
+        switch (paymentMethod) {
+            case PaymentMethodType.Cash:
+                return <Tag value='Tiền Mặt' severity='info' />
+            case PaymentMethodType.BankTransfer:
+                return <Tag value='Chuyển Khoản' severity='info' />
+            case PaymentMethodType.Cod:
+                return <Tag style={{ fontSize: '9px' }} value='Thanh Toán Khi Nhận Hàng' severity='info' />
+            default:
+                return <Tag value={PaymentMethodType[paymentMethod]} />
+        }
+    }
+    const paymentModeBody = (paymentStatus: number) => {
+        switch (paymentStatus) {
+            case PaymentModeType.Online:
+                return <Tag value='Chờ Thanh Toán' severity='info' />
+            case PaymentModeType.IN_STORE:
+                return <Tag value='Đã Thanh Toán' severity='info' />
+            default:
+                return <Tag value={PaymentModeType[paymentStatus]} />
+        }
+    }
     return (
         <div className='card'>
             <div className='flex justify-between items-center'>
@@ -85,56 +107,78 @@ const CustomerOrderInfo = ({ customerOrder, setCustomerOrder }: CustomerOrderInf
                 />
             </div>
             <hr className='my-2 border-gray-400' />
-            <div className='grid grid-cols-3 gap-4 justify-items-center justify-between mt-4'>
-                {customerOrder?.firstName === 'Retail' ? (
+            <div className='grid grid-cols-3 justify-between gap-4 mt-4'>
+                {customerOrder?.firstName === 'Khách Lẻ' ? (
                     <>
                         <div className='flex flex-col gap-2'>
+                            <span className='font-semibold'>Thông tin đơn hàng</span>
                             <span>Mã Hóa Đơn: {customerOrder?.billId}</span>
-                        </div>
-                        <div className='flex flex-col gap-2'>
                             <span>
                                 Tên Khách Hàng: {customerOrder?.firstName} {customerOrder?.lastName}
                             </span>
+                        </div>
+                        <div className='flex flex-col gap-2'>
+                            <span className='font-semibold'>Thông tin giao hàng</span>
                             <span>
                                 Hình Thức Giao Hàng: <Tag className='w-fit' value={customerOrder?.delivery} />
                             </span>
+                            <span>
+                                Trạng Thái Đơn Hàng:
+                                <Tag
+                                    severity={getSeverity(customerOrder?.orderStatusType ?? OrderStatusType.CREATED)}
+                                    value={
+                                        customerOrder?.orderStatusType !== undefined
+                                            ? statusConfig[customerOrder.orderStatusType as OrderStatusType]?.label ||
+                                              ''
+                                            : ''
+                                    }
+                                />
+                            </span>
                         </div>
-                        <div className=''>
-                            <span>Trạng Thái Đơn Hàng: </span>
-                            <Tag
-                                severity={getSeverity(customerOrder?.orderStatusType ?? OrderStatusType.CREATED)}
-                                value={
-                                    customerOrder?.orderStatusType !== undefined
-                                        ? statusConfig[customerOrder.orderStatusType as OrderStatusType]?.label || ''
-                                        : ''
-                                }
-                            />
+                        <div className='flex flex-col gap-2'>
+                            <span className='font-semibold'>Thông tin thanh toán</span>
+                            <span>
+                                Phương thức thanh toán:{' '}
+                                {paymentMethodBody(customerOrder?.paymentMethod ?? PaymentMethodType.Cash)}
+                            </span>
+                            <span>Trạng thái thanh toán: {paymentModeBody(customerOrder?.paymentStatusType)}</span>
                         </div>
                     </>
                 ) : (
                     <>
                         <div className='flex flex-col gap-2'>
+                            <span className='font-semibold'>Thông tin đơn hàng</span>
                             <span>Mã Hóa Đơn: {customerOrder?.billId}</span>
-                            <span>Số Điện Thoại: {customerOrder?.phoneNumber}</span>
-                        </div>
-                        <div className='flex flex-col gap-2'>
                             <span>
                                 Tên khách hàng: {customerOrder?.firstName} {customerOrder?.lastName}
                             </span>
+                            <span>Số Điện Thoại: {customerOrder?.phoneNumber}</span>
+                        </div>
+                        <div className='flex flex-col gap-2'>
+                            <span className='font-semibold'>Thông tin giao hàng</span>
                             <span>
                                 Hình thức giao hàng: <Tag className='w-fit' value={customerOrder?.delivery} />
                             </span>
+                            <span>
+                                Trạng thái đơn hàng:
+                                <Tag
+                                    severity={getSeverity(customerOrder?.orderStatusType ?? OrderStatusType.CREATED)}
+                                    value={
+                                        customerOrder?.orderStatusType !== undefined
+                                            ? statusConfig[customerOrder.orderStatusType as OrderStatusType]?.label ||
+                                              ''
+                                            : ''
+                                    }
+                                />
+                            </span>
                         </div>
-                        <div className=''>
-                            <span>Trạng thái đơn hàng: </span>
-                            <Tag
-                                severity={getSeverity(customerOrder?.orderStatusType ?? OrderStatusType.CREATED)}
-                                value={
-                                    customerOrder?.orderStatusType !== undefined
-                                        ? statusConfig[customerOrder.orderStatusType as OrderStatusType]?.label || ''
-                                        : ''
-                                }
-                            />
+                        <div className='flex flex-col gap-2'>
+                            <span className='font-semibold'>Thông tin thanh toán</span>
+                            <span>
+                                Phương thức thanh toán:{' '}
+                                {paymentMethodBody(customerOrder?.paymentMethod ?? PaymentMethodType.Cash)}
+                            </span>
+                            <span>Trạng thái thanh toán: {paymentModeBody(customerOrder?.paymentStatusType)}</span>
                         </div>
                     </>
                 )}

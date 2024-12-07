@@ -289,12 +289,12 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 }
                 break
             case 'unitPrice':
-                if (newValue && Number(newValue) < 100000) {
+                if (newValue && Number(newValue) < 10000) {
                     event.preventDefault()
                     return toast.current?.show({
                         severity: 'error',
                         summary: 'Lỗi',
-                        detail: 'Đơn giá phải lớn hơn 100.000 VNĐ',
+                        detail: 'Đơn giá phải lớn hơn 10,000 VNĐ',
                         life: 3000
                     })
                 }
@@ -324,12 +324,12 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 }
                 break
             case 'productCost':
-                if (newValue && Number(newValue) < 100000) {
+                if (newValue && Number(newValue) < 10000) {
                     event.preventDefault()
                     return toast.current?.show({
                         severity: 'error',
                         summary: 'Lỗi',
-                        detail: 'Giá nhập phải lớn hơn 100.000 VNĐ',
+                        detail: 'Giá nhập phải lớn hơn 10,000 VNĐ',
                         life: 3000
                     })
                 }

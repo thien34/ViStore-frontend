@@ -87,16 +87,16 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
             newErrors.name = 'Tên sản phẩm là bắt buộc'
             isValid = false
         }
-        if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 0) {
-            newErrors.price = 'Giá phải lớn hơn 0'
+        if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 10000) {
+            newErrors.price = 'Giá phải lớn hơn 10,000'
             isValid = false
         }
-        if (!formData.quantity || isNaN(Number(formData.quantity)) || formData.quantity <= 0) {
+        if (!formData.quantity || isNaN(Number(formData.quantity)) || formData.quantity < 0) {
             newErrors.quantity = 'Số lượng phải lớn hơn 0'
             isValid = false
         }
-        if (!formData.productCost || isNaN(Number(formData.productCost)) || formData.productCost <= 0) {
-            newErrors.productCost = 'Giá nhập phải lớn hơn 0'
+        if (!formData.productCost || isNaN(Number(formData.productCost)) || formData.productCost <= 10000) {
+            newErrors.productCost = 'Giá nhập phải lớn hơn 10,000'
             isValid = false
         }
 
@@ -117,6 +117,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
         if (Object.keys(isValid).length > 0) {
             return
         }
+
         if (!isValid) {
             toast.current?.show({
                 severity: 'error',
@@ -401,8 +402,8 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.price}
                                 onValueChange={(e) => {
-                                    if (e.value && e.value <= 0) {
-                                        setErrors({ ...errors, price: 'Giá phải lớn hơn 0' })
+                                    if (!e.value || e.value < 100000 || e.value > 100000000) {
+                                        setErrors({ ...errors, price: 'Giá phải từ 100,000 đến 100,000,000' })
                                     } else {
                                         setErrors({ ...errors, price: '' })
                                     }
@@ -416,8 +417,10 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
                                 mode='currency'
                                 disabled={!!discount}
                                 className={discount ? 'p-disabled' : ''}
-                                currency='USD'
-                                max={1000000}
+                                currency='VND'
+                                locale='vi-VN'
+                                minFractionDigits={0}
+                                max={100000000}
                             />
                             {errors.price && <small className='p-error'>{errors.price}</small>}
                         </div>
@@ -431,8 +434,8 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.productCost}
                                 onValueChange={(e) => {
-                                    if (e.value && e.value <= 0) {
-                                        setErrors({ ...errors, productCost: 'Giá nhập phải lớn hơn 0' })
+                                    if (e.value && e.value <= 100000) {
+                                        setErrors({ ...errors, productCost: 'Giá nhập phải lớn hơn 100,000' })
                                     } else {
                                         setErrors({ ...errors, productCost: '' })
                                     }
@@ -445,8 +448,10 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
                                 }}
                                 mode='currency'
                                 className={errors.productCost ? 'p-invalid' : ''}
-                                currency='USD'
-                                max={1000000}
+                                currency='VND'
+                                locale='vi-VN'
+                                minFractionDigits={0}
+                                max={100000000}
                             />
                             {errors.productCost && <small className='p-error'>{errors.productCost}</small>}
                         </div>
