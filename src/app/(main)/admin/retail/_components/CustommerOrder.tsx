@@ -217,7 +217,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 orderTotal: totalOrder,
                 refundedAmount: 0,
                 paidDateUtc: '',
-                billCode: 'Hóa Đơn' + numberBill,
+                billCode: 'HĐ' + numberBill,
                 deliveryMode: checked ? 0 : 1,
                 orderItems: res.map((item) => ({
                     productId: item.productResponse.id,
@@ -429,7 +429,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 toast.current?.show({
                                     severity: 'success',
                                     summary: 'Success',
-                                    detail: 'Order created successfully'
+                                    detail: 'Đơn hàng đã được tạo thành công'
                                 })
                                 await new Promise((resolve) => setTimeout(resolve, 1000))
 

@@ -3,14 +3,17 @@ import { useRef, useState } from 'react'
 import OrderService from '@/service/order.service'
 import { useUpdateEffect } from 'primereact/hooks'
 import HistoryOrder from './_components/HistoryOrder'
-import { OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
+import { CustomerOrderResponse, OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
 import ProductOrderList from './_components/ProductOrderList'
 import { OrderFilter, OrderResponse, OrderStatusType } from '@/interface/order.interface'
 import ChangeStatusOrderHistory from './_components/ChangeStatusOrderHistory'
 import CustomerOrderInfo from './_components/CustomerOrder'
 import OrderToltalPrice from './_components/OrderToltalPrice'
 import { Toast } from 'primereact/toast'
-import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
+import { ConfirmDialog } from 'primereact/confirmdialog'
+import { Dialog } from 'primereact/dialog'
+import { InputTextarea } from 'primereact/inputtextarea'
+import { Button } from 'primereact/button'
 
 interface Props {
     params: {
@@ -28,6 +31,8 @@ export default function OrderDetail({ params }: Props) {
     const [order, setOrder] = useState<OrderResponse>()
     const [filter, setFilter] = useState<OrderFilter>({})
     const toast = useRef<Toast>(null)
+    const [visible, setVisible] = useState(false)
+    const [customerOrder, setCustomerOrder] = useState<CustomerOrderResponse>()
     useUpdateEffect(() => {
         fetchOrderStatusHistory()
         fetchOrder()
@@ -37,17 +42,22 @@ export default function OrderDetail({ params }: Props) {
         OrderService.getOrderStatusHistory(id).then((response) => {
             setOrderStatusHistoryResponses(response.payload)
             setLatestStatus(response.payload[response.payload.length - 1])
+            getCustomerOrder()
         })
     }
 
     const fetchOrder = async () => {
         OrderService.getOrders(filter).then((response) => {
             setOrder(response.payload.find((order) => order.id === Number(id)))
+            setFilter({})
         })
     }
 
     const handleUpdateQuantity = async (id: number, quantity: number) => {
         await OrderService.updateOrderItem(Number(id), quantity)
+    }
+    const getCustomerOrder = () => {
+        OrderService.getCustomerOrder(Number(id)).then((res) => setCustomerOrder(res.payload))
     }
 
     const handleNextStatus = async () => {
@@ -93,32 +103,47 @@ export default function OrderDetail({ params }: Props) {
 
     const cancelOrder = async (reason: string) => {
         setVisibleConfirm(false)
-        confirmDialog({
-            message: 'Are you sure you want to cancel this order?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            defaultFocus: 'accept',
-            accept: async () => {
-                await OrderService.cancelOrder(Number(id), reason).then((response) => {
-                    if (response.status === 200) {
-                        toast.current?.show({
-                            severity: 'success',
-                            summary: 'Success',
-                            detail: 'Cancel order successfully!',
-                            life: 3000
-                        })
-                        fetchOrderStatusHistory()
-                    }
+
+        await OrderService.cancelOrder(Number(id), reason).then((response) => {
+            if (response.status === 200) {
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Thành công',
+                    detail: 'Hủy đơn hàng thành công!',
+                    life: 3000
                 })
+                fetchOrderStatusHistory()
             }
         })
+        setVisible(false)
     }
 
     return (
         <>
             <div className='card'>
-                <h4 className='text-xl font-semibold'>Order Detail</h4>
+                <h4 className='text-xl font-semibold'>Chi tiết đơn hàng</h4>
                 <ConfirmDialog />
+                <Dialog
+                    header='Hủy đơn hàng'
+                    visible={visible}
+                    onHide={() => {
+                        if (!visible) return
+                        setVisible(false)
+                    }}
+                    footer={<Button type='button' label='Xác Nhận' onClick={() => cancelOrder(reason)} />}
+                    position='top'
+                    style={{ width: '30vw' }}
+                >
+                    <h4>Lý do hủy đơn hàng</h4>
+                    <InputTextarea
+                        placeholder='Nhập lý do hủy đơn hàng ...'
+                        className='w-full h-32'
+                        minLength={30}
+                        maxLength={255}
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                    />
+                </Dialog>
                 <Toast ref={toast} />
                 <HistoryOrder
                     orderStatusHistoryResponses={orderStatusHistoryResponses}
@@ -134,9 +159,11 @@ export default function OrderDetail({ params }: Props) {
                     latestStatus={latestStatus?.status as OrderStatusType}
                     reason={reason}
                     setReason={setReason}
-                    cancelOrder={cancelOrder}
+                    setVisible={setVisible}
                 />
-                <CustomerOrderInfo />
+                {customerOrder && (
+                    <CustomerOrderInfo customerOrder={customerOrder} setCustomerOrder={setCustomerOrder} />
+                )}
                 {orderStatusHistoryResponses.length > 0 && (
                     <ProductOrderList
                         onDelete={() => {}}

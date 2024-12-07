@@ -160,13 +160,6 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
         return (
             <>
                 <Button icon='pi pi-pencil' rounded outlined className='mr-2' onClick={() => editCategory(rowData)} />
-                <Button
-                    icon='pi pi-trash'
-                    rounded
-                    outlined
-                    severity='danger'
-                    // onClick={() => confirmDeleteProduct(rowData)}
-                />
             </>
         )
     }
@@ -275,7 +268,9 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                                 autoFocus
                                 className={classNames({ 'p-invalid': submitted && !category.name })}
                             />
-                            {submitted && !category.name && <small className='p-error'>Tên danh mục là bắt buộc.</small>}
+                            {submitted && !category.name && (
+                                <small className='p-error'>Tên danh mục là bắt buộc.</small>
+                            )}
                         </div>
                         <div className='field'>
                             <label htmlFor='description' className='font-bold'>
