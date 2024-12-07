@@ -5,8 +5,10 @@ class VoucherService {
     private basePath = 'http://localhost:8080/api/admin/vouchers'
     private path = '/api/admin/vouchers'
 
-    async getAll() {
-        const response = await axios.get<{ data: Voucher[] }>(this.basePath + `?discountTypeId=ASSIGNED_TO_ORDER_TOTAL`)
+    async getAll(isBirthday: boolean) {
+        const response = await axios.get<{ data: Voucher[] }>(
+            `${this.basePath}?discountTypeId=ASSIGNED_TO_ORDER_TOTAL&&isBirthday=${isBirthday}`
+        )
         return response.data.data
     }
     async getAllIsPublished() {

@@ -15,8 +15,8 @@ const AppMenu = () => {
             items: [{ label: 'Tổng Quan', icon: 'pi pi-fw pi-home', to: '/' }]
         },
         {
-            label: 'Bán Lẻ',
-            items: [{ label: 'Bán Lẻ', icon: 'pi pi-fw pi-shop', to: '/admin/retail' }]
+            label: 'Bán Hàng',
+            items: [{ label: 'Tại Quầy', icon: 'pi pi-fw pi-shop', to: '/admin/retail' }]
         },
         {
             label: 'Danh Mục',

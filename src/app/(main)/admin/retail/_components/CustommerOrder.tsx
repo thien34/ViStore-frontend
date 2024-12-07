@@ -24,6 +24,7 @@ import { Voucher } from '@/interface/voucher.interface'
 import axios from 'axios'
 import { AutoComplete } from 'primereact/autocomplete'
 import VoucherSidebar from './VoucherSidebar'
+import dayjs from 'dayjs'
 
 interface CustommerOrderProps {
     orderTotals: {
@@ -71,6 +72,17 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [loading, setLoading] = useState(false)
     const [validVouchers, setValidVouchers] = useState([])
     const [totalDiscount, setTotalDiscount] = useState<number>(0)
+    const [hoveredVoucher, setHoveredVoucher] = useState<Voucher | null>(null)
+
+    const handleHoverEnter = (voucher: Voucher) => {
+        setHoveredVoucher(voucher)
+    }
+    const handleHoverLeave = () => {
+        setHoveredVoucher(null)
+    }
+    const handleClearCouponCodes = () => {
+        setCouponCodes([])
+    }
 
     const validateCouponCode = async () => {
         setLoading(true)
@@ -99,12 +111,29 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             if (validVoucherList.length === 0) {
                 setMessage('Không tìm thấy phiếu giảm giá hợp lệ.')
             }
-        } catch (error) {
-            console.error('Lỗi khi xác thực phiếu giảm giá:', error)
-            setMessage('Lỗi khi xác thực phiếu giảm giá. Mời thử lại.')
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Voucher Error',
+                    detail: error.response.data.message
+                })
+                console.log('====================================')
+                console.log(error.response.data.message)
+                console.log('====================================')
+            } else {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Error validating coupon. Please try again later.'
+                })
+            }
         } finally {
             setLoading(false)
         }
+    }
+    const formatDate = (dateString: string | undefined): string => {
+        return dayjs(dateString).format('DD/MM/YYYY HH:mm')
     }
 
     const handleApplyVoucher = () => {
@@ -169,6 +198,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (!billId) return
         const validVoucherIds = validVouchers.map((voucher: Voucher) => voucher.id).filter((id) => id !== undefined)
         CartService.getCart(billId).then(async (res: CartResponse[]) => {
+            const totalOrder = orderTotals.total - totalDiscount
+            const totalOrderDiscount = orderTotals.subtotal - totalDiscount
             const order: OrderRequest = {
                 customerId: customer?.id || 1,
                 orderGuid: billId,
@@ -180,10 +211,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
                 paymentMode: PaymentModeType.IN_STORE,
                 orderSubtotal: orderTotals.subtotal,
-                orderSubtotalDiscount: 0,
+                orderSubtotalDiscount: totalOrderDiscount,
                 orderShipping: orderTotals.shippingCost,
-                orderDiscount: 0,
-                orderTotal: orderTotals.total,
+                orderDiscount: totalDiscount,
+                orderTotal: totalOrder,
                 refundedAmount: 0,
                 paidDateUtc: '',
                 billCode: 'HĐ' + numberBill,
@@ -330,6 +361,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const handleOrder = async () => {
         const billId = localStorage.getItem('billIdCurrent')
         if (!billId) return
+        validateCouponCode();
         if (!validateAddress()) return
         if (!validateDiscount()) return
         if (!validatePayment()) return
@@ -344,6 +376,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             defaultFocus: 'reject',
             accept: () => {
                 CartService.getCart(billId).then(async (res: CartResponse[]) => {
+                    const totalOrder = orderTotals.total - totalDiscount
+                    const totalOrderDiscount = orderTotals.subtotal - totalDiscount
                     const order: OrderRequest = {
                         customerId: customer?.id || 1,
                         orderGuid: billId,
@@ -356,10 +390,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
                         paymentMode: PaymentModeType.IN_STORE,
                         orderSubtotal: orderTotals.subtotal,
-                        orderSubtotalDiscount: 0,
+                        orderSubtotalDiscount: totalOrderDiscount,
                         orderShipping: orderTotals.shippingCost,
-                        orderDiscount: 0,
-                        orderTotal: orderTotals.total,
+                        orderDiscount: totalDiscount,
+                        orderTotal: totalOrder,
                         refundedAmount: 0,
                         paidDateUtc: '',
                         billCode: 'Hóa Đơn' + numberBill,
@@ -406,7 +440,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             }
                         })
                         .catch((error) => {
-                            console.log(error)
                             toast.current?.show({
                                 severity: 'error',
                                 summary: 'Error',
@@ -450,16 +483,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     return (
         <div className='space-y-4 w-full'>
             <div className='card'>
-                <div className='flex justify-between items-center'>
-                    {checked && <h3 className='text-2xl font-bold'>Thông Tin Vận Chuyển</h3>}
-                    <h3></h3>
-                    <h3 className='text-2xl font-bold'>Tóm Tắt Thanh Toán</h3>
-                </div>
-                <div className='space-y-4  mt-2 flex justify-between'>
-                    <div className='w-2/3'>
-                        {/* TODO: Add customer details */}
+                <div className='flex justify-between gap-x-8'>
+                    <div className='w-[45%]'>
+                        <h3 className='text-2xl font-bold'>Thông Tin Khách Hàng</h3>
                         <ConfirmDialog />
-
                         <>
                             <div className='flex justify-between'>
                                 <div className='flex items-center justify-between gap-4 py-3'>
@@ -490,10 +517,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 </div>
                             </div>
                             <hr className='border-collapse mt-0 border-gray-300' />
-                            <div className='flex flex-wrap justify-content-between w-full'>
-                                <div className='field w-full md:w-[49%]'>
+                            <div className='flex flex-col md:flex-row justify-between gap-4 w-full'>
+                                <div className='field w-full md:w-1/2'>
                                     <label htmlFor='firstName' className='font-medium block'>
-                                        Tên Khách Hàng
+                                        Tên
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -510,9 +537,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                         className='w-full'
                                     />
                                 </div>
-                                <div className='field w-full md:w-[49%]'>
+                                <div className='field w-full md:w-1/2'>
                                     <label htmlFor='lastName' className='font-medium block'>
-                                        Họ Khách Hàng
+                                        Họ
                                     </label>
                                     <InputText
                                         onChange={(e) =>
@@ -598,88 +625,121 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             )}
                         </>
                     </div>
-                    <div className='w-1/2'>
-                        <div className='mt-6 w-full space-y-6 sm:mt-8 lg:mt-0 lg:max-w-xs xl:max-w-md float-end'>
-                            <div className='flow-root'>
-                                <div className='-my-3 divide-y divide-gray-200 dark:divide-gray-800'>
-                                    <div className='flex items-center justify-between gap-4 py-3'>
-                                        <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Vận Chuyển
-                                        </label>
-                                        <InputSwitch
-                                            checked={checked}
-                                            onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
-                                        />
-                                    </div>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <div className='flex items-center justify-center gap-3'>
-                                            <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                                Phiếu Giảm Giá
-                                            </dt>
-                                            <div className='flex items-center gap-3'>
-                                                <AutoComplete
-                                                    id='couponCode'
-                                                    className='w-4/5'
-                                                    value={couponCode}
-                                                    onInput={handleInputChange}
-                                                    onKeyDown={handleKeyDown}
-                                                    placeholder='Nhập mã giảm giá'
-                                                />
-                                                <Button
-                                                    icon='pi pi-thumbtack'
-                                                    onClick={validateCouponCode}
-                                                    loading={loading}
-                                                    disabled={loading || couponCodes.length === 0}
-                                                />
-                                            </div>
+                    <div className='w-[55%]'>
+                        <h3 className='text-2xl font-bold'>Thông Tin Đơn Hàng</h3>
+                        <div className='divide-y divide-gray-200 dark:divide-gray-800'>
+                            <div className='flex items-center justify-between gap-4 py-3'>
+                                <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                    Vận Chuyển
+                                </label>
+                                <InputSwitch
+                                    checked={checked}
+                                    onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
+                                />
+                            </div>
+                            <div className='flex justify-between gap-3 py-3'>
+                                <div className='flex items-center justify-center gap-3'>
+                                    <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                        Phiếu Giảm Giá
+                                    </label>
+                                    <AutoComplete
+                                        id='couponCode'
+                                        size={12}
+                                        value={couponCode}
+                                        onInput={handleInputChange}
+                                        onKeyDown={handleKeyDown}
+                                        placeholder='Nhập mã giảm giá'
+                                    />
+                                    <Button
+                                        icon='pi pi-thumbtack'
+                                        onClick={validateCouponCode}
+                                        loading={loading}
+                                        disabled={loading || couponCodes.length === 0}
+                                    />
+                                </div>
+                                <Button onClick={() => setVisibleRight(true)} icon='pi pi-ticket' />
+                            </div>
+                            <VoucherSidebar
+                                visibleRight={visibleRight}
+                                setVisibleRight={setVisibleRight}
+                                customer={customer}
+                                handleApplyVoucher={handleApplyVoucher}
+                            />
+                            {validVouchers.length > 0 || couponCodes.length > 0 || message ? (
+                                <dl className='bg-white p-4 rounded-md shadow-sm max-w-md mx-auto mt-3 border border-gray-200'>
+                                    {message && (
+                                        <div className='mt-2 text-xs text-red-600 font-medium border-l-4 border-red-600 pl-2 py-1 bg-red-50 rounded-sm'>
+                                            {message}
                                         </div>
-
-                                        <Button onClick={() => setVisibleRight(true)} icon='pi pi-ticket'></Button>
-                                        <VoucherSidebar
-                                            visibleRight={visibleRight}
-                                            setVisibleRight={setVisibleRight}
-                                            customer={customer}
-                                            handleApplyVoucher={handleApplyVoucher}
-                                        />
-                                    </dl>
-                                    {validVouchers.length > 0 || couponCodes.length > 0 || message ? (
-                                        <dl className='bg-white p-4 rounded-md shadow-sm max-w-md mx-auto mt-3 border border-gray-200'>
-                                            {message && (
-                                                <div className='mt-2 text-xs text-red-600 font-medium border-l-4 border-red-600 pl-2 py-1 bg-red-50 rounded-sm'>
-                                                    {message}
-                                                </div>
-                                            )}
+                                    )}
 
                                             {validVouchers.length > 0 && (
-                                                <div className='mt-3'>
-                                                    <h3 className='text-sm font-semibold text-green-700 mb-2'>
-                                                        Voucher hợp lệ:
+                                                <div className='mt-4'>
+                                                    <h3 className='text-sm font-semibold text-green-700 mb-3'>
+                                                        Valid Vouchers:
                                                     </h3>
-                                                    <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-green-200 rounded-md p-2'>
+                                                    <ul className='grid grid-cols-2 gap-3 max-h-40 border border-green-200 rounded-md p-3'>
                                                         {validVouchers.map((voucher: Voucher, index) => (
                                                             <li
                                                                 key={index}
-                                                                className='flex items-center justify-between px-2 py-1 rounded-md border border-green-500 bg-green-50 hover:bg-green-100 transition-colors text-xs'
+                                                                className='flex items-center justify-between px-3 py-2 rounded-md border border-green-500 bg-green-50 hover:bg-green-100 transition-colors text-xs relative'
+                                                                onMouseEnter={() => handleHoverEnter(voucher)}
+                                                                onMouseLeave={handleHoverLeave}
                                                             >
                                                                 <span className='font-semibold text-green-700'>
                                                                     {voucher.couponCode}
                                                                 </span>
                                                                 <button
                                                                     onClick={() => handleRemoveValidVoucher(index)}
-                                                                    className='text-red-500 hover:text-red-700 ml-1'
+                                                                    className='text-red-500 hover:text-red-700 ml-2'
                                                                 >
                                                                     ×
                                                                 </button>
+
+                                                                {hoveredVoucher?.id === voucher.id && (
+                                                                    <div className='absolute bg-white shadow-lg p-4 rounded-lg w-64 border border-gray-300 mt-60 z-20'>
+                                                                        <h4 className='font-semibold text-sm text-green-700'>
+                                                                            Voucher Conditions
+                                                                        </h4>
+                                                                        <div className='text-xs text-gray-600 mt-2 space-y-2'>
+                                                                            {(voucher.discountPercent ||
+                                                                                voucher.discountAmount) && (
+                                                                                <p>
+                                                                                    Discount:{' '}
+                                                                                    {voucher.discountPercent
+                                                                                        ? `${voucher.discountPercent}%`
+                                                                                        : `$${voucher.discountAmount}`}
+                                                                                </p>
+                                                                            )}
+                                                                            {voucher.minOderAmount && (
+                                                                                <p>
+                                                                                    Min Order Amount: $
+                                                                                    {voucher.minOderAmount}
+                                                                                </p>
+                                                                            )}
+                                                                            {voucher.maxDiscountAmount && (
+                                                                                <p>
+                                                                                    Max Discount: $
+                                                                                    {voucher.maxDiscountAmount}
+                                                                                </p>
+                                                                            )}
+                                                                            <p>
+                                                                                Validity:{' '}
+                                                                                {formatDate(voucher.startDateUtc)} -{' '}
+                                                                                {formatDate(voucher.endDateUtc)}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                             </li>
                                                         ))}
                                                     </ul>
                                                 </div>
                                             )}
-
                                             {couponCodes.length > 0 && (
                                                 <div className='mt-4'>
                                                     <h3 className='text-sm font-semibold text-blue-700 mb-2'>
-                                                        Mã phiếu giảm giá đã nhập:
+                                                        Entered Coupon Codes:
                                                     </h3>
                                                     <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2'>
                                                         {couponCodes.map((code, index) => (
@@ -699,78 +759,78 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                                             </li>
                                                         ))}
                                                     </ul>
+                                                    <div className='mt-2'>
+                                                        <button
+                                                            onClick={handleClearCouponCodes}
+                                                            className='px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition-colors text-sm'
+                                                        >
+                                                            Clear All
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             )}
 
-                                            {validVouchers.length === 0 && couponCodes.length === 0 && (
-                                                <div className='mt-3 text-xs text-gray-500 text-center font-medium'>
-                                                    Không áp dụng giảm giá.
-                                                </div>
-                                            )}
-                                        </dl>
-                                    ) : null}
+                                    {validVouchers.length === 0 && couponCodes.length === 0 && (
+                                        <div className='mt-3 text-xs text-gray-500 text-center font-medium'>
+                                            Không áp dụng giảm giá.
+                                        </div>
+                                    )}
+                                </dl>
+                            ) : null}
 
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Tổng phụ
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${orderTotals.subtotal.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Chi phí vận chuyển
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${orderTotals.shippingCost.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Giảm giá
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${totalDiscount.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                            Tổng cộng
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            $
-                                            {(
-                                                orderTotals.subtotal +
-                                                orderTotals.shippingCost +
-                                                orderTotals.tax -
-                                                totalDiscount
-                                            ).toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                    <dl className='flex items-center justify-between gap-4 py-3'>
-                                        <dt className='text-base font-normal flex items-center gap-2 text-gray-500 dark:text-gray-400'>
-                                            Thanh toán của khách hàng
-                                            <FaIdCard
-                                                className='text-primary-700 text-5xl cursor-pointer'
-                                                onClick={handlePayment}
-                                            />
-                                        </dt>
-                                        <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                            ${amountPaid.toFixed(2)}
-                                        </dd>
-                                    </dl>
-                                </div>
-                            </div>
-                            <div className='space-y-3'>
-                                <button
-                                    type='submit'
-                                    className='flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800'
-                                    onClick={handleOrder}
-                                >
-                                    Tiến hành thanh toán
-                                </button>
-                            </div>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Tổng phụ</dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${orderTotals.subtotal.toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                    Chi phí vận chuyển
+                                </dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${orderTotals.shippingCost.toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Giảm giá</dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${totalDiscount.toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Tổng cộng</dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    $
+                                    {(
+                                        orderTotals.subtotal +
+                                        orderTotals.shippingCost +
+                                        orderTotals.tax -
+                                        totalDiscount
+                                    ).toFixed(2)}
+                                </dd>
+                            </dl>
+                            <dl className='flex items-center justify-between gap-4 py-3'>
+                                <dt className='text-base font-normal flex items-center gap-2 text-gray-500 dark:text-gray-400'>
+                                    Thanh toán của khách hàng
+                                    <FaIdCard
+                                        className='text-primary-700 text-5xl cursor-pointer'
+                                        onClick={handlePayment}
+                                    />
+                                </dt>
+                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                    ${amountPaid.toFixed(2)}
+                                </dd>
+                            </dl>
+                        </div>
+                        <div className='space-y-3'>
+                            <button
+                                type='submit'
+                                className='flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800'
+                                onClick={handleOrder}
+                            >
+                                Tiến hành thanh toán
+                            </button>
                         </div>
                     </div>
                 </div>
