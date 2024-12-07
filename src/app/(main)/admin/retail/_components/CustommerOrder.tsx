@@ -24,6 +24,7 @@ import { Voucher } from '@/interface/voucher.interface'
 import axios from 'axios'
 import { AutoComplete } from 'primereact/autocomplete'
 import VoucherSidebar from './VoucherSidebar'
+import dayjs from 'dayjs'
 
 interface CustommerOrderProps {
     orderTotals: {
@@ -71,6 +72,17 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [loading, setLoading] = useState(false)
     const [validVouchers, setValidVouchers] = useState([])
     const [totalDiscount, setTotalDiscount] = useState<number>(0)
+    const [hoveredVoucher, setHoveredVoucher] = useState<Voucher | null>(null)
+
+    const handleHoverEnter = (voucher: Voucher) => {
+        setHoveredVoucher(voucher)
+    }
+    const handleHoverLeave = () => {
+        setHoveredVoucher(null)
+    }
+    const handleClearCouponCodes = () => {
+        setCouponCodes([])
+    }
 
     const validateCouponCode = async () => {
         setLoading(true)
@@ -99,12 +111,29 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             if (validVoucherList.length === 0) {
                 setMessage('Không tìm thấy phiếu giảm giá hợp lệ.')
             }
-        } catch (error) {
-            console.error('Lỗi khi xác thực phiếu giảm giá:', error)
-            setMessage('Lỗi khi xác thực phiếu giảm giá. Mời thử lại.')
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Voucher Error',
+                    detail: error.response.data.message
+                })
+                console.log('====================================')
+                console.log(error.response.data.message)
+                console.log('====================================')
+            } else {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Error validating coupon. Please try again later.'
+                })
+            }
         } finally {
             setLoading(false)
         }
+    }
+    const formatDate = (dateString: string | undefined): string => {
+        return dayjs(dateString).format('DD/MM/YYYY HH:mm')
     }
 
     const handleApplyVoucher = () => {
@@ -169,6 +198,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (!billId) return
         const validVoucherIds = validVouchers.map((voucher: Voucher) => voucher.id).filter((id) => id !== undefined)
         CartService.getCart(billId).then(async (res: CartResponse[]) => {
+            const totalOrder = orderTotals.total - totalDiscount
+            const totalOrderDiscount = orderTotals.subtotal - totalDiscount
             const order: OrderRequest = {
                 customerId: customer?.id || 1,
                 orderGuid: billId,
@@ -180,10 +211,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
                 paymentMode: PaymentModeType.IN_STORE,
                 orderSubtotal: orderTotals.subtotal,
-                orderSubtotalDiscount: 0,
+                orderSubtotalDiscount: totalOrderDiscount,
                 orderShipping: orderTotals.shippingCost,
-                orderDiscount: 0,
-                orderTotal: orderTotals.total,
+                orderDiscount: totalDiscount,
+                orderTotal: totalOrder,
                 refundedAmount: 0,
                 paidDateUtc: '',
                 billCode: 'Hóa Đơn' + numberBill,
@@ -330,6 +361,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const handleOrder = async () => {
         const billId = localStorage.getItem('billIdCurrent')
         if (!billId) return
+        validateCouponCode();
         if (!validateAddress()) return
         if (!validateDiscount()) return
         if (!validatePayment()) return
@@ -344,6 +376,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             defaultFocus: 'reject',
             accept: () => {
                 CartService.getCart(billId).then(async (res: CartResponse[]) => {
+                    const totalOrder = orderTotals.total - totalDiscount
+                    const totalOrderDiscount = orderTotals.subtotal - totalDiscount
                     const order: OrderRequest = {
                         customerId: customer?.id || 1,
                         orderGuid: billId,
@@ -356,10 +390,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
                         paymentMode: PaymentModeType.IN_STORE,
                         orderSubtotal: orderTotals.subtotal,
-                        orderSubtotalDiscount: 0,
+                        orderSubtotalDiscount: totalOrderDiscount,
                         orderShipping: orderTotals.shippingCost,
-                        orderDiscount: 0,
-                        orderTotal: orderTotals.total,
+                        orderDiscount: totalDiscount,
+                        orderTotal: totalOrder,
                         refundedAmount: 0,
                         paidDateUtc: '',
                         billCode: 'Hóa Đơn' + numberBill,
@@ -389,21 +423,29 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             : null,
                         idVouchers: validVoucherIds
                     }
-                    OrderService.createOrder(order).then(async (res) => {
-                        if (res.status === 200) {
-                            toast.current?.show({
-                                severity: 'success',
-                                summary: 'Success',
-                                detail: 'Đơn hàng đã được tạo thành công'
-                            })
-                            await new Promise((resolve) => setTimeout(resolve, 1000))
+                    OrderService.createOrder(order)
+                        .then(async (res) => {
+                            if (res.status === 200) {
+                                toast.current?.show({
+                                    severity: 'success',
+                                    summary: 'Success',
+                                    detail: 'Order created successfully'
+                                })
+                                await new Promise((resolve) => setTimeout(resolve, 1000))
 
-                            localStorage.removeItem('billIdCurrent')
-                            setCustomer(null)
-                            await CartService.deleteBill(billId)
-                            await fetchBill()
-                        }
-                    })
+                                localStorage.removeItem('billIdCurrent')
+                                setCustomer(null)
+                                await CartService.deleteBill(billId)
+                                await fetchBill()
+                            }
+                        })
+                        .catch((error) => {
+                            toast.current?.show({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: error instanceof Error ? error.message : 'Đã xảy ra lỗi'
+                            })
+                        })
                 })
             }
         })
@@ -631,55 +673,102 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                         </div>
                                     )}
 
-                                    {validVouchers.length > 0 && (
-                                        <div className='mt-3'>
-                                            <h3 className='text-sm font-semibold text-green-700 mb-2'>
-                                                Voucher hợp lệ:
-                                            </h3>
-                                            <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-green-200 rounded-md p-2'>
-                                                {validVouchers.map((voucher: Voucher, index) => (
-                                                    <li
-                                                        key={index}
-                                                        className='flex items-center justify-between px-2 py-1 rounded-md border border-green-500 bg-green-50 hover:bg-green-100 transition-colors text-xs'
-                                                    >
-                                                        <span className='font-semibold text-green-700'>
-                                                            {voucher.couponCode}
-                                                        </span>
-                                                        <button
-                                                            onClick={() => handleRemoveValidVoucher(index)}
-                                                            className='text-red-500 hover:text-red-700 ml-1'
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
+                                            {validVouchers.length > 0 && (
+                                                <div className='mt-4'>
+                                                    <h3 className='text-sm font-semibold text-green-700 mb-3'>
+                                                        Valid Vouchers:
+                                                    </h3>
+                                                    <ul className='grid grid-cols-2 gap-3 max-h-40 border border-green-200 rounded-md p-3'>
+                                                        {validVouchers.map((voucher: Voucher, index) => (
+                                                            <li
+                                                                key={index}
+                                                                className='flex items-center justify-between px-3 py-2 rounded-md border border-green-500 bg-green-50 hover:bg-green-100 transition-colors text-xs relative'
+                                                                onMouseEnter={() => handleHoverEnter(voucher)}
+                                                                onMouseLeave={handleHoverLeave}
+                                                            >
+                                                                <span className='font-semibold text-green-700'>
+                                                                    {voucher.couponCode}
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => handleRemoveValidVoucher(index)}
+                                                                    className='text-red-500 hover:text-red-700 ml-2'
+                                                                >
+                                                                    ×
+                                                                </button>
 
-                                    {couponCodes.length > 0 && (
-                                        <div className='mt-4'>
-                                            <h3 className='text-sm font-semibold text-blue-700 mb-2'>
-                                                Mã phiếu giảm giá đã nhập:
-                                            </h3>
-                                            <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2'>
-                                                {couponCodes.map((code, index) => (
-                                                    <li
-                                                        key={index}
-                                                        className='flex items-center justify-between px-2 py-1 rounded-md border border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors text-xs'
-                                                    >
-                                                        <span className='font-medium text-gray-700'>{code}</span>
+                                                                {hoveredVoucher?.id === voucher.id && (
+                                                                    <div className='absolute bg-white shadow-lg p-4 rounded-lg w-64 border border-gray-300 mt-60 z-20'>
+                                                                        <h4 className='font-semibold text-sm text-green-700'>
+                                                                            Voucher Conditions
+                                                                        </h4>
+                                                                        <div className='text-xs text-gray-600 mt-2 space-y-2'>
+                                                                            {(voucher.discountPercent ||
+                                                                                voucher.discountAmount) && (
+                                                                                <p>
+                                                                                    Discount:{' '}
+                                                                                    {voucher.discountPercent
+                                                                                        ? `${voucher.discountPercent}%`
+                                                                                        : `$${voucher.discountAmount}`}
+                                                                                </p>
+                                                                            )}
+                                                                            {voucher.minOderAmount && (
+                                                                                <p>
+                                                                                    Min Order Amount: $
+                                                                                    {voucher.minOderAmount}
+                                                                                </p>
+                                                                            )}
+                                                                            {voucher.maxDiscountAmount && (
+                                                                                <p>
+                                                                                    Max Discount: $
+                                                                                    {voucher.maxDiscountAmount}
+                                                                                </p>
+                                                                            )}
+                                                                            <p>
+                                                                                Validity:{' '}
+                                                                                {formatDate(voucher.startDateUtc)} -{' '}
+                                                                                {formatDate(voucher.endDateUtc)}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                            {couponCodes.length > 0 && (
+                                                <div className='mt-4'>
+                                                    <h3 className='text-sm font-semibold text-blue-700 mb-2'>
+                                                        Entered Coupon Codes:
+                                                    </h3>
+                                                    <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2'>
+                                                        {couponCodes.map((code, index) => (
+                                                            <li
+                                                                key={index}
+                                                                className='flex items-center justify-between px-2 py-1 rounded-md border border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors text-xs'
+                                                            >
+                                                                <span className='font-medium text-gray-700'>
+                                                                    {code}
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => handleRemoveCouponCode(index)}
+                                                                    className='text-red-500 hover:text-red-700 ml-1'
+                                                                >
+                                                                    ×
+                                                                </button>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                    <div className='mt-2'>
                                                         <button
-                                                            onClick={() => handleRemoveCouponCode(index)}
-                                                            className='text-red-500 hover:text-red-700 ml-1'
+                                                            onClick={handleClearCouponCodes}
+                                                            className='px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition-colors text-sm'
                                                         >
-                                                            ×
+                                                            Clear All
                                                         </button>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
+                                                    </div>
+                                                </div>
+                                            )}
 
                                     {validVouchers.length === 0 && couponCodes.length === 0 && (
                                         <div className='mt-3 text-xs text-gray-500 text-center font-medium'>

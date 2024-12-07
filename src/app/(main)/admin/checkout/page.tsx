@@ -42,12 +42,6 @@ export default function CheckoutPage() {
         CartService.getCart(billId).then((res) => {
             const sortedCarts = res.sort((a, b) => a.cartUUID.localeCompare(b.cartUUID))
             setCarts(sortedCarts)
-            setAmountPaidLocal(
-                sortedCarts.reduce((total, cart) => {
-                    const price = cart.productResponse.discountPrice || cart.productResponse.price
-                    return total + price * cart.quantity
-                }, 0)
-            )
         })
     }
 
