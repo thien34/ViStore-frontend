@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@payos/node": "^1.0.10",
+        "@payos/payos-checkout": "^1.0.8",
         "@reactuiutils/horizontal-timeline": "^1.0.4",
         "@reduxjs/toolkit": "^2.3.0",
         "@stripe/react-stripe-js": "^2.8.1",

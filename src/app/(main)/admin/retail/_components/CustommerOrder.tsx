@@ -63,7 +63,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [addresses, setAddresses] = useState<AddressesResponse[]>([])
     const [selectedAddress, setSelectedAddress] = useState<AddressesResponse | null>(null)
     const toast = useRef<Toast>(null)
-    const [, setOrderLocal] = useLocalStorage('orderLocal', '')
+    const [, setOrderLocal] = useLocalStorage<string>('', 'orderLocal')
 
     const [couponCode, setCouponCode] = useState('')
     const [couponCodes, setCouponCodes] = useState<string[]>([])
@@ -437,6 +437,16 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (couponCodes.length > 0) validateCouponCode()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [orderTotals.subtotal])
+
+    useEffect(() => {
+        if (amountPaid > 0)
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Đã lưu thanh toán thành công',
+                life: 3000
+            })
+    }, [amountPaid])
 
     return (
         <div className='space-y-4 w-full'>
