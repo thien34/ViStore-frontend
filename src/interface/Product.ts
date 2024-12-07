@@ -14,14 +14,19 @@ export interface ProductRequest {
     deleted?: boolean
     categoryId?: number
     manufacturerId?: number
-    attributes?: ProductAttribute[]
+    attributes?: ProductAttributeValue[];
     image?: File
 }
 
-export interface ProductAttribute {
-    id?: number
-    productId?: number
-    value?: string
+export interface ProductAttributeValue {
+    id?: number;
+    productId?: number;
+    value?: string;
+}
+
+export interface ProductAttribute extends ProductAttributeValue {
+    name: string;
+    description: string;
 }
 
 export interface ProductAttributeValueResponse {

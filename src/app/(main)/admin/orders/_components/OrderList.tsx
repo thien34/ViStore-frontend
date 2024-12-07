@@ -6,6 +6,10 @@ import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
 import { Tag } from 'primereact/tag'
 import React from 'react'
+import { FaTimesCircle } from 'react-icons/fa'
+import { FaRegCheckCircle, FaTruck } from 'react-icons/fa'
+import { FaRegClock } from 'react-icons/fa'
+import { FaRegCalendarCheck } from 'react-icons/fa'
 import { TbEyeEdit } from 'react-icons/tb'
 
 interface Props {
@@ -13,6 +17,18 @@ interface Props {
 }
 
 export default function OrderList({ orders }: Props) {
+    const statusConfig = {
+        [OrderStatusType.CREATED]: { label: 'Tạo', icon: FaRegCalendarCheck, color: 'blue' },
+        [OrderStatusType.PENDING]: { label: 'Chờ xử lý', icon: FaRegClock, color: 'orange' },
+        [OrderStatusType.CONFIRMED]: { label: 'Đã xác nhận', icon: FaRegCheckCircle, color: 'cyan' },
+        [OrderStatusType.SHIPPING_PENDING]: { label: 'Chờ vận chuyển', icon: FaTruck, color: 'teal' },
+        [OrderStatusType.SHIPPING_CONFIRMED]: { label: 'Đã xác nhận vận chuyển', icon: FaTruck, color: 'purple' },
+        [OrderStatusType.DELIVERING]: { label: 'Đang giao hàng', icon: FaTruck, color: 'gold' },
+        [OrderStatusType.DELIVERED]: { label: 'Đã giao hàng', icon: FaRegCheckCircle, color: 'green' },
+        [OrderStatusType.PAID]: { label: 'Đã thanh toán', icon: FaRegCalendarCheck, color: 'darkgreen' },
+        [OrderStatusType.COMPLETED]: { label: 'Thành công', icon: FaRegCheckCircle, color: 'darkblue' },
+        [OrderStatusType.CANCELLED]: { label: 'Đã hủy', icon: FaTimesCircle, color: 'red' }
+    }
     const formatDate = (date: string) => {
         if (!date) return ''
         const dateObj = new Date(date)
@@ -27,29 +43,30 @@ export default function OrderList({ orders }: Props) {
         })
         return `${dateStr} ${timeStr}`
     }
-
     const orderStatusBody = (row: OrderResponse) => {
-        switch (row.orderStatus) {
+        const status = statusConfig[row.orderStatus as OrderStatusType]
+        if (!status) {
+            return <Tag value='Trạng thái không xác định' />
+        }
+        return <Tag value={status.label} severity={getSeverity(row.orderStatus)} />
+    }
+    const getSeverity = (orderStatus: OrderStatusType) => {
+        switch (orderStatus) {
             case OrderStatusType.PENDING:
-                return <Tag value='Pending' severity='info' />
+                return 'info'
             case OrderStatusType.CONFIRMED:
-                return <Tag value='Confirmed' severity='success' />
-            case OrderStatusType.SHIPPING_PENDING:
-                return <Tag value='Shipping Pending' severity='warning' />
-            case OrderStatusType.SHIPPING_CONFIRMED:
-                return <Tag value='Shipping Confirmed' severity='info' />
-            case OrderStatusType.DELIVERING:
-                return <Tag value='Delivering' severity='info' />
             case OrderStatusType.DELIVERED:
-                return <Tag value='Delivered' severity='success' />
-            case OrderStatusType.PAID:
-                return <Tag value='Paid' severity='success' />
             case OrderStatusType.COMPLETED:
-                return <Tag value='Completed' severity='success' />
+            case OrderStatusType.PAID:
+                return 'success'
+            case OrderStatusType.SHIPPING_PENDING:
+            case OrderStatusType.SHIPPING_CONFIRMED:
+            case OrderStatusType.DELIVERING:
+                return 'warning'
             case OrderStatusType.CANCELLED:
-                return <Tag value='Cancelled' severity='danger' />
+                return 'danger'
             default:
-                return <Tag value={OrderStatusType[row.orderStatus]} />
+                return 'info'
         }
     }
 
@@ -86,7 +103,7 @@ export default function OrderList({ orders }: Props) {
 
     const customerNameBody = (row: OrderResponse) => {
         if (row.customerId == 1) {
-            return <Tag value='Guest' severity='info' />
+            return <Tag value='Khách lẻ' severity='info' />
         }
         return <span>{row.customerName}</span>
     }
@@ -95,20 +112,20 @@ export default function OrderList({ orders }: Props) {
         <div className='card'>
             <DataTable value={orders} paginator rows={10} rowsPerPageOptions={[10, 20, 50]}>
                 <Column body={(_, { rowIndex }) => rowIndex + 1} header='#' />
-                <Column align='center' field='billCode' header='Bill Code' />
-                <Column align='center' field='customerName' header='Customer Name' body={customerNameBody} />
-                <Column align='center' field='orderStatus' header='Order Status' body={orderStatusBody} />
-                <Column align='center' field='totalItem' header='Total Item' />
-                <Column align='center' field='orderTotal' header='Price Total' body={(row) => `$${row.orderTotal} `} />
-                <Column align='center' field='paymentMethod' header='Payment Method' body={paymentMethodBody} />
-                <Column align='center' field='paymentMode' header='Payment Mode' body={paymentModeBody} />
+                <Column align='center' field='billCode' header='Mã Hóa Đơn' />
+                <Column align='center' field='customerName' header='Khách Hàng' body={customerNameBody} />
+                <Column align='center' field='orderStatus' header='Trạng Thái' body={orderStatusBody} />
+                <Column align='center' field='totalItem' header='Tổng Sản Phẩm' />
+                <Column align='center' field='orderTotal' header='Tổng Tiền' body={(row) => `$${row.orderTotal} `} />
+                <Column align='center' field='paymentMethod' header='Phương Thức Thanh Toán' body={paymentMethodBody} />
+                <Column align='center' field='paymentMode' header='Hình Thức Thanh Toán' body={paymentModeBody} />
                 <Column
                     align='center'
                     field='paidDateUtc'
-                    header='Paid Date'
+                    header='Ngày Thanh Toán'
                     body={(row) => formatDate(row.paidDateUtc)}
                 />
-                <Column align='center' field='action' header='Action' body={orderDetailBody} />
+                <Column align='center' field='action' header='Chi Tiết' body={orderDetailBody} />
             </DataTable>
         </div>
     )

@@ -117,7 +117,7 @@ export default function OrderDetail({ params }: Props) {
     return (
         <>
             <div className='card'>
-                <h4 className='text-xl font-semibold'>Order Detail</h4>
+                <h4 className='text-xl font-semibold'>Chi tiết đơn hàng</h4>
                 <ConfirmDialog />
                 <Toast ref={toast} />
                 <HistoryOrder

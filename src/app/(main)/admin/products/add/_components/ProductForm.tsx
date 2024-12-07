@@ -22,6 +22,10 @@ import { useRouter } from 'next/navigation'
 import ManagerPath from '@/constants/ManagerPath'
 import Spinner from '@/components/spinner/Spinner'
 import RequiredIcon from '@/components/icon/RequiredIcon'
+import AtbDialog from './AtbDialog'
+import productAttributeService from '@/service/productAttribute.service'
+import { useMountEffect } from 'primereact/hooks'
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
 
 export interface AttributeRow {
     selectedAttribute: ProductAttributeName | null
@@ -52,9 +56,12 @@ const columns: ColumnMeta[] = [
 interface ProductAddFormProps {
     categories: TreeNode[]
     manufacturers: ManufacturerName[]
-    productAttributes: ProductAttributeName[]
 }
-const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacturers, productAttributes }) => {
+const emptyProductAttribute: ProductAttribute = {
+    name: '',
+    description: ''
+}
+const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacturers }) => {
     const [attributeRows, setAttributeRows] = useState<AttributeRow[]>([])
     const [combinedRows, setCombinedRows] = useState<CombinedRow[]>([])
     const [name, setName] = useState<string>('')
@@ -68,6 +75,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const [categoryError, setCategoryError] = useState<string>('')
     const [manufactureError, setManufactureError] = useState<string>('')
     const [weightError, setWeightError] = useState<string>('')
+    const [productAttribute, setProductAttribute] = useState<ProductAttribute>(emptyProductAttribute)
+    const [submitted, setSubmitted] = useState(false)
+    const [productAttributes, setProductAttributes] = useState<ProductAttributeName[]>([])
+
     const [bulkValues, setBulkValues] = useState({
         unitPrice: 0,
         productCost: 0,
@@ -77,7 +88,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
-
+    const [atbDialogVisible, setAtbDialogVisible] = useState(false)
     const addCustomTag = (tag: string, index: number) => {
         setAttributeRows((prevRows) => {
             const newRows = [...prevRows]
@@ -88,7 +99,13 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             return newRows
         })
     }
-
+    useMountEffect(() => {
+        fetchAttributes()
+    })
+    const fetchAttributes = async () => {
+        const response = await productAttributeService.getListName()
+        setProductAttributes(response.payload)
+    }
     const handleKeydown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         if (event.key === 'Enter') {
             const input = (event.target as HTMLInputElement).value.trim()
@@ -104,11 +121,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 })
                 return
             }
-            if (!/^[a-zA-Z0-9\s]+(?:-[a-zA-Z0-9\s]+)*$/.test(input)) {
+            if (!/^[a-zA-Z0-9\u00C0-\u024F\s-]+$/.test(input)) {
                 toast.current?.show({
                     severity: 'error',
-                    summary: 'Error',
-                    detail: 'Chỉ được phép sử dụng chữ cái, số, khoảng cách và dấu gạch nối, nhưng không được theo sau dấu gạch nối bằng số',
+                    detail: 'Giá trị thuộc tính không hợp lệ',
                     life: 3000
                 })
                 return
@@ -135,6 +151,15 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     }
 
     const addAttributeRow = () => {
+        if (attributeRows.length >= 5) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Số lượng thuộc tính không được vượt quá 5',
+                life: 3000
+            })
+            return
+        }
         setAttributeRows([...attributeRows, { selectedAttribute: null, selectedValues: [] }])
     }
     const generateCombinations = () => {
@@ -153,9 +178,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                         newCombinations.push({
                             name: name,
                             sku: '',
-                            productCost: 100,
-                            unitPrice: 100,
-                            quantity: 10,
+                            productCost: 100000,
+                            unitPrice: 100000,
+                            quantity: 50,
                             gtin: '',
                             images: []
                         })
@@ -188,24 +213,44 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     }
 
     const removeCombinationRow = (index: number) => {
-        const newCombinedRows = combinedRows.filter((_, i) => i !== index)
+        confirmDialog({
+            message: 'Bạn có chắc chắn muốn xóa kết thuộc tính hợp này không?',
+            header: 'Xác nhận xóa kết hợp',
+            icon: 'pi pi-info-circle',
+            defaultFocus: 'reject',
+            acceptClassName: 'p-button-danger',
+            accept: () => {
+                const newCombinedRows = combinedRows.filter((_, i) => i !== index)
 
-        const updatedAttributeRows = attributeRows.map((row) => {
-            const updatedSelectedValues = row.selectedValues.filter((value) =>
-                newCombinedRows.some((combinedRow) => combinedRow.name.includes(value))
-            )
-            return { ...row, selectedValues: updatedSelectedValues }
+                const updatedAttributeRows = attributeRows.map((row) => {
+                    const updatedSelectedValues = row.selectedValues.filter((value) =>
+                        newCombinedRows.some((combinedRow) => combinedRow.name.includes(value))
+                    )
+                    return { ...row, selectedValues: updatedSelectedValues }
+                })
+
+                generateCombinations()
+                setCombinedRows(newCombinedRows)
+                setAttributeRows(updatedAttributeRows)
+            },
+            reject: () => {}
         })
-
-        generateCombinations()
-        setCombinedRows(newCombinedRows)
-        setAttributeRows(updatedAttributeRows)
     }
 
     const removeAttributeRow = (index: number) => {
-        setAttributeRows((prevRows) => prevRows.filter((_, i) => i !== index))
-        attributeRows[index].selectedValues = []
-        generateCombinations()
+        confirmDialog({
+            message: 'Bạn có chắc chắn muốn xóa thuộc tính này không?',
+            header: 'Xác nhận xóa thuộc tính',
+            icon: 'pi pi-info-circle',
+            defaultFocus: 'reject',
+            acceptClassName: 'p-button-danger',
+            accept: () => {
+                setAttributeRows((prevRows) => prevRows.filter((_, i) => i !== index))
+                attributeRows[index].selectedValues = []
+                generateCombinations()
+            },
+            reject: () => {}
+        })
     }
 
     const isPositiveInteger = (val: number) => {
@@ -230,35 +275,79 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             case 'quantity':
                 if (newValue && Number(newValue) > 1000000) {
                     event.preventDefault()
-                } else if (isPositiveInteger(newValue)) {
+                    return toast.current?.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Số lượng không được vượt quá 1.000.000',
+                        life: 3000
+                    })
+                }
+                if (isPositiveInteger(newValue)) {
                     rowData[field] = newValue
                 } else {
                     event.preventDefault()
                 }
                 break
             case 'unitPrice':
-                if (newValue && Number(newValue) > 1000000) {
+                if (newValue && Number(newValue) < 100000) {
                     event.preventDefault()
-                } else if (isPositiveInteger(newValue)) {
-                    if (Number(newValue) < Number(rowData.productCost)) {
-                        event.preventDefault()
-                    } else {
-                        rowData[field] = newValue
-                    }
-                } else {
-                    event.preventDefault()
+                    return toast.current?.show({
+                        severity: 'error',
+                        summary: 'Lỗi',
+                        detail: 'Đơn giá phải lớn hơn 100.000 VNĐ',
+                        life: 3000
+                    })
                 }
-                break
-            case 'productCost':
-                if (newValue && Number(newValue) > 1000000) {
+                if (newValue && Number(newValue) > 100000000) {
                     event.preventDefault()
-                } else if (isPositiveInteger(newValue)) {
+                    return toast.current?.show({
+                        severity: 'error',
+                        summary: 'Lỗi',
+                        detail: 'Đơn giá không được vượt quá 100.000.000 VNĐ',
+                        life: 3000
+                    })
+                }
+                if (newValue && Number(newValue) < rowData.productCost) {
+                    event.preventDefault()
+                    return toast.current?.show({
+                        severity: 'error',
+                        summary: 'Lỗi',
+                        detail: 'Đơn giá phải lớn hơn hoặc bằng giá nhập',
+                        life: 3000
+                    })
+                }
+
+                if (isPositiveInteger(newValue)) {
                     rowData[field] = newValue
                 } else {
                     event.preventDefault()
                 }
                 break
-
+            case 'productCost':
+                if (newValue && Number(newValue) < 100000) {
+                    event.preventDefault()
+                    return toast.current?.show({
+                        severity: 'error',
+                        summary: 'Lỗi',
+                        detail: 'Giá nhập phải lớn hơn 100.000 VNĐ',
+                        life: 3000
+                    })
+                }
+                if (newValue && Number(newValue) > 100000000) {
+                    event.preventDefault()
+                    return toast.current?.show({
+                        severity: 'error',
+                        summary: 'Lỗi',
+                        detail: 'Giá nhập không được vượt quá 100.000.000 VNĐ',
+                        life: 3000
+                    })
+                }
+                if (isPositiveInteger(newValue)) {
+                    rowData[field] = newValue
+                } else {
+                    event.preventDefault()
+                }
+                break
             case 'sku':
                 if (isSkuUnique(newValue)) {
                     rowData[field] = newValue
@@ -437,6 +526,37 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     }
 
     const handleBulkUpdate = (field: 'unitPrice' | 'productCost' | 'quantity', value: number) => {
+        if (field === 'unitPrice') {
+            if (value < 100000) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Đơn giá phải lớn hơn 100.000 VNĐ',
+                    life: 3000
+                })
+                return
+            }
+            if (value > 100000000) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Đơn giá không được vượt quá 100.000.000 VNĐ',
+                    life: 3000
+                })
+                return
+            }
+        } else if (field === 'quantity') {
+            if (value > 1000000) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Số lượng không được vượt quá 1.000.000',
+                    life: 3000
+                })
+                return
+            }
+        }
+
         setBulkValues((prev) => ({ ...prev, [field]: value }))
     }
 
@@ -457,8 +577,42 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         return attributeRows.length >= availableAttributes.length
     }
 
+    const saveProductAttribute = async () => {
+        setSubmitted(true)
+        if (productAttribute.name.trim()) {
+            if (!productAttribute.id) {
+                await productAttributeService
+                    .create(productAttribute)
+                    .then(() => {
+                        toast.current?.show({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Thuộc tính sản phẩm đã được thêm thành công',
+                            life: 3000
+                        })
+                        hideDialog()
+                    })
+                    .catch((error) => {
+                        toast.current?.show({
+                            severity: 'error',
+                            summary: 'Error',
+                            detail: error.message,
+                            life: 3000
+                        })
+                    })
+            }
+        }
+    }
+    const hideDialog = () => {
+        setSubmitted(false)
+        setProductAttribute(emptyProductAttribute)
+        setAtbDialogVisible(false)
+        fetchAttributes()
+    }
+
     return (
         <div>
+            <ConfirmDialog />
             <Toast ref={toast} />
             <Spinner isLoading={isLoading} />
             <div className='card'>
@@ -573,14 +727,30 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 <Dropdown
                                     value={row.selectedAttribute}
                                     options={[
+                                        { id: 'add-new', name: '+ Thêm  thuộc tính' },
                                         ...getAvailableAttributes(),
                                         ...productAttributes.filter((attr) => attr.id === row.selectedAttribute?.id)
                                     ]}
+                                    itemTemplate={(option) => (
+                                        <div
+                                            className={
+                                                option.id === 'add-new'
+                                                    ? 'text-green-600 rounded-lg bg-yellow-300 font-semibold text-center border-t border-gray-200 hover:bg-yellow-500'
+                                                    : 'text-gray-800'
+                                            }
+                                        >
+                                            {option.name}
+                                        </div>
+                                    )}
                                     onChange={(e) => {
-                                        const updatedRows = [...attributeRows]
-                                        updatedRows[index].selectedAttribute = e.value
-                                        setAttributeRows(updatedRows)
-                                        generateCombinations()
+                                        if (e.value?.id === 'add-new') {
+                                            setAtbDialogVisible(true)
+                                        } else {
+                                            const updatedRows = [...attributeRows]
+                                            updatedRows[index].selectedAttribute = e.value
+                                            setAttributeRows(updatedRows)
+                                            generateCombinations()
+                                        }
                                     }}
                                     optionLabel='name'
                                     placeholder='Chọn một thuộc tính'
@@ -624,8 +794,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             id='bulkUnitPrice'
                                             value={bulkValues.unitPrice}
                                             onValueChange={(e) => handleBulkUpdate('unitPrice', e.value || 0)}
-                                            min={0}
-                                            max={1000000}
+                                            min={100000}
+                                            max={100000000}
                                         />
                                         <Button onClick={() => applyBulkUpdate('unitPrice')} label='Áp Dụng' />
                                     </div>
@@ -639,8 +809,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             id='bulkProductCost'
                                             value={bulkValues.productCost}
                                             onValueChange={(e) => handleBulkUpdate('productCost', e.value || 0)}
-                                            min={0}
-                                            max={1000000}
+                                            min={100000}
+                                            max={100000000}
                                         />
                                         <Button onClick={() => applyBulkUpdate('productCost')} label='Áp Dụng' />
                                     </div>
@@ -686,16 +856,39 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                             key={field}
                                             field={field}
                                             header={header}
-                                            editor={(options) => (
-                                                <InputText
-                                                    type='text'
-                                                    style={{
-                                                        width: '100%'
-                                                    }}
-                                                    value={options.value}
-                                                    onChange={(e) => options.editorCallback?.(e.target.value)}
-                                                />
-                                            )}
+                                            editor={(options) => {
+                                                if (field === 'unitPrice' || field === 'productCost') {
+                                                    return (
+                                                        <InputNumber
+                                                            value={options.value}
+                                                            onValueChange={(e) => options.editorCallback?.(e.value)}
+                                                            mode='currency'
+                                                            currency='VND'
+                                                            locale='vi-VN'
+                                                            minFractionDigits={0}
+                                                            style={{ width: '100%' }}
+                                                        />
+                                                    )
+                                                }
+
+                                                return (
+                                                    <InputText
+                                                        type='text'
+                                                        style={{ width: '100%' }}
+                                                        value={options.value}
+                                                        onChange={(e) => options.editorCallback?.(e.target.value)}
+                                                    />
+                                                )
+                                            }}
+                                            body={(rowData) => {
+                                                if (field === 'unitPrice' || field === 'productCost') {
+                                                    return new Intl.NumberFormat('vi-VN', {
+                                                        style: 'currency',
+                                                        currency: 'VND'
+                                                    }).format(rowData[field])
+                                                }
+                                                return rowData[field]
+                                            }}
                                             onCellEditComplete={onCellEditComplete}
                                             style={{ width: '25%' }}
                                         />
@@ -773,6 +966,16 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     Thêm Mới
                 </Button>
             </div>
+            <AtbDialog
+                visible={atbDialogVisible}
+                setVisible={setAtbDialogVisible}
+                productAttribute={productAttribute}
+                setProductAttribute={setProductAttribute}
+                submitted={submitted}
+                setSubmitted={setSubmitted}
+                hideDialog={hideDialog}
+                saveProductAttribute={saveProductAttribute}
+            />
         </div>
     )
 }

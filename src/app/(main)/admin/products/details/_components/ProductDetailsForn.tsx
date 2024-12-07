@@ -1,6 +1,6 @@
 'use client'
 import { ProductResponseDetails } from '@/interface/Product'
-import { ProductAttributeName } from '@/interface/productAttribute.interface'
+import { ProductAttribute, ProductAttributeName } from '@/interface/productAttribute.interface'
 import AttributeValueService from '@/service/AttributeValueService'
 import PictureService from '@/service/PictureService'
 import ProductService from '@/service/ProducrService'
@@ -19,6 +19,10 @@ import { Message } from 'primereact/message'
 import QRCode from 'react-qr-code'
 import Image from 'next/image'
 import RequiredIcon from '@/components/icon/RequiredIcon'
+import productAttributeService from '@/service/productAttribute.service'
+import { useMountEffect } from 'primereact/hooks'
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
+import AtbDialog from '../../add/_components/AtbDialog'
 
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
@@ -27,15 +31,22 @@ type AttributeRow = {
 
 type Props = {
     product: ProductResponseDetails
-    productAttributes: ProductAttributeName[]
 }
-const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => {
+const emptyProductAttribute: ProductAttribute = {
+    name: '',
+    description: ''
+}
+const ProductDetailsForm: React.FC<Props> = ({ product }) => {
     const [formData, setFormData] = useState<ProductResponseDetails>(product)
     const [imageUrl, setImageUrl] = useState<string>(product.imageUrl)
     const [uploadedFile, setUploadedFile] = useState<File | null>(null)
     const [discount, setDiscount] = useState(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const toast = useRef<Toast>(null)
+    const [productAttributes, setProductAttributes] = useState<ProductAttributeName[]>([])
+    const [submitted, setSubmitted] = useState(false)
+    const [productAttribute, setProductAttribute] = useState<ProductAttribute>(emptyProductAttribute)
+    const [atbDialogVisible, setAtbDialogVisible] = useState(false)
     const [attributeRows, setAttributeRows] = useState<AttributeRow[]>(
         product.attributes.map((attr) => ({
             selectedAttribute: { id: attr.id, name: attr.name },
@@ -50,6 +61,13 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
         productCost: '',
         attributes: ''
     })
+    useMountEffect(() => {
+        fetchAttributes()
+    })
+    const fetchAttributes = async () => {
+        const response = await productAttributeService.getListName()
+        setProductAttributes(response.payload)
+    }
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -120,7 +138,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Vui lòng điền vào tất cả các trường bắt buộc',
+                detail: 'Vui lòng chọn ít nhất một thuộc tính',
                 life: 3000
             })
             return
@@ -160,11 +178,29 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
     }
 
     const addAttributeRow = () => {
+        if (attributeRows.length >= 5) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Số lượng thuộc tính không được vượt quá 5',
+                life: 3000
+            })
+            return
+        }
         setAttributeRows([...attributeRows, { selectedAttribute: null, selectedValues: '' }])
     }
 
     const removeAttributeRow = (index: number) => {
-        setAttributeRows((prevRows) => prevRows.filter((_, i) => i !== index))
+        confirmDialog({
+            message: 'Bạn có chắc chắn muốn xóa thuộc tính này không?',
+            header: 'Xác nhận xóa thuộc tính',
+            icon: 'pi pi-info-circle',
+            defaultFocus: 'reject',
+            acceptClassName: 'p-button-danger',
+            accept: () => {
+                setAttributeRows((prevRows) => prevRows.filter((_, i) => i !== index))
+            }
+        })
     }
     useEffect(() => {
         const fetchDiscounts = async (productId: number) => {
@@ -211,6 +247,28 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (file) {
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+            if (!validTypes.includes(file.type)) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF hoặc WebP',
+                    life: 3000
+                })
+                return
+            }
+
+            const maxSize = 5 * 1024 * 1024
+            if (file.size > maxSize) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Kích thước file không được vượt quá 5MB',
+                    life: 3000
+                })
+                return
+            }
+
             const reader = new FileReader()
             reader.onloadend = () => {
                 setImageUrl(reader.result as string)
@@ -227,6 +285,38 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
         setItems(fetchedValues.filter((item) => item.toLowerCase().includes(event.query.toLowerCase())))
     }
 
+    const saveProductAttribute = async () => {
+        setSubmitted(true)
+        if (productAttribute.name.trim()) {
+            if (!productAttribute.id) {
+                await productAttributeService
+                    .create(productAttribute)
+                    .then(() => {
+                        toast.current?.show({
+                            severity: 'success',
+                            summary: 'Successful',
+                            detail: 'Thuộc tính sản phẩm đã được thêm thành công',
+                            life: 3000
+                        })
+                        hideDialog()
+                    })
+                    .catch((error) => {
+                        toast.current?.show({
+                            severity: 'error',
+                            summary: 'Error',
+                            detail: error.message,
+                            life: 3000
+                        })
+                    })
+            }
+        }
+    }
+    const hideDialog = () => {
+        setSubmitted(false)
+        setProductAttribute(emptyProductAttribute)
+        setAtbDialogVisible(false)
+        fetchAttributes()
+    }
     return (
         <div className='card'>
             <Toast ref={toast} />
@@ -249,7 +339,8 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                         style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}
                                     ></i>
                                     <div>
-                                        Cảnh báo: Sản phẩm này hiện đang được giảm giá và không thể chỉnh sửa giá cho đến khi giảm giá kết thúc.
+                                        Cảnh báo: Sản phẩm này hiện đang được giảm giá và không thể chỉnh sửa giá cho
+                                        đến khi giảm giá kết thúc.
                                     </div>
                                 </div>
                             }
@@ -332,7 +423,7 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                         </div>
                         <div className='flex flex-column gap-2 w-full'>
                             <label htmlFor='productCost' className='mb-2'>
-                                Giá  Nhập <RequiredIcon />
+                                Giá Nhập <RequiredIcon />
                             </label>
                             <InputNumber
                                 tooltip='Nhập giá nhập cho sản phẩm'
@@ -402,7 +493,13 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
 
                             <Tooltip target='.upload' />
                             <label data-pr-tooltip='Upload Image' className='block cursor-pointer upload'>
-                                <input onChange={handleImageUpload} type='file' ref={fileInputRef} className='hidden' />
+                                <input
+                                    onChange={handleImageUpload}
+                                    type='file'
+                                    ref={fileInputRef}
+                                    accept='image/jpeg,image/png,image/gif,image/webp'
+                                    className='hidden'
+                                />
                                 <span
                                     className='flex items-center justify-center p-4 bg-violet-50 rounded-lg text-gray-600'
                                     style={{ pointerEvents: 'none' }}
@@ -431,13 +528,29 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                                 <Dropdown
                                     value={attributeRows[index].selectedAttribute}
                                     options={[
+                                        { id: 'add-new', name: '+ Thêm  thuộc tính' },
                                         ...getAvailableAttributes(),
                                         ...productAttributes.filter((attr) => attr.id === row.selectedAttribute?.id)
                                     ]}
+                                    itemTemplate={(option) => (
+                                        <div
+                                            className={
+                                                option.id === 'add-new'
+                                                    ? 'text-green-600 rounded-lg bg-yellow-300 font-semibold text-center border-t border-gray-200 hover:bg-yellow-500'
+                                                    : 'text-gray-800'
+                                            }
+                                        >
+                                            {option.name}
+                                        </div>
+                                    )}
                                     onChange={(e) => {
-                                        const updatedRows = [...attributeRows]
-                                        updatedRows[index].selectedAttribute = e.value
-                                        setAttributeRows(updatedRows)
+                                        if (e.value.id === 'add-new') {
+                                            setAtbDialogVisible(true)
+                                        } else {
+                                            const updatedRows = [...attributeRows]
+                                            updatedRows[index].selectedAttribute = e.value
+                                            setAttributeRows(updatedRows)
+                                        }
                                     }}
                                     optionLabel='name'
                                     placeholder='Chọn một thuộc tính'
@@ -476,6 +589,17 @@ const ProductDetailsForm: React.FC<Props> = ({ product, productAttributes }) => 
                     </AccordionTab>
                 </Accordion>
                 <Button label='Save' onClick={handleSave} />
+                <ConfirmDialog />
+                <AtbDialog
+                    visible={atbDialogVisible}
+                    setVisible={setAtbDialogVisible}
+                    productAttribute={productAttribute}
+                    setProductAttribute={setProductAttribute}
+                    submitted={submitted}
+                    setSubmitted={setSubmitted}
+                    hideDialog={hideDialog}
+                    saveProductAttribute={saveProductAttribute}
+                />
             </div>
         </div>
     )

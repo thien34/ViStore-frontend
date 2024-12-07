@@ -8,16 +8,16 @@ import { Dialog } from 'primereact/dialog'
 import { useState } from 'react'
 
 const statusConfig = {
-    [OrderStatusType.CREATED]: { label: 'Created', icon: FaRegCalendarCheck, color: 'blue' },
-    [OrderStatusType.PENDING]: { label: 'Pending', icon: FaRegClock, color: 'orange' },
-    [OrderStatusType.CONFIRMED]: { label: 'Confirmed', icon: FaRegCheckCircle, color: 'cyan' },
-    [OrderStatusType.SHIPPING_PENDING]: { label: 'Shipping Pending', icon: FaTruck, color: 'teal' },
-    [OrderStatusType.SHIPPING_CONFIRMED]: { label: 'Shipping Confirmed', icon: FaTruck, color: 'purple' },
-    [OrderStatusType.DELIVERING]: { label: 'Delivering', icon: FaTruck, color: 'gold' },
-    [OrderStatusType.DELIVERED]: { label: 'Delivered', icon: FaRegCheckCircle, color: 'green' },
-    [OrderStatusType.PAID]: { label: 'Paid', icon: FaRegCalendarCheck, color: 'darkgreen' },
-    [OrderStatusType.COMPLETED]: { label: 'Completed', icon: FaRegCheckCircle, color: 'darkblue' },
-    [OrderStatusType.CANCELLED]: { label: 'Cancelled', icon: FaTimesCircle, color: 'red' }
+    [OrderStatusType.CREATED]: { label: 'Tạo', icon: FaRegCalendarCheck, color: 'blue' },
+    [OrderStatusType.PENDING]: { label: 'Chờ xử lý', icon: FaRegClock, color: 'orange' },
+    [OrderStatusType.CONFIRMED]: { label: 'Đã xác nhận', icon: FaRegCheckCircle, color: 'cyan' },
+    [OrderStatusType.SHIPPING_PENDING]: { label: 'Chờ vận chuyển', icon: FaTruck, color: 'teal' },
+    [OrderStatusType.SHIPPING_CONFIRMED]: { label: 'Đã xác nhận vận chuyển', icon: FaTruck, color: 'purple' },
+    [OrderStatusType.DELIVERING]: { label: 'Đang giao hàng', icon: FaTruck, color: 'gold' },
+    [OrderStatusType.DELIVERED]: { label: 'Đã giao hàng', icon: FaRegCheckCircle, color: 'green' },
+    [OrderStatusType.PAID]: { label: 'Đã thanh toán', icon: FaRegCalendarCheck, color: 'darkgreen' },
+    [OrderStatusType.COMPLETED]: { label: 'Thành công', icon: FaRegCheckCircle, color: 'darkblue' },
+    [OrderStatusType.CANCELLED]: { label: 'Đã hủy', icon: FaTimesCircle, color: 'red' }
 }
 
 interface Props {
@@ -38,11 +38,11 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
     return (
         <>
             <div className='card'>
-                <h4 className='text-xl font-semibold'>Order History</h4>
+                <h4 className='text-xl font-semibold'>Lịch sử đơn hàng</h4>
                 <Timeline minEvents={6}>
                     {orderStatusHistoryResponses.map((status) => {
                         const config = statusConfig[status.status as keyof typeof statusConfig] || {
-                            label: 'Unknown Status',
+                            label: 'Trạng thái không xác định',
                             icon: FaBug,
                             color: 'gray'
                         }
@@ -62,7 +62,7 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                                 </div>
                                 {status.notes && (
                                     <Button className='h-4 my-3' onClick={() => handleViewNotes(status.notes)}>
-                                        View Notes
+                                        Xem nội dung
                                     </Button>
                                 )}
                             </Event>
@@ -88,7 +88,7 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                 <Dialog
                     visible={visible}
                     modal
-                    header='Notes Order'
+                    header='Nội dung'
                     position='top'
                     style={{ width: '30rem' }}
                     onHide={() => {

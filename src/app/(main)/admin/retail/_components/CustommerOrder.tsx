@@ -186,7 +186,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 orderTotal: orderTotals.total,
                 refundedAmount: 0,
                 paidDateUtc: '',
-                billCode: 'Hóa Đơn' + numberBill,
+                billCode: 'HĐ' + numberBill,
                 deliveryMode: checked ? 0 : 1,
                 orderItems: res.map((item) => ({
                     productId: item.productResponse.id,
@@ -389,21 +389,30 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             : null,
                         idVouchers: validVoucherIds
                     }
-                    OrderService.createOrder(order).then(async (res) => {
-                        if (res.status === 200) {
-                            toast.current?.show({
-                                severity: 'success',
-                                summary: 'Success',
-                                detail: 'Đơn hàng đã được tạo thành công'
-                            })
-                            await new Promise((resolve) => setTimeout(resolve, 1000))
+                    OrderService.createOrder(order)
+                        .then(async (res) => {
+                            if (res.status === 200) {
+                                toast.current?.show({
+                                    severity: 'success',
+                                    summary: 'Success',
+                                    detail: 'Đơn hàng đã được tạo thành công'
+                                })
+                                await new Promise((resolve) => setTimeout(resolve, 1000))
 
-                            localStorage.removeItem('billIdCurrent')
-                            setCustomer(null)
-                            await CartService.deleteBill(billId)
-                            await fetchBill()
-                        }
-                    })
+                                localStorage.removeItem('billIdCurrent')
+                                setCustomer(null)
+                                await CartService.deleteBill(billId)
+                                await fetchBill()
+                            }
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                            toast.current?.show({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: error instanceof Error ? error.message : 'Đã xảy ra lỗi'
+                            })
+                        })
                 })
             }
         })
