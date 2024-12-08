@@ -98,3 +98,39 @@ export interface OrderFilter {
     startDate?: string
     endDate?: string
 }
+
+export interface InvoiceData {
+    invoiceNumber: string;
+    date: string;
+    dueDate: string;
+    company: Company;
+    client: Client;
+    items: Item[]
+    subtotal: number
+    discount: number
+    total: number
+}
+
+export interface Company {
+    name: string;
+    logo: string;
+    address: string;
+    phone: string;
+    email: string;
+}
+
+export interface Client {
+    name: string;
+    address: string;
+    email: string;
+    phone: string;
+}
+
+export interface Item {
+    productName: string;
+    quantity: number
+    rate: number
+    amount: number
+}
+
+

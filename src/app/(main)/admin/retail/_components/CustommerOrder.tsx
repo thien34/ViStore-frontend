@@ -88,7 +88,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         setLoading(true)
         setMessage('')
         try {
-            if (!customer?.email) {
+            if (!customer?.email && customer?.id) {
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',

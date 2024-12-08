@@ -30,30 +30,77 @@ export default function ChangeStatusOrderHistory({
     const handleConfirm = () => {
         handleConfirmNext()
     }
+    enum OrderStatusType {
+        CREATED = 0, // Mới tạo
+        PENDING = 1, // Chờ xử lý
+        CONFIRMED = 2, // Đã xác nhận
+        SHIPPING_PENDING = 3, // Chờ vận chuyển
+        SHIPPING_CONFIRMED = 4, // Đã xác nhận vận chuyển
+        DELIVERING = 5, // Đang giao hàng
+        DELIVERED = 6, // Đã giao hàng
+        PAID = 7, // Đã thanh toán
+        COMPLETED = 8, // Thành công
+        CANCELLED = 9 // Đã hủy
+    }
+
+    const getButtonLabel = (status: OrderStatusType): string => {
+        switch (status) {
+            case OrderStatusType.CREATED:
+                return 'Xác Nhận Đơn Hàng'
+            case OrderStatusType.PENDING:
+                return 'Xác Nhận Vận Chuyển'
+            case OrderStatusType.CONFIRMED:
+                return 'Xác Nhận Giao Hàng'
+            case OrderStatusType.SHIPPING_PENDING:
+                return 'Xác Nhận Lấy Hàng'
+            case OrderStatusType.SHIPPING_CONFIRMED:
+                return 'Bắt Đầu Giao Hàng'
+            case OrderStatusType.DELIVERING:
+                return 'Hoàn Thành Giao Hàng'
+            case OrderStatusType.DELIVERED:
+                return 'Xác Nhận Thanh Toán'
+            case OrderStatusType.PAID:
+                return 'Xác Nhận Thanh Toán'
+            case OrderStatusType.COMPLETED:
+                return 'Hoàn Thành Đơn Hàng'
+            case OrderStatusType.CANCELLED:
+                return 'Đơn Hàng Đã Hủy'
+            default:
+                return 'Thực Hiện Hành Động'
+        }
+    }
+    const shouldHideCard = (status: OrderStatusType): boolean => {
+        if (status === OrderStatusType.COMPLETED || status === OrderStatusType.CANCELLED) {
+            return true
+        }
+        return status > OrderStatusType.COMPLETED
+    }
     return (
         <>
-            <div className='card'>
-                <div className='flex justify-between'>
-                    <div className='w-1/2 flex gap-2'>
-                        <Button
-                            type='button'
-                            severity='success'
-                            label='Xác Nhận Giao Hàng'
-                            onClick={() => setVisibleConfirm(true)}
-                            disabled={
-                                latestStatus === OrderStatusType.COMPLETED || latestStatus === OrderStatusType.CANCELLED
-                            }
-                        />
-                        <Button
-                            type='button'
-                            severity='danger'
-                            label='Hủy Đơn Hàng'
-                            onClick={() => setVisible(true)}
-                            disabled={latestStatus > OrderStatusType.CONFIRMED}
-                        />
-                    </div>
-                    <Button
-                        disabled={
+            {!shouldHideCard(latestStatus) && (
+                <div className='card'>
+                    <div className='flex justify-between'>
+                        <div className='w-1/2 flex gap-2'>
+                            {latestStatus !== OrderStatusType.COMPLETED &&
+                                latestStatus !== OrderStatusType.CANCELLED && (
+                                    <Button
+                                        type='button'
+                                        severity='success'
+                                        label={getButtonLabel(latestStatus)}
+                                        onClick={() => setVisibleConfirm(true)}
+                                    />
+                                )}
+
+                            {latestStatus <= OrderStatusType.CONFIRMED && (
+                                <Button
+                                    type='button'
+                                    severity='danger'
+                                    label='Hủy Đơn Hàng'
+                                    onClick={() => setVisible(true)}
+                                />
+                            )}
+                        </div>
+                        {!(
                             latestStatus === OrderStatusType.SHIPPING_CONFIRMED ||
                             latestStatus === OrderStatusType.DELIVERING ||
                             latestStatus === OrderStatusType.DELIVERED ||
@@ -62,14 +109,17 @@ export default function ChangeStatusOrderHistory({
                             latestStatus === OrderStatusType.CREATED ||
                             latestStatus === OrderStatusType.PAID ||
                             latestStatus === OrderStatusType.PENDING
-                        }
-                        onClick={() => handleConfirmPrevious()}
-                        className='ms-auto flex items-center gap-2 bg-gray-200 text-gray-500 hover:bg-gray-300 border-none font-semibold'
-                    >
-                        <FaArrowLeft /> Trở Lại
-                    </Button>
+                        ) && (
+                            <Button
+                                onClick={() => handleConfirmPrevious()}
+                                className='ms-auto flex items-center gap-2 bg-gray-200 text-gray-500 hover:bg-gray-300 border-none font-semibold'
+                            >
+                                <FaArrowLeft /> Trở Lại
+                            </Button>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
             <Dialog
                 header='Xác Nhận Giao Hàng'
                 visible={visibleConfirm}

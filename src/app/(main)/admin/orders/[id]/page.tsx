@@ -5,7 +5,7 @@ import { useUpdateEffect } from 'primereact/hooks'
 import HistoryOrder from './_components/HistoryOrder'
 import { CustomerOrderResponse, OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
 import ProductOrderList from './_components/ProductOrderList'
-import { OrderFilter, OrderResponse, OrderStatusType } from '@/interface/order.interface'
+import { InvoiceData, OrderFilter, OrderResponse, OrderStatusType } from '@/interface/order.interface'
 import ChangeStatusOrderHistory from './_components/ChangeStatusOrderHistory'
 import CustomerOrderInfo from './_components/CustomerOrder'
 import OrderToltalPrice from './_components/OrderToltalPrice'
@@ -37,12 +37,14 @@ export default function OrderDetail({ params }: Props) {
         fetchOrderStatusHistory()
         fetchOrder()
     }, [id])
+    const [invoiceData, setInvoiceData] = useState<InvoiceData>()
 
     const fetchOrderStatusHistory = async () => {
         OrderService.getOrderStatusHistory(id).then((response) => {
             setOrderStatusHistoryResponses(response.payload)
             setLatestStatus(response.payload[response.payload.length - 1])
             getCustomerOrder()
+            fetchInvoiceData()
         })
     }
 
@@ -118,6 +120,10 @@ export default function OrderDetail({ params }: Props) {
         setVisible(false)
     }
 
+    const fetchInvoiceData = async () => {
+        OrderService.getInvoiceData(Number(id)).then((response) => setInvoiceData(response.payload))
+    }
+
     return (
         <>
             <div className='card'>
@@ -150,6 +156,7 @@ export default function OrderDetail({ params }: Props) {
                     orderId={Number(id)}
                     handleConfirmPrevious={handleConfirmPrevious}
                     latestStatus={latestStatus?.status as OrderStatusType}
+                    invoiceData={invoiceData}
                 />
                 <ChangeStatusOrderHistory
                     visibleConfirm={visibleConfirm}
