@@ -86,23 +86,46 @@ const UpdateAddress = ({ provinces, customerId, visible, setVisible, idAddress, 
         address.customerId = customerId
         if (address.email.trim()) {
             if (address.id) {
-                await addressService.update(address.id, address)
-                toast.current?.show({
-                    severity: 'success',
-                    summary: 'Thành công',
-                    detail: 'Địa chỉ đã được cập nhật',
-                    life: 3000
-                })
+                await addressService
+                    .update(address.id, address)
+                    .then(() => {
+                        toast.current?.show({
+                            severity: 'success',
+                            summary: 'Thành công',
+                            detail: 'Địa chỉ đã được cập nhật',
+                            life: 3000
+                        })
+                        hideDialog()
+                    })
+                    .catch((error) => {
+                        toast.current?.show({
+                            severity: 'error',
+                            summary: 'Thất bại',
+                            detail: error.message,
+                            life: 3000
+                        })
+                    })
             } else {
-                await addressService.create(address)
-                toast.current?.show({
-                    severity: 'success',
-                    summary: 'Thành công',
-                    detail: 'Địa chỉ đã được tạo',
-                    life: 3000
-                })
+                await addressService
+                    .create(address)
+                    .then(() => {
+                        toast.current?.show({
+                            severity: 'success',
+                            summary: 'Thành công',
+                            detail: 'Địa chỉ đã được tạo',
+                            life: 3000
+                        })
+                        hideDialog()
+                    })
+                    .catch((error) => {
+                        toast.current?.show({
+                            severity: 'error',
+                            summary: 'Thất bại',
+                            detail: error.message,
+                            life: 3000
+                        })
+                    })
             }
-            hideDialog()
         }
     }
 

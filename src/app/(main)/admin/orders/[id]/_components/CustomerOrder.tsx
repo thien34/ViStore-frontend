@@ -5,7 +5,7 @@ import OrderService from '@/service/order.service'
 import { CustomerOrderResponse } from '@/interface/orderItem.interface'
 import { useParams } from 'next/dist/client/components/navigation'
 import { useMountEffect } from 'primereact/hooks'
-import { OrderStatusType, PaymentMethodType, PaymentModeType } from '@/interface/order.interface'
+import { OrderStatusType, PaymentMethodType, PaymentModeType, PaymentStatusType } from '@/interface/order.interface'
 import { Tag } from 'primereact/tag'
 import { IconType } from 'react-icons'
 import { Province } from '@/interface/address.interface'
@@ -84,16 +84,16 @@ const CustomerOrderInfo = ({ customerOrder, setCustomerOrder }: CustomerOrderInf
                 return <Tag value={PaymentMethodType[paymentMethod]} />
         }
     }
-    const paymentModeBody = (paymentStatus: number) => {
-        switch (paymentStatus) {
-            case PaymentModeType.Online:
-                return <Tag value='Chờ Thanh Toán' severity='info' />
-            case PaymentModeType.IN_STORE:
-                return <Tag value='Đã Thanh Toán' severity='info' />
-            default:
-                return <Tag value={PaymentModeType[paymentStatus]} />
-        }
-    }
+    // const paymentModeBody = (paymentStatus: number) => {
+    //     switch (paymentStatus) {
+    //         case PaymentModeType.Online:
+    //             return <Tag value='Chờ Thanh Toán' severity='info' />
+    //         case PaymentModeType.IN_STORE:
+    //             return <Tag value='Đã Thanh Toán' severity='info' />
+    //         default:
+    //             return <Tag value={PaymentModeType[paymentStatus]} />
+    //     }
+    // }
     return (
         <div className='card'>
             <div className='flex justify-between items-center'>
@@ -107,7 +107,7 @@ const CustomerOrderInfo = ({ customerOrder, setCustomerOrder }: CustomerOrderInf
                 />
             </div>
             <hr className='my-2 border-gray-400' />
-            <div className='grid grid-cols-3 justify-between gap-4 mt-4'>
+            <div className='grid grid-cols-3 justify-around gap-4 mt-4'>
                 {customerOrder?.firstName === 'Khách Lẻ' ? (
                     <>
                         <div className='flex flex-col gap-2'>
@@ -141,7 +141,6 @@ const CustomerOrderInfo = ({ customerOrder, setCustomerOrder }: CustomerOrderInf
                                 Phương thức thanh toán:{' '}
                                 {paymentMethodBody(customerOrder?.paymentMethod ?? PaymentMethodType.Cash)}
                             </span>
-                            <span>Trạng thái thanh toán: {paymentModeBody(customerOrder?.paymentStatusType)}</span>
                         </div>
                     </>
                 ) : (
@@ -178,7 +177,6 @@ const CustomerOrderInfo = ({ customerOrder, setCustomerOrder }: CustomerOrderInf
                                 Phương thức thanh toán:{' '}
                                 {paymentMethodBody(customerOrder?.paymentMethod ?? PaymentMethodType.Cash)}
                             </span>
-                            <span>Trạng thái thanh toán: {paymentModeBody(customerOrder?.paymentStatusType)}</span>
                         </div>
                     </>
                 )}
