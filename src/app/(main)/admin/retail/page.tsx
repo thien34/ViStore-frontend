@@ -9,7 +9,6 @@ import { useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { TiShoppingCart } from 'react-icons/ti'
 import { Badge } from 'primereact/badge'
-import Spinner from '@/components/spinner/Spinner'
 import ProductListComponent from './_components/ProductList'
 
 type Tab = {
@@ -25,41 +24,36 @@ export default function Retail() {
     const [activeIndex, setActiveIndex] = useState(0)
     const [billId, setBillId] = useLocalStorage<string>('billId', '')
     const toast = useRef<Toast>(null)
-    const [isLoading, setIsLoading] = useState(false)
 
     useUpdateEffect(() => {
         fetchBill()
     }, [billId])
 
     const fetchBill = () => {
-        CartService.getBills()
-            .then((res) => {
-                if (res) {
-                    const billData = res as unknown as Record<string, { numberBill: number; totalItems: number }>
-                    const newTabs = Object.entries(billData)
-                        .sort(([, { numberBill: a }], [, { numberBill: b }]) => a - b)
-                        .map(([billId, { numberBill, totalItems }]) => ({
-                            id: billId,
-                            header: `Bill ${numberBill}`,
-                            content: (
-                                <ProductListComponent
-                                    updateTabTotalItems={updateTabTotalItems}
-                                    fetchBill={fetchBill}
-                                    numberBill={numberBill}
-                                />
-                            ),
-                            billId: billId,
-                            totalItems: totalItems
-                        }))
+        CartService.getBills().then((res) => {
+            if (res) {
+                const billData = res as unknown as Record<string, { numberBill: number; totalItems: number }>
+                const newTabs = Object.entries(billData)
+                    .sort(([, { numberBill: a }], [, { numberBill: b }]) => a - b)
+                    .map(([billId, { numberBill, totalItems }]) => ({
+                        id: billId,
+                        header: `Bill ${numberBill}`,
+                        content: (
+                            <ProductListComponent
+                                updateTabTotalItems={updateTabTotalItems}
+                                fetchBill={fetchBill}
+                                numberBill={numberBill}
+                            />
+                        ),
+                        billId: billId,
+                        totalItems: totalItems
+                    }))
 
-                    setTabs(newTabs)
-                    setBillId(newTabs[0]?.id || '')
-                    localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching bills:', error)
-            })
+                setTabs(newTabs)
+                setBillId(newTabs[0]?.id || '')
+                localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
+            }
+        })
     }
 
     const tabHeaderTemplate = (options: TabPanelHeaderTemplateOptions, header: string, totalItems: number) => {
@@ -91,66 +85,50 @@ export default function Retail() {
 
     const addTab = async () => {
         const newId = uuidv4()
-        const newHeader = `Bill ${tabs.length + 1}`
-        try {
-            if (tabs.length >= 5) {
-                showError()
-                return
-            }
-            setIsLoading(true)
-            await CartService.addBill(newId)
-            setIsLoading(false)
-            setBillId(newId)
-            setTabs([
-                ...tabs,
-                {
-                    id: newId,
-                    header: newHeader,
-                    content: (
-                        <ProductListComponent
-                            updateTabTotalItems={updateTabTotalItems}
-                            fetchBill={fetchBill}
-                            numberBill={tabs.length + 1}
-                        />
-                    ),
-                    billId: newId,
-                    totalItems: 0
-                }
-            ])
-            setActiveIndex(tabs.length)
-        } catch (error) {
-            console.error('Error adding bill:', error)
-        } finally {
-            setIsLoading(false)
+        const newHeader = `Hóa đơn ${tabs.length + 1}`
+        if (tabs.length >= 7) {
+            showError()
+            return
         }
+        await CartService.addBill(newId)
+        setBillId(newId)
+        setTabs([
+            ...tabs,
+            {
+                id: newId,
+                header: newHeader,
+                content: (
+                    <ProductListComponent
+                        updateTabTotalItems={updateTabTotalItems}
+                        fetchBill={fetchBill}
+                        numberBill={tabs.length + 1}
+                    />
+                ),
+                billId: newId,
+                totalItems: 0
+            }
+        ])
+        setActiveIndex(tabs.length)
     }
 
     const removeTab = (tabIndex: number, billId: string) => {
-        setIsLoading(true)
-        try {
-            const newTabs = tabs.filter((_, index) => index !== tabIndex)
+        const newTabs = tabs.filter((_, index) => index !== tabIndex)
 
-            CartService.deleteBill(billId)
-            setTabs(newTabs)
+        CartService.deleteBill(billId)
+        setTabs(newTabs)
 
-            if (newTabs.length > 0) {
-                if (tabIndex === activeIndex) {
-                    const newActiveIndex = tabIndex === newTabs.length ? activeIndex - 1 : activeIndex
-                    setActiveIndex(newActiveIndex)
-                    setBillId(newTabs[newActiveIndex].billId)
-                } else {
-                    setActiveIndex(activeIndex > tabIndex ? activeIndex - 1 : activeIndex)
-                    setBillId(newTabs[activeIndex > tabIndex ? activeIndex - 1 : activeIndex].billId)
-                }
+        if (newTabs.length > 0) {
+            if (tabIndex === activeIndex) {
+                const newActiveIndex = tabIndex === newTabs.length ? activeIndex - 1 : activeIndex
+                setActiveIndex(newActiveIndex)
+                setBillId(newTabs[newActiveIndex].billId)
             } else {
-                setActiveIndex(0)
-                setBillId('')
+                setActiveIndex(activeIndex > tabIndex ? activeIndex - 1 : activeIndex)
+                setBillId(newTabs[activeIndex > tabIndex ? activeIndex - 1 : activeIndex].billId)
             }
-            setIsLoading(false)
-        } catch (error) {
-            console.error('Error deleting bill:', error)
-        } finally {
-            setIsLoading(false)
+        } else {
+            setActiveIndex(0)
+            setBillId('')
         }
     }
 
@@ -164,8 +142,8 @@ export default function Retail() {
     const showError = () => {
         toast.current?.show({
             severity: 'error',
-            summary: 'Error',
-            detail: 'You can only create up to 5 bill.',
+            summary: 'Cảnh báo',
+            detail: 'Tạo tối đa 7 đơn',
             life: 1000
         })
     }
@@ -191,14 +169,9 @@ export default function Retail() {
     return (
         <div className='card'>
             <div className='flex justify-between items-center'>
-                <h2 className=''>Bán Lẻ</h2>
+                <h2 className=''>Bán hàng tại quầy</h2>
                 <Button label='Tạo Hóa Đơn' onClick={addTab} />
             </div>
-            {isLoading && (
-                <div className='spinner-container'>
-                    <Spinner isLoading={isLoading} />
-                </div>
-            )}
             <TabView className='mt-5' activeIndex={activeIndex} onTabChange={handleTabChange}>
                 {tabs.map((tab) => (
                     <TabPanel
