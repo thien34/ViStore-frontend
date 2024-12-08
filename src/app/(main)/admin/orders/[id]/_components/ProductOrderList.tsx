@@ -132,7 +132,7 @@ export default function ProductOrderList({ id }: Props) {
 
     return (
         <div>
-            <h4>Order Items</h4>
+            <h4>Danh sách sản phẩm đơn hàng</h4>
             {/* <div className='flex justify-end'>
                 <Button type='button' label='Add Item' onClick={() => setVisible(true)} />
             </div> */}
