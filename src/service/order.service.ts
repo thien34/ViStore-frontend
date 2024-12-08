@@ -1,4 +1,4 @@
-import { OrderFilter, OrderItemRequest, OrderRequest, OrderResponse, OrderStatusType } from '@/interface/order.interface'
+import { InvoiceData, OrderFilter, OrderItemRequest, OrderRequest, OrderResponse, OrderStatusType } from '@/interface/order.interface'
 import { OrderItemsResponse, OrderStatusHistoryResponse, CustomerOrderResponse } from '@/interface/orderItem.interface'
 import http from '@/libs/http'
 
@@ -35,6 +35,9 @@ class OrderService {
     }
     static async cancelOrder(orderId: number, reason: string) {
         return await http.get(`${this.basePath}/cancel-order/${orderId}?note=${reason}`, {})
+    }
+    static async getInvoiceData(orderId: number) {
+        return await http.get<InvoiceData>(`${this.basePath}/invoice/${orderId}`, {})
     }
 }
 
