@@ -1,9 +1,11 @@
-import { OrderFilter, OrderResponse } from "@/interface/order.interface";
-import { count } from "console";
+import { OrderFilter, OrderResponse, OrderStatusType } from "@/interface/order.interface";
+import { useMountEffect } from "primereact/hooks";
 import { TabMenu } from "primereact/tabmenu";
 import { useEffect, useState } from "react";
+import { IconType } from "react-icons";
+import { FaRegCalendarCheck, FaRegCheckCircle, FaRegClock, FaTimesCircle, FaTruck } from "react-icons/fa";
 
-const statusOptions = [
+export const statusOptions = [
     { label: 'Tất Cả', value: undefined, filter: undefined, count: 0 },
     { label: 'Đã Tạo', value: 0, filter: 'CREATED', count: 0 },
     { label: 'Chờ Xác Nhận', value: 1, filter: 'PENDING', count: 0 },
@@ -19,7 +21,7 @@ const statusOptions = [
 
 interface Props {
     setFilter: (filter: OrderFilter) => void,
-    orderResponse: OrderResponse[]
+    allOrders: OrderResponse[]
     filter: OrderFilter
 }
 interface StatusLabel {
@@ -28,10 +30,22 @@ interface StatusLabel {
     filter: string | undefined
     count: number
 }
-const OrderStatusTaskbar = ({ filter, setFilter, orderResponse }: Props) => {
+const OrderStatusTaskbar = ({ allOrders, filter, setFilter }: Props) => {
+    const statusConfig: Record<OrderStatusType, { label: string; icon: IconType; color: string }> = {
+        [OrderStatusType.CREATED]: { label: 'Tạo', icon: FaRegCalendarCheck, color: 'blue' },
+        [OrderStatusType.PENDING]: { label: 'Chờ xử lý', icon: FaRegClock, color: 'orange' },
+        [OrderStatusType.CONFIRMED]: { label: 'Đã xác nhận', icon: FaRegCheckCircle, color: 'cyan' },
+        [OrderStatusType.SHIPPING_PENDING]: { label: 'Chờ vận chuyển', icon: FaTruck, color: 'teal' },
+        [OrderStatusType.SHIPPING_CONFIRMED]: { label: 'Đã xác nhận vận chuyển', icon: FaTruck, color: 'purple' },
+        [OrderStatusType.DELIVERING]: { label: 'Đang giao hàng', icon: FaTruck, color: 'gold' },
+        [OrderStatusType.DELIVERED]: { label: 'Đã giao hàng', icon: FaRegCheckCircle, color: 'green' },
+        [OrderStatusType.PAID]: { label: 'Đã thanh toán', icon: FaRegCalendarCheck, color: 'darkgreen' },
+        [OrderStatusType.COMPLETED]: { label: 'Thành công', icon: FaRegCheckCircle, color: 'darkblue' },
+        [OrderStatusType.CANCELLED]: { label: 'Đã hủy', icon: FaTimesCircle, color: 'red' }
+    }
     const [label, setLabel] = useState<StatusLabel[]>(statusOptions);
     const [activeIndex, setActiveIndex] = useState(0);
-    const statusCount = orderResponse.reduce((acc, order) => {
+    const statusCount = allOrders.reduce((acc, order) => {
         acc[order.orderStatus] = (acc[order.orderStatus] || 0) + 1;
         return acc;
     }, {} as Record<number, number>);
@@ -45,13 +59,16 @@ const OrderStatusTaskbar = ({ filter, setFilter, orderResponse }: Props) => {
         setLabel(statusOptions.map(status => ({
             ...status,
             count: status.value !== undefined ? statusCount[status.value] || 0 : 0,
-            label: `${status.label}${status.value !== undefined && statusCount[status.value] > 0 ? ` (${statusCount[status.value]})` : ''}`
+            label: `${status.label}${status.value !== undefined && statusCount[status.value] > 0 ? `(${statusCount[status.value]})` : ''}`
         })));
     }
+    useMountEffect(() => {
+        countValue()
+    })
 
     useEffect(() => {
-        countValue();
-    }, []);
+        countValue()
+    }, [allOrders])
     return (
         <>
             <div className="flex  gap-2 ">

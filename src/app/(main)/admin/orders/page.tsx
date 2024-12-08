@@ -8,10 +8,12 @@ import OrderStatusTaskbar from './_components/OrderStatusTasbar'
 
 export default function Orders() {
     const [orders, setOrders] = useState<OrderResponse[]>([])
+    const [allOrders, setAllOrders] = useState<OrderResponse[]>([])
     const [filter, setFilter] = useState<OrderFilter>({})
     const fetchData = async () => {
         OrderService.getOrders(filter).then((response) => {
             setOrders(response.payload)
+            if (!allOrders.length) setAllOrders(response.payload)
         })
     }
     useMountEffect(() => {
@@ -20,7 +22,6 @@ export default function Orders() {
     useEffect(() => {
         fetchData()
     }, [filter])
-
     return (
         <>
             <div className='card'>
@@ -30,7 +31,7 @@ export default function Orders() {
                 <OrderFilterTaskbar cancelFilter={cancelFilter} applyFilter={applyFilter} orderFilter={filter} setFilter={setFilter} />
             </div> */}
             <div className="card w-full">
-                <OrderStatusTaskbar orderResponse={orders} setFilter={setFilter} filter={filter} />
+                <OrderStatusTaskbar allOrders={allOrders} setFilter={setFilter} filter={filter} />
             </div>
             <div className='card'>
                 <OrderList orders={orders} />
