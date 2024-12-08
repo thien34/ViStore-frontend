@@ -27,6 +27,12 @@ class CartService {
         const response = await http.delete<void>(`${this.basePath}/${billId}`)
         return response.payload
     }
+
+    static async deleteItemInBill(billId: string): Promise<void> {
+        const response = await http.delete<void>(`${this.basePath}/delete-item-in-bill/${billId}`)
+        return response.payload
+    }
+
     static async updateCartQuantity(id: number, newQuantity: number): Promise<void> {
         const response = await http.put<void>(`${this.basePath}/updateQuantity/${id}?quantity=${newQuantity}`, {})
         return response.payload

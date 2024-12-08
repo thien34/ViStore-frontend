@@ -6,7 +6,7 @@ import { DataTableFilterMeta } from 'primereact/datatable'
 import { Button } from 'primereact/button'
 import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import ProductService from '@/service/ProducrService'
-import { useLocalStorage, useMountEffect, useUpdateEffect } from 'primereact/hooks'
+import { useLocalStorage, useUpdateEffect } from 'primereact/hooks'
 import { CartResponse, ShoppingCart } from '@/interface/cart.interface'
 import CartService from '@/service/cart.service'
 import { v4 as uuidv4 } from 'uuid'
@@ -90,10 +90,6 @@ export default function ProductListComponent({
     const [visible, setVisible] = useState<boolean>(false)
     const [visibleQuantity, setVisibleQuantity] = useState<boolean>(false)
 
-    useMountEffect(() => {
-        fetchProducts()
-    })
-
     const fetchProducts = () => {
         ProductService.getProuctsDetails().then((res) => setProducts(res))
     }
@@ -143,7 +139,7 @@ export default function ProductListComponent({
         if (quantity === 0) {
             toast.current?.show({
                 severity: 'error',
-                summary: 'Error',
+                summary: 'Lỗi',
                 detail: 'Số lượng không thể bằng 0',
                 life: 1000
             })
@@ -166,6 +162,7 @@ export default function ProductListComponent({
                     detail: 'Sản phẩm được thêm vào giỏ hàng thành công',
                     life: 1000
                 })
+                fetchProducts()
                 fetchCart()
             })
             .catch((error) => {
@@ -187,7 +184,7 @@ export default function ProductListComponent({
             acceptLabel: 'Yes',
             rejectLabel: 'No',
             accept: () => {
-                CartService.deleteBill(cart.cartUUID)
+                CartService.deleteItemInBill(cart.cartUUID)
                     .then(() => {
                         toast.current?.show({
                             severity: 'success',
