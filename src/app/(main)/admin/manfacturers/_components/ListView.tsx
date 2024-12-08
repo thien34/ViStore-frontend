@@ -115,13 +115,6 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     className='mr-2'
                     onClick={() => editManufacturer(rowData)}
                 />
-                <Button
-                    icon='pi pi-trash'
-                    rounded
-                    outlined
-                    severity='danger'
-                    // onClick={() => confirmDeleteProduct(rowData)}
-                />
             </>
         )
     }

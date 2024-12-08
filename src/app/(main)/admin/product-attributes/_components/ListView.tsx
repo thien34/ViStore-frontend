@@ -86,17 +86,6 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
         return (
             <div className='flex flex-wrap gap-2'>
                 <Button label='New' icon='pi pi-plus' severity='success' onClick={openNew} />
-                <Button
-                    label='Delete'
-                    icon='pi pi-trash'
-                    severity='danger'
-                    // onClick={confirmDeleteSelected}
-                    disabled={
-                        !selectedProductAttributes ||
-                        !Array.isArray(selectedProductAttributes) ||
-                        !selectedProductAttributes.length
-                    }
-                />
             </div>
         )
     }
@@ -125,13 +114,6 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
                     outlined
                     className='mr-2'
                     onClick={() => editProductAttribute(rowData)}
-                />
-                <Button
-                    icon='pi pi-trash'
-                    rounded
-                    outlined
-                    severity='danger'
-                    // onClick={() => confirmDeleteProduct(rowData)}
                 />
             </>
         )
@@ -176,7 +158,6 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} product attributes'
                     globalFilter={globalFilter}
                     emptyMessage='No product attribute found.'
                     header={header}

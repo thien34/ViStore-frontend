@@ -34,7 +34,7 @@ function ProductList({ products }: Props) {
                     header='Thao Tác'
                     body={(rowData) => (
                         <Link href={`/admin/products/${rowData.id}`}>
-                            <Button label='Chỉnh Sửa' />
+                            <Button icon='pi pi-pencil' rounded outlined />
                         </Link>
                     )}
                 />

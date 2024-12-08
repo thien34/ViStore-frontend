@@ -6,7 +6,8 @@ class VoucherService {
     private path = '/api/admin/vouchers'
 
     async getAll() {
-        const response = await axios.get<{ data: Voucher[] }>(this.basePath + `?discountTypeId=ASSIGNED_TO_ORDER_TOTAL`)
+        const response = await axios.get<{ data: Voucher[] }>(
+            `${this.basePath}?discountTypeId=ASSIGNED_TO_ORDER_TOTAL`)
         return response.data.data
     }
     async getAllIsPublished() {

@@ -17,6 +17,7 @@ import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
 import Spinner from '@/components/spinner/Spinner'
 import discountService from '@/service/discount.service'
 import { Image } from 'primereact/image'
+import axios from 'axios'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -28,7 +29,6 @@ const ListView = () => {
     const [filteredDiscounts, setFilteredDiscounts] = useState<Voucher[]>([])
     const toast = useRef<Toast>(null)
     const [loading, setLoading] = useState(true)
-
     useEffect(() => {
         const fetchDiscounts = async () => {
             try {
@@ -44,6 +44,18 @@ const ListView = () => {
         }
         fetchDiscounts()
     }, [])
+
+    const leftToolbarTemplate = () => (
+        <div className='flex flex-wrap gap-2 my-5'>
+            <Link href='/admin/vouchers/add'>
+                <Button label='Add new discount' icon='pi pi-plus' severity='success' />
+            </Link>
+            <Link href='/admin/vouchers/default-birthday-voucher'>
+                <Button label='Update default birthday voucher' icon='pi pi-plus' severity='info' />
+            </Link>
+        </div>
+    )
+
     const formatDiscountAndStock = (rowData: Voucher) => {
         const isPercentage = rowData.usePercentage
         const stockClassName = classNames(
@@ -71,14 +83,6 @@ const ListView = () => {
             </div>
         )
     }
-
-    const leftToolbarTemplate = () => (
-        <div className='flex flex-wrap gap-2 my-5'>
-            <Link href='/admin/vouchers/add'>
-                <Button label='Add new discount' icon='pi pi-plus' severity='success' />
-            </Link>
-        </div>
-    )
 
     const statusBodyTemplate = (discount: Voucher) => {
         const { severity, icon } = getStatus(discount.status)
@@ -250,6 +254,35 @@ const ListView = () => {
             }
         })
     }
+    const isCumulativeTemplate = (rowData: Voucher) => {
+        return (
+            <Tag
+                severity={rowData.isCumulative ? 'success' : 'danger'}
+                icon={rowData.isCumulative ? 'pi pi-check' : 'pi pi-times'}
+                value={rowData.isCumulative ? 'True' : 'False'}
+            />
+        )
+    }
+    async function handleGenerateBirthdayVouchers() {
+        try {
+            debugger
+            await axios.post('http://localhost:8080/api/admin/vouchers/generate-birthday-vouchers')
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Birthday Vouchers generated successfully',
+                life: 3000
+            })
+        } catch (error) {
+            console.error('Error generating birthday vouchers:', error)
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to generate birthday vouchers',
+                life: 3000
+            })
+        }
+    }
 
     return (
         <>
@@ -258,7 +291,9 @@ const ListView = () => {
             <Spinner isLoading={loading} />
             <div className='card'>
                 {leftToolbarTemplate()}
-
+                <Button className='my-4' onClick={handleGenerateBirthdayVouchers}>
+                    Generate Birthday Vouchers
+                </Button>
                 <DataTable
                     scrollable
                     value={filteredDiscounts}
@@ -278,6 +313,8 @@ const ListView = () => {
                         header='Limitation Times'
                         body={(rowData) => (rowData.limitationTimes ? rowData.limitationTimes : 'Infinite')}
                     />
+                    <Column header='Usage Count' field='usageCount' />
+                    <Column header='Is Cumulative' body={isCumulativeTemplate} />
                     <Column
                         header='Time of Discount Code'
                         body={(rowData) => {

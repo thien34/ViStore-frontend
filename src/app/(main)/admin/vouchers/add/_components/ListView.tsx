@@ -236,7 +236,6 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
             }
         }
         const validDiscountPercentage = !usePercentage && value != null ? value : 0
-
         if (minOrderAmount >= 0 && validDiscountPercentage > 0.69 * minOrderAmount) {
             newErrors.value = 'Voucher value cannot exceed 69% of the minimum order amount.'
             isValid = false
@@ -349,7 +348,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                                     id='maxDiscountAmount'
                                     value={maxDiscountAmount}
                                     prefix='$'
-                                    onValueChange={(e) => setMaxDiscountAmount(e.value)}
+                                    onValueChange={(e) => setMaxDiscountAmount(e.value ?? 0)}
                                     min={1}
                                     max={5000}
                                     showButtons
@@ -366,7 +365,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                         <InputNumber
                             id='minOrderAmount'
                             value={minOrderAmount}
-                            onValueChange={(e) => setMinOrderAmount(e.value)}
+                            onValueChange={(e) => setMinOrderAmount(e.value ?? 0)}
                             prefix='$'
                             min={1}
                             max={1000000}
@@ -424,6 +423,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                             {errors.dateError && <small className='p-error'>{errors.dateError}</small>}
                         </div>
                     </div>
+
                     <div className='field'>
                         <label htmlFor='couponCode'>Coupon Code</label>
                         <InputMask

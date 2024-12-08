@@ -4,6 +4,7 @@ import { InputNumber } from 'primereact/inputnumber'
 import { Toast } from 'primereact/toast'
 import { ToggleButton } from 'primereact/togglebutton'
 import { useMemo, useRef, useState } from 'react'
+import PayOSForm from './PayOSEmbeddedForm'
 
 type PaymentDialogProps = {
     visible: boolean
@@ -34,12 +35,6 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
             return
         }
         setAmountPaid(totalAmount)
-        toast.current?.show({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Đã lưu thanh toán thành công',
-            life: 3000
-        })
         setTimeout(() => {
             onHide()
         }, 500)
@@ -50,7 +45,7 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
 
     return (
         <Dialog
-            header='Tóm tắt thanh toán'
+            header='Thanh toán'
             style={{ width: '40vw', marginLeft: '15vw' }}
             visible={visible}
             modal
@@ -81,32 +76,52 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
                         style={{ width: '100%' }}
                     />
                 </div>
-                <div className='flex flex-col gap-1'>
-                    <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>
-                        Số tiền khách hàng đã thanh toán
-                    </label>
-                    <InputNumber
-                        placeholder='Nhập số tiền'
-                        className='w-full'
-                        value={amountPaidState}
-                        min={0}
-                        showButtons
-                        onChange={(e) => setAmountPaidState(e.value ?? 0)}
-                    />
-                </div>
-                <div className='flex justify-between items-center gap-2'>
-                    <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>Tiền phải trả</label>
-                    <div className='text-xl font-medium text-primary-700 dark:text-white'>${amountRemaining}</div>
-                </div>
-                <div className='flex justify-between items-center gap-2'>
-                    <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>
-                        Tiền thừa
-                    </label>
-                    <div className='text-xl font-medium text-green-700 dark:text-white'>${amountExcess}</div>
-                </div>
-                <div className='flex justify-end items-center gap-2'>
-                    <Button label='Lưu' icon='pi pi-save' onClick={onSave} />
-                </div>
+                {checked ? (
+                    <>
+                        <div className='flex flex-col gap-1'>
+                            <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>
+                                Số tiền khách hàng đã thanh toán
+                            </label>
+                            <InputNumber
+                                placeholder='Nhập số tiền'
+                                className='w-full'
+                                value={amountPaidState}
+                                min={0}
+                                showButtons
+                                onChange={(e) => setAmountPaidState(e.value ?? 0)}
+                            />
+                        </div>
+                        <div className='flex justify-between items-center gap-2'>
+                            <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>
+                                Tiền phải trả
+                            </label>
+                            <div className='text-xl font-medium text-primary-700 dark:text-white'>
+                                ${amountRemaining.toFixed(2)}
+                            </div>
+                        </div>
+                        <div className='flex justify-between items-center gap-2'>
+                            <label className='text-xl ms-0 font-medium text-gray-900 dark:text-white'>Tiền thừa</label>
+                            <div className='text-xl font-medium text-green-700 dark:text-white'>
+                                ${amountExcess.toFixed(2)}
+                            </div>
+                        </div>
+                        <div className='flex justify-end items-center gap-2'>
+                            <Button label='Lưu' icon='pi pi-save' onClick={onSave} />
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <PayOSForm
+                            paymentOSRequest={{
+                                items: [],
+                                amount: Number(totalAmount.toFixed(0)),
+                                description: 'thanh toan hang'
+                            }}
+                            setVisible={setVisible}
+                            setAmountPaid={setAmountPaid}
+                        />
+                    </>
+                )}
             </div>
         </Dialog>
     )
