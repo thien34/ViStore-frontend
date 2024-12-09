@@ -98,13 +98,17 @@ export default function OrderList({ orders }: Props) {
 
     return (
         <div className='card'>
-            <DataTable value={orders} paginator rows={10} rowsPerPageOptions={[10, 20, 50]}>
+            <DataTable
+                value={orders} paginator rows={5} rowsPerPageOptions={[10, 20, 50]}
+                emptyMessage='Không có đơn đơn hàng nào'
+            >
                 <Column body={(_, { rowIndex }) => rowIndex + 1} header='#' />
-                <Column align='center' field='billCode' header='Mã Hóa Đơn' />
-                <Column align='center' field='customerName' header='Khách Hàng' body={customerNameBody} />
+                <Column  align='center' field='billCode' header='Mã Hóa Đơn' />
+                <Column   align='center' field='customerName' header='Khách Hàng' body={customerNameBody} />
                 <Column align='center' field='orderStatus' header='Trạng Thái' body={orderStatusBody} />
                 {/* <Column align='center' field='totalItem' header='Tổng Sản Phẩm' /> */}
                 <Column
+                    sortable    
                     align='center'
                     field='orderTotal'
                     header='Tổng Tiền'
@@ -113,6 +117,7 @@ export default function OrderList({ orders }: Props) {
                 {/* <Column align='center' field='paymentMethod' header='Phương Thức Thanh Toán' body={paymentMethodBody} /> */}
                 {/* <Column align='center' field='paymentMode' header='Hình Thức Thanh Toán' body={paymentModeBody} /> */}
                 <Column
+                    sortable
                     align='center'
                     field='paidDateUtc'
                     header='Ngày Thanh Toán'
