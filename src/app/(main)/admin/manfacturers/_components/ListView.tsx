@@ -179,6 +179,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                     />
                     <Column field='description' header='Mô Tả' />
                     <Column
+                        header='Chi Tiết'
                         body={actionBodyTemplate}
                         style={{
                             maxWidth: '30px'
