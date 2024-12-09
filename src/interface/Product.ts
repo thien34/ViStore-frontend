@@ -43,8 +43,9 @@ export interface ProductResponse {
     weight: number
     sku: string
     description: string
-    categoryName: number
-    manufacturerName: number
+    categoryName: string
+    manufacturerName: string
+    imageUrl: string
     gtin: string
     largestDiscountPercentage: number
     discountPrice: number

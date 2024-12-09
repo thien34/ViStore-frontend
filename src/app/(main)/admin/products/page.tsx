@@ -8,7 +8,6 @@ import Spinner from '@/components/spinner/Spinner'
 export default function ProductPage() {
     const [products, setProducts] = useState<ProductResponse[]>([])
     const [isLoading, setIsLoading] = useState(true)
-
     useEffect(() => {
         async function fetchProducts() {
             setIsLoading(true)
@@ -21,14 +20,16 @@ export default function ProductPage() {
                 setIsLoading(false)
             }
         }
-
         fetchProducts()
     }, [])
 
     return (
         <>
             <Spinner isLoading={isLoading} />
-            <ProductList products={products} />
+            <div className="card">
+                <ProductList products={products} />
+            </div>
+
         </>
     )
 }
