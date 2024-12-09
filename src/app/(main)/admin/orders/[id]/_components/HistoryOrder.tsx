@@ -1,14 +1,25 @@
 import { Event, Subtitle, Timeline, Title } from '@reactuiutils/horizontal-timeline'
-import { FaBug, FaRegCalendarCheck, FaTimesCircle, FaTruck, FaRegCheckCircle, FaRegClock } from 'react-icons/fa'
-import { OrderStatusType } from '@/interface/order.interface'
+import {
+    FaBug,
+    FaRegCalendarCheck,
+    FaTimesCircle,
+    FaTruck,
+    FaRegCheckCircle,
+    FaRegClock,
+    FaPrint,
+    FaHistory
+} from 'react-icons/fa'
+import { InvoiceData, OrderStatusType } from '@/interface/order.interface'
 import '@reactuiutils/horizontal-timeline/timeline.css'
 import { OrderStatusHistoryResponse } from '@/interface/orderItem.interface'
 import { Button } from 'primereact/button'
 import { Dialog } from 'primereact/dialog'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Tag } from 'primereact/tag'
+import InvoiceComponent from '@/components/invoice/InvoiceComponent'
+import { useReactToPrint } from 'react-to-print'
 
 const statusConfig = {
     [OrderStatusType.CREATED]: { label: 'Tạo', icon: FaRegCalendarCheck, color: 'blue' },
@@ -28,9 +39,10 @@ interface Props {
     orderId: number
     handleConfirmPrevious: () => Promise<void>
     latestStatus: OrderStatusType
+    invoiceData?: InvoiceData
 }
 
-export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
+export default function HistoryOrder({ orderStatusHistoryResponses, invoiceData, latestStatus }: Props) {
     const [visible, setVisible] = useState(false)
     const [notes, setNotes] = useState('')
     const [historyVisible, setHistoryVisible] = useState(false)
@@ -101,6 +113,23 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
     const renderIndex = (rowData: OrderStatusHistoryResponse) => {
         return <div>{orderStatusHistoryResponses.findIndex((item) => item.id === rowData.id) + 1}</div>
     }
+
+    const componentRef = useRef<HTMLDivElement>(null)
+    const reactToPrintFn = useReactToPrint({
+        contentRef: componentRef,
+        onAfterPrint: () => {
+            if (componentRef.current) {
+                componentRef.current.classList.add('hidden')
+            }
+        }
+    })
+    const handlePrint = () => {
+        if (componentRef.current) {
+            componentRef.current.classList.remove('hidden')
+        }
+        reactToPrintFn()
+    }
+
     return (
         <>
             <div className='card'>
@@ -136,12 +165,35 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                         )
                     })}
                 </Timeline>
-                <Button
-                    onClick={() => setHistoryVisible(true)}
-                    className='ms-auto flex items-center gap-2 mt-5 bg-blue-500 text-white hover:bg-blue-600 border-none font-semibold'
-                >
-                    Lịch sử đơn hàng
-                </Button>
+                <div className='flex justify-between'>
+                    {latestStatus === OrderStatusType.COMPLETED && (
+                        <Button
+                            className='gap-2 mt-5 bg-blue-500 text-white hover:bg-blue-600 border-none font-semibold'
+                            label='In hóa đơn'
+                            icon={<FaPrint />}
+                            onClick={handlePrint}
+                        />
+                    )}
+                    <Button
+                        icon={<FaHistory />}
+                        onClick={() => setHistoryVisible(true)}
+                        className='ms-auto flex items-center gap-2 mt-5 bg-blue-500 text-white hover:bg-blue-600 border-none font-semibold'
+                    >
+                        Lịch sử đơn hàng
+                    </Button>
+                </div>
+
+                <div ref={componentRef} style={{ display: 'none' }}>
+                    {invoiceData && <InvoiceComponent data={invoiceData} />}
+                </div>
+
+                <style jsx>{`
+                    @media print {
+                        div {
+                            display: block !important;
+                        }
+                    }
+                `}</style>
                 <Dialog
                     visible={visible}
                     modal
@@ -160,7 +212,7 @@ export default function HistoryOrder({ orderStatusHistoryResponses }: Props) {
                     modal
                     header='Lịch sử đơn hàng'
                     position='top'
-                    style={{ width: '70rem' }}
+                    style={{ width: '75rem' }}
                     onHide={() => {
                         if (!historyVisible) return
                         setHistoryVisible(false)
