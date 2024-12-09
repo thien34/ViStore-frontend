@@ -65,7 +65,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [selectedAddress, setSelectedAddress] = useState<AddressesResponse | null>(null)
     const toast = useRef<Toast>(null)
     const [, setOrderLocal] = useLocalStorage<string>('', 'orderLocal')
-
     const [couponCode, setCouponCode] = useState('')
     const [couponCodes, setCouponCodes] = useState<string[]>([])
     const [message, setMessage] = useState('')
@@ -118,9 +117,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                     summary: 'Voucher Error',
                     detail: error.response.data.message
                 })
-                console.log('====================================')
-                console.log(error.response.data.message)
-                console.log('====================================')
             } else {
                 toast.current?.show({
                     severity: 'error',
@@ -258,7 +254,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             ) {
                 toast.current?.show({
                     severity: 'error',
-                    summary: 'Error',
+                    summary: 'Lỗi',
                     detail: 'Vui lòng chọn một địa chỉ'
                 })
                 return false
@@ -353,10 +349,18 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const handleOrder = async () => {
         const billId = localStorage.getItem('billIdCurrent')
         if (!billId) return
-        validateCouponCode()
+        if (validVouchers.length > 0) validateCouponCode()
         if (!validateAddress()) return
         if (!validateDiscount()) return
         if (!validatePayment()) return
+        if (amountPaid < orderTotals.total) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Vui lòng thanh toán đủ số tiền'
+            })
+            return
+        }
         const validVoucherIds = validVouchers
             .map((voucher: Voucher) => voucher.id)
             .filter((id): id is number => id !== undefined)
@@ -485,182 +489,164 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     return (
         <div className='space-y-4 w-full'>
             <div className='card'>
-                <div className='flex justify-between gap-x-8'>
-                    <div className='w-[45%]'>
-                        <h3 className='text-2xl font-bold'>Thông Tin Khách Hàng</h3>
-                        <ConfirmDialog />
+                <div className='flex justify-between border py-2 px-4 mb-4 mt-1 rounded-2xl shadow-md'>
+                    <div className='flex items-center justify-between gap-4 py-3 border px-4 rounded-lg my-2 shadow-inner'>
+                        <label className='text-base font-normal text-gray-500 dark:text-gray-400'>Bán Lẻ</label>
+                        <InputSwitch checked={!customer ? true : false} onChange={() => onCheckRetail()} />
+                    </div>
+                    <div className='flex items-center gap-2'>
+                        <Tooltip target='.customer-tooltip' mouseTrack mouseTrackLeft={10} />
+                        <FaUserPlus
+                            onClick={() => setCustomerDialogVisible(true)}
+                            data-pr-tooltip='Chọn Khách Hàng'
+                            className='text-primary-700 text-5xl cursor-pointer customer-tooltip '
+                        />
+                        {customer != null && checked && (
+                            <>
+                                <Tooltip target='.location-tooltip' mouseTrack mouseTrackLeft={10} />
+
+                                <IoLocationSharp
+                                    onClick={onOpenCustomerAddressDialog}
+                                    data-pr-tooltip='Pick Location'
+                                    className='text-primary-700 text-5xl cursor-pointer location-tooltip'
+                                />
+                            </>
+                        )}
+                    </div>
+                    <div className='flex items-center justify-between gap-4 py-3 border px-4 rounded-lg my-2 shadow-inner'>
+                        <label className='text-base font-normal text-gray-500 dark:text-gray-400'>Vận Chuyển</label>
+                        <InputSwitch
+                            checked={customer != null && checked}
+                            onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
+                        />
+                    </div>
+                </div>
+                <ConfirmDialog />
+                <div className='flex justify-between gap-x-8 '>
+                    {customer && (
                         <>
-                            <div className='flex justify-between'>
-                                <div className='flex items-center justify-between gap-4 py-3'>
-                                    <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                        Bán Lẻ
-                                    </label>
-                                    <InputSwitch checked={!customer ? true : false} onChange={() => onCheckRetail()} />
+                            <div className='w-[45%]'>
+                                <h3 className='text-2xl font-bold'>Thông Tin Khách Hàng</h3>
+                                <div className='flex flex-col md:flex-row justify-between gap-4 w-full'>
+                                    <div className='field w-full md:w-1/2'>
+                                        <label htmlFor='firstName' className='font-medium block'>
+                                            Tên
+                                        </label>
+                                        <InputText
+                                            onChange={(e) =>
+                                                setAddress(
+                                                    (prev) =>
+                                                        prev && {
+                                                            ...prev,
+                                                            firstName: e.target.value
+                                                        }
+                                                )
+                                            }
+                                            value={address?.firstName || ''}
+                                            id='firstName'
+                                            className='w-full'
+                                        />
+                                    </div>
+                                    <div className='field w-full md:w-1/2'>
+                                        <label htmlFor='lastName' className='font-medium block'>
+                                            Họ
+                                        </label>
+                                        <InputText
+                                            onChange={(e) =>
+                                                setAddress(
+                                                    (prev) =>
+                                                        prev && {
+                                                            ...prev,
+                                                            lastName: e.target.value
+                                                        }
+                                                )
+                                            }
+                                            value={address?.lastName || ''}
+                                            id='lastName'
+                                            className='w-full'
+                                        />
+                                    </div>
                                 </div>
-                                <div className='flex items-center gap-2'>
-                                    <Tooltip target='.customer-tooltip' mouseTrack mouseTrackLeft={10} />
-
-                                    <FaUserPlus
-                                        onClick={() => setCustomerDialogVisible(true)}
-                                        data-pr-tooltip='Chọn Khách Hàng'
-                                        className='text-primary-700 text-5xl cursor-pointer customer-tooltip '
-                                    />
-                                    {customer != null && checked && (
-                                        <>
-                                            <Tooltip target='.location-tooltip' mouseTrack mouseTrackLeft={10} />
-
-                                            <IoLocationSharp
-                                                onClick={onOpenCustomerAddressDialog}
-                                                data-pr-tooltip='Pick Location'
-                                                className='text-primary-700 text-5xl cursor-pointer location-tooltip'
-                                            />
-                                        </>
+                                <div className='flex flex-wrap justify-content-between w-full'>
+                                    <div className='field w-full md:w-[49%]'>
+                                        <label htmlFor='phoneNumber' className='font-medium block'>
+                                            Số Điện Thoại
+                                        </label>
+                                        <InputText
+                                            onChange={(e) =>
+                                                setAddress(
+                                                    (prev) =>
+                                                        prev && {
+                                                            ...prev,
+                                                            phoneNumber: e.target.value
+                                                        }
+                                                )
+                                            }
+                                            value={address?.phoneNumber || ''}
+                                            id='phoneNumber'
+                                            className='w-full'
+                                        />
+                                    </div>
+                                </div>
+                                <div className='flex flex-wrap justify-content-between w-full gap-2'>
+                                    {checked && (
+                                        <AddressComponent
+                                            provinces={provinces || []}
+                                            submitted={false}
+                                            onAddressChange={handleGetAddress}
+                                            addressDetail={addressDetail || undefined}
+                                        />
                                     )}
                                 </div>
-                            </div>
-                            <hr className='border-collapse mt-0 border-gray-300' />
-                            <div className='flex flex-col md:flex-row justify-between gap-4 w-full'>
-                                <div className='field w-full md:w-1/2'>
-                                    <label htmlFor='firstName' className='font-medium block'>
-                                        Tên
-                                    </label>
-                                    <InputText
-                                        onChange={(e) =>
-                                            setAddress(
-                                                (prev) =>
-                                                    prev && {
-                                                        ...prev,
-                                                        firstName: e.target.value
-                                                    }
-                                            )
-                                        }
-                                        value={address?.firstName || ''}
-                                        id='firstName'
-                                        className='w-full'
-                                    />
-                                </div>
-                                <div className='field w-full md:w-1/2'>
-                                    <label htmlFor='lastName' className='font-medium block'>
-                                        Họ
-                                    </label>
-                                    <InputText
-                                        onChange={(e) =>
-                                            setAddress(
-                                                (prev) =>
-                                                    prev && {
-                                                        ...prev,
-                                                        lastName: e.target.value
-                                                    }
-                                            )
-                                        }
-                                        value={address?.lastName || ''}
-                                        id='lastName'
-                                        className='w-full'
-                                    />
-                                </div>
-                            </div>
-                            <div className='flex flex-wrap justify-content-between w-full'>
-                                <div className='field w-full md:w-[49%]'>
-                                    <label htmlFor='phoneNumber' className='font-medium block'>
-                                        Số Điện Thoại
-                                    </label>
-                                    <InputText
-                                        onChange={(e) =>
-                                            setAddress(
-                                                (prev) =>
-                                                    prev && {
-                                                        ...prev,
-                                                        phoneNumber: e.target.value
-                                                    }
-                                            )
-                                        }
-                                        value={address?.phoneNumber || ''}
-                                        id='phoneNumber'
-                                        className='w-full'
-                                    />
-                                </div>
-                                <div className='field w-full md:w-[49%]'>
-                                    <label htmlFor='note' className='font-medium block'>
-                                        Ghi Chú
-                                    </label>
-                                    <InputText
-                                        onChange={(e) =>
-                                            setAddress(
-                                                (prev) =>
-                                                    prev && {
-                                                        ...prev,
-                                                        note: e.target.value
-                                                    }
-                                            )
-                                        }
-                                        id='note'
-                                        className='w-full'
-                                    />
-                                </div>
-                            </div>
-                            <div className='flex flex-wrap justify-content-between w-full gap-2'>
                                 {checked && (
-                                    <AddressComponent
-                                        provinces={provinces || []}
-                                        submitted={false}
-                                        onAddressChange={handleGetAddress}
-                                        addressDetail={addressDetail || undefined}
-                                    />
+                                    <div className='field w-full'>
+                                        <label htmlFor='addressName' className='font-medium block'>
+                                            Địa Chỉ Chi Tiết
+                                        </label>
+                                        <InputText
+                                            onChange={(e) =>
+                                                setAddressDetail((prev) =>
+                                                    prev ? { ...prev, address: e.target.value } : null
+                                                )
+                                            }
+                                            value={addressDetail?.address || ''}
+                                            id='addressName'
+                                            className='w-full'
+                                        />
+                                    </div>
                                 )}
                             </div>
-                            {checked && (
-                                <div className='field w-full'>
-                                    <label htmlFor='addressName' className='font-medium block'>
-                                        Địa Chỉ Chi Tiết
-                                    </label>
-                                    <InputText
-                                        onChange={(e) =>
-                                            setAddressDetail((prev) =>
-                                                prev ? { ...prev, address: e.target.value } : null
-                                            )
-                                        }
-                                        value={addressDetail?.address || ''}
-                                        id='addressName'
-                                        className='w-full'
-                                    />
-                                </div>
-                            )}
                         </>
-                    </div>
-                    <div className='w-[55%]'>
+                    )}
+                    <div className='w-full'>
                         <h3 className='text-2xl font-bold'>Thông Tin Đơn Hàng</h3>
                         <div className='divide-y divide-gray-200 dark:divide-gray-800'>
-                            <div className='flex items-center justify-between gap-4 py-3'>
-                                <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                    Vận Chuyển
-                                </label>
-                                <InputSwitch
-                                    checked={checked}
-                                    onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
-                                />
-                            </div>
-                            <div className='flex justify-between gap-3 py-3'>
-                                <div className='flex items-center justify-center gap-3'>
-                                    <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                        Phiếu Giảm Giá
-                                    </label>
-                                    <AutoComplete
-                                        id='couponCode'
-                                        size={12}
-                                        value={couponCode}
-                                        onInput={handleInputChange}
-                                        onKeyDown={handleKeyDown}
-                                        placeholder='Nhập mã giảm giá'
-                                    />
-                                    <Button
-                                        icon='pi pi-thumbtack'
-                                        onClick={validateCouponCode}
-                                        loading={loading}
-                                        disabled={loading || couponCodes.length === 0}
-                                    />
-                                </div>
-                                <Button onClick={() => setVisibleRight(true)} icon='pi pi-ticket' />
-                            </div>
+                            {customer && (
+                                <>
+                                    <div className='flex justify-between gap-3 py-3'>
+                                        <div className='flex items-center justify-center gap-3'>
+                                            <label className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                                Phiếu Giảm Giá
+                                            </label>
+                                            <AutoComplete
+                                                id='couponCode'
+                                                size={12}
+                                                value={couponCode}
+                                                onInput={handleInputChange}
+                                                onKeyDown={handleKeyDown}
+                                                placeholder='Nhập mã giảm giá'
+                                            />
+                                            <Button
+                                                icon='pi pi-thumbtack'
+                                                onClick={validateCouponCode}
+                                                loading={loading}
+                                                disabled={loading || couponCodes.length === 0}
+                                            />
+                                        </div>
+                                        <Button onClick={() => setVisibleRight(true)} icon='pi pi-ticket' />
+                                    </div>
+                                </>
+                            )}
                             <VoucherSidebar
                                 visibleRight={visibleRight}
                                 setVisibleRight={setVisibleRight}
@@ -823,7 +809,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         <div className='space-y-3'>
                             <button
                                 type='submit'
-                                className='flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800'
+                                className='flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800'
                                 onClick={handleOrder}
                             >
                                 Tiến hành thanh toán
