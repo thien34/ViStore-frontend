@@ -109,22 +109,20 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const handleKeydown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         if (event.key === 'Enter') {
             const input = (event.target as HTMLInputElement).value.trim()
+            let errorMessage = ''
 
             // Validate input
             if (input === '') return
             if (input.length > 50) {
+                errorMessage = 'Giá trị thuộc tính không được vượt quá 50 ký tự'
+            } else if (/[{}\[\]\/\\+*.$^|?@!#%&()_=`~:;"'<>,]/.test(input)) {
+                errorMessage = 'Giá trị thuộc tính không hợp lệ'
+            }
+            if (errorMessage) {
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Giá trị thuộc tính không được vượt quá 50 ký tự',
-                    life: 3000
-                })
-                return
-            }
-            if (!/^[a-zA-Z0-9\u00C0-\u024F\s-]+$/.test(input)) {
-                toast.current?.show({
-                    severity: 'error',
-                    detail: 'Giá trị thuộc tính không hợp lệ',
+                    detail: errorMessage,
                     life: 3000
                 })
                 return
@@ -574,7 +572,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
     const isAddAttributeDisabled = () => {
         const availableAttributes = getAvailableAttributes()
-        return attributeRows.length >= availableAttributes.length
+        return availableAttributes.length === 0
     }
 
     const saveProductAttribute = async () => {
@@ -960,7 +958,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     </AccordionTab>
                 </Accordion>
                 <Button
-                    disabled={!!(combinedRows.length === 0 || nameError || categoryError || manufactureError)}
+                    disabled={!!(addAttributeRow.length === 0 || nameError || categoryError || manufactureError)}
                     onClick={handleAddProduct}
                 >
                     Thêm Mới
