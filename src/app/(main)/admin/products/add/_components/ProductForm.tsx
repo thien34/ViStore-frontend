@@ -26,6 +26,8 @@ import AtbDialog from './AtbDialog'
 import productAttributeService from '@/service/productAttribute.service'
 import { useMountEffect } from 'primereact/hooks'
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
+import Link from 'next/link'
+import { MdSettingsBackupRestore } from 'react-icons/md'
 
 export interface AttributeRow {
     selectedAttribute: ProductAttributeName | null
@@ -614,7 +616,12 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             <Toast ref={toast} />
             <Spinner isLoading={isLoading} />
             <div className='card'>
-                <h4>Thêm Sản Phẩm</h4>
+                <div className='flex justify-between items-center gap-2'>
+                    <h4>Thêm Sản Phẩm</h4>
+                    <Link href={'/admin/products'}>
+                        <Image src={'/layout/images/btn-back.png'} alt='ViStore' width={20} height={20} />
+                    </Link>
+                </div>
                 <div className='flex flex-column gap-4'>
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
@@ -958,11 +965,11 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     </AccordionTab>
                 </Accordion>
                 <Button
+                    className='w-full'
+                    label='Thêm Mới'
                     disabled={!!(addAttributeRow.length === 0 || nameError || categoryError || manufactureError)}
                     onClick={handleAddProduct}
-                >
-                    Thêm Mới
-                </Button>
+                />
             </div>
             <AtbDialog
                 visible={atbDialogVisible}
