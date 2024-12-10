@@ -44,7 +44,7 @@ interface CustomIsApplicable {
 }
 
 export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: CustommerOrderProps) {
-    const [checked, setChecked] = useState<boolean>(true)
+    const [checked, setChecked] = useState<boolean>(false)
     const [provinces, setProvinces] = useState<Province[]>([])
     const [visible, setVisible] = useState<boolean>(false)
     const [amountPaid, setAmountPaid] = useState<number>(0)
@@ -109,7 +109,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             setValidVouchers(validVoucherList)
             setAmountPaidLocal(orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount)
 
-            if (validVoucherList.length === 0) {
+            if (validVoucherList.length === 0 && couponCodes.length > 0 && customer) {
                 setMessage('Không tìm thấy phiếu giảm giá hợp lệ.')
             }
         } catch (error: unknown) {
@@ -463,6 +463,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         addressDetail: ''
                     })
                     setAddressDetail(null)
+                    setChecked(false)
                 }
             })
         }
@@ -523,96 +524,102 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 </div>
                             </div>
                             <hr className='border-collapse mt-0 border-gray-300' />
-                            <div className='flex flex-col md:flex-row justify-between gap-4 w-full'>
-                                <div className='field w-full md:w-1/2'>
-                                    <label htmlFor='firstName' className='font-medium block'>
-                                        Tên
-                                    </label>
-                                    <InputText
-                                        onChange={(e) =>
-                                            setAddress(
-                                                (prev) =>
-                                                    prev && {
-                                                        ...prev,
-                                                        firstName: e.target.value
+                            {customer && (
+                                <div>
+                                    <div className='flex flex-col md:flex-row justify-between gap-4 w-full'>
+                                        <div className='field w-full md:w-1/2'>
+                                            <label htmlFor='firstName' className='font-medium block'>
+                                                Tên
+                                            </label>
+                                            <InputText
+                                                onChange={(e) =>
+                                                    setAddress(
+                                                        (prev) =>
+                                                            prev && {
+                                                                ...prev,
+                                                                firstName: e.target.value
+                                                            }
+                                                    )
+                                                }
+                                                value={address?.firstName || ''}
+                                                id='firstName'
+                                                className='w-full'
+                                            />
+                                        </div>
+                                        <div className='field w-full md:w-1/2'>
+                                            <label htmlFor='lastName' className='font-medium block'>
+                                                Họ
+                                            </label>
+                                            <InputText
+                                                onChange={(e) =>
+                                                    setAddress(
+                                                        (prev) =>
+                                                            prev && {
+                                                                ...prev,
+                                                                lastName: e.target.value
+                                                            }
+                                                    )
+                                                }
+                                                value={address?.lastName || ''}
+                                                id='lastName'
+                                                className='w-full'
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='flex flex-wrap justify-content-between w-full'>
+                                        <div className='field w-full md:w-[49%]'>
+                                            <label htmlFor='phoneNumber' className='font-medium block'>
+                                                Số Điện Thoại
+                                            </label>
+                                            <InputText
+                                                onChange={(e) =>
+                                                    setAddress(
+                                                        (prev) =>
+                                                            prev && {
+                                                                ...prev,
+                                                                phoneNumber: e.target.value
+                                                            }
+                                                    )
+                                                }
+                                                value={address?.phoneNumber || ''}
+                                                id='phoneNumber'
+                                                className='w-full'
+                                            />
+                                        </div>
+                                        {checked && (
+                                            <div className='field w-full md:w-[49%]'>
+                                                <label htmlFor='note' className='font-medium block'>
+                                                    Ghi Chú
+                                                </label>
+                                                <InputText
+                                                    onChange={(e) =>
+                                                        setAddress(
+                                                            (prev) =>
+                                                                prev && {
+                                                                    ...prev,
+                                                                    note: e.target.value
+                                                                }
+                                                        )
                                                     }
-                                            )
-                                        }
-                                        value={address?.firstName || ''}
-                                        id='firstName'
-                                        className='w-full'
-                                    />
+                                                    id='note'
+                                                    className='w-full'
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className='flex flex-wrap justify-content-between w-full gap-2'>
+                                        {checked && (
+                                            <AddressComponent
+                                                provinces={provinces || []}
+                                                submitted={false}
+                                                onAddressChange={handleGetAddress}
+                                                addressDetail={addressDetail || undefined}
+                                            />
+                                        )}
+                                    </div>
                                 </div>
-                                <div className='field w-full md:w-1/2'>
-                                    <label htmlFor='lastName' className='font-medium block'>
-                                        Họ
-                                    </label>
-                                    <InputText
-                                        onChange={(e) =>
-                                            setAddress(
-                                                (prev) =>
-                                                    prev && {
-                                                        ...prev,
-                                                        lastName: e.target.value
-                                                    }
-                                            )
-                                        }
-                                        value={address?.lastName || ''}
-                                        id='lastName'
-                                        className='w-full'
-                                    />
-                                </div>
-                            </div>
-                            <div className='flex flex-wrap justify-content-between w-full'>
-                                <div className='field w-full md:w-[49%]'>
-                                    <label htmlFor='phoneNumber' className='font-medium block'>
-                                        Số Điện Thoại
-                                    </label>
-                                    <InputText
-                                        onChange={(e) =>
-                                            setAddress(
-                                                (prev) =>
-                                                    prev && {
-                                                        ...prev,
-                                                        phoneNumber: e.target.value
-                                                    }
-                                            )
-                                        }
-                                        value={address?.phoneNumber || ''}
-                                        id='phoneNumber'
-                                        className='w-full'
-                                    />
-                                </div>
-                                <div className='field w-full md:w-[49%]'>
-                                    <label htmlFor='note' className='font-medium block'>
-                                        Ghi Chú
-                                    </label>
-                                    <InputText
-                                        onChange={(e) =>
-                                            setAddress(
-                                                (prev) =>
-                                                    prev && {
-                                                        ...prev,
-                                                        note: e.target.value
-                                                    }
-                                            )
-                                        }
-                                        id='note'
-                                        className='w-full'
-                                    />
-                                </div>
-                            </div>
-                            <div className='flex flex-wrap justify-content-between w-full gap-2'>
-                                {checked && (
-                                    <AddressComponent
-                                        provinces={provinces || []}
-                                        submitted={false}
-                                        onAddressChange={handleGetAddress}
-                                        addressDetail={addressDetail || undefined}
-                                    />
-                                )}
-                            </div>
-                            {checked && (
+                            )}
+                            {customer && checked && (
                                 <div className='field w-full'>
                                     <label htmlFor='addressName' className='font-medium block'>
                                         Địa Chỉ Chi Tiết
@@ -639,7 +646,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     Vận Chuyển
                                 </label>
                                 <InputSwitch
-                                    checked={checked}
+                                    checked={Boolean(checked && customer)}
                                     onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
                                 />
                             </div>

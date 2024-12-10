@@ -27,7 +27,6 @@ import productAttributeService from '@/service/productAttribute.service'
 import { useMountEffect } from 'primereact/hooks'
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
 import Link from 'next/link'
-import { MdSettingsBackupRestore } from 'react-icons/md'
 
 export interface AttributeRow {
     selectedAttribute: ProductAttributeName | null
