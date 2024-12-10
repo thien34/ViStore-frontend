@@ -395,7 +395,8 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, id, name }) => {
                                 mode='currency'
                                 disabled={!!discount}
                                 className={discount ? 'p-disabled' : errors.price ? 'p-invalid' : ''}
-                                currency='USD'
+                                currency='VND'
+                                locale='vi-VN'
                                 max={1000000}
                             />
                             {errors.price && <small className='p-error'>{errors.price}</small>}
@@ -425,7 +426,8 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, id, name }) => {
                                 max={1000000}
                                 mode='currency'
                                 className={errors.productCost ? 'p-invalid' : ''}
-                                currency='USD'
+                                currency='VND'
+                                locale='vi-VN'
                             />
                             {errors.productCost && <small className='p-error'>{errors.productCost}</small>}
                         </div>
