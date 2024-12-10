@@ -16,6 +16,7 @@ import categoryService from '@/service/category.service'
 import Image from 'next/image'
 import { Image as PrimeImage } from 'primereact/image'
 import RequiredIcon from '@/components/icon/RequiredIcon'
+import { error } from 'console'
 
 interface CategoryProps {
     initialData: Category[]
@@ -95,27 +96,42 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                     detail: 'Danh mục đã được tạo',
                     life: 3000
                 })
+                setCategoryDialog(false)
+                setCategory(emptyCategory)
             } else {
                 const originalCategory = categories.find((cat) => cat.id === category.id)
                 if (
                     category.id == originalCategory?.id &&
                     category.name == originalCategory.name &&
                     category.categoryParentId == originalCategory.categoryParentId &&
-                    category.linkImg == originalCategory.linkImg
+                    category.linkImg == originalCategory.linkImg &&
+                    category.description == originalCategory.description
                 ) {
                     setCategoryDialog(false)
                     return
                 }
-                await categoryService.update(category.id, category)
-                toast.current?.show({
-                    severity: 'success',
-                    summary: 'Thành công',
-                    detail: 'Danh mục đã được cập nhật',
-                    life: 3000
-                })
+                await categoryService
+                    .update(category.id, category)
+                    .then(() => {
+                        toast.current?.show({
+                            severity: 'success',
+                            summary: 'Thành công',
+                            detail: 'Danh mục đã được cập nhật',
+                            life: 3000
+                        })
+                        setCategoryDialog(false)
+                        setCategory(emptyCategory)
+                    })
+                    .catch((error) => {
+                        toast.current?.show({
+                            severity: 'error',
+                            summary: 'Thất bại',
+                            detail: error.message,
+                            life: 3000
+                        })
+                    })
             }
-            setCategoryDialog(false)
-            setCategory(emptyCategory)
+
             await fetchCategories()
         }
     }

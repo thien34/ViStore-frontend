@@ -26,6 +26,7 @@ import AtbDialog from './AtbDialog'
 import productAttributeService from '@/service/productAttribute.service'
 import { useMountEffect } from 'primereact/hooks'
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
+import Link from 'next/link'
 
 export interface AttributeRow {
     selectedAttribute: ProductAttributeName | null
@@ -109,22 +110,20 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
     const handleKeydown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         if (event.key === 'Enter') {
             const input = (event.target as HTMLInputElement).value.trim()
+            let errorMessage = ''
 
             // Validate input
             if (input === '') return
             if (input.length > 50) {
+                errorMessage = 'Giá trị thuộc tính không được vượt quá 50 ký tự'
+            } else if (/[{}\[\]\/\\+*.$^|?@!#%&()_=`~:;"'<>,]/.test(input)) {
+                errorMessage = 'Giá trị thuộc tính không hợp lệ'
+            }
+            if (errorMessage) {
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Giá trị thuộc tính không được vượt quá 50 ký tự',
-                    life: 3000
-                })
-                return
-            }
-            if (!/^[a-zA-Z0-9\u00C0-\u024F\s-]+$/.test(input)) {
-                toast.current?.show({
-                    severity: 'error',
-                    detail: 'Giá trị thuộc tính không hợp lệ',
+                    detail: errorMessage,
                     life: 3000
                 })
                 return
@@ -574,7 +573,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
 
     const isAddAttributeDisabled = () => {
         const availableAttributes = getAvailableAttributes()
-        return attributeRows.length >= availableAttributes.length
+        return availableAttributes.length === 0
     }
 
     const saveProductAttribute = async () => {
@@ -616,7 +615,12 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             <Toast ref={toast} />
             <Spinner isLoading={isLoading} />
             <div className='card'>
-                <h4>Thêm Sản Phẩm</h4>
+                <div className='flex justify-between items-center gap-2'>
+                    <h4>Thêm Sản Phẩm</h4>
+                    <Link href={'/admin/products'}>
+                        <Image src={'/layout/images/btn-back.png'} alt='ViStore' width={20} height={20} />
+                    </Link>
+                </div>
                 <div className='flex flex-column gap-4'>
                     <div className='flex flex-row gap-4'>
                         <div className='flex flex-column gap-2 w-full'>
@@ -960,11 +964,11 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     </AccordionTab>
                 </Accordion>
                 <Button
-                    disabled={!!(combinedRows.length === 0 || nameError || categoryError || manufactureError)}
+                    className='w-full'
+                    label='Thêm Mới'
+                    disabled={!!(addAttributeRow.length === 0 || nameError || categoryError || manufactureError)}
                     onClick={handleAddProduct}
-                >
-                    Thêm Mới
-                </Button>
+                />
             </div>
             <AtbDialog
                 visible={atbDialogVisible}

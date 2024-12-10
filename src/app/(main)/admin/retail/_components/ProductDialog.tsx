@@ -45,6 +45,9 @@ const ProductDialog = ({
             </div>
         )
     }
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+    }
     return (
         <Dialog
             header='Tìm Sản Phẩm'
@@ -92,11 +95,11 @@ const ProductDialog = ({
                         <div className='flex gap-2 items-center'>
                             {rowData.discountPrice ? (
                                 <>
-                                    <span className='line-through text-gray-500'>$ {rowData.price}</span>
-                                    <span className='text-red-500'>$ {rowData.discountPrice}</span>
+                                    <span className='line-through text-gray-500'>{formatCurrency(rowData.price)}</span>
+                                    <span className='text-red-500'>{formatCurrency(rowData.discountPrice)}</span>
                                 </>
                             ) : (
-                                <span>$ {rowData.price}</span>
+                                <span>{formatCurrency(rowData.price)}</span>
                             )}
                         </div>
                     )}
