@@ -966,7 +966,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                 <Button
                     className='w-full'
                     label='Thêm Mới'
-                    disabled={!!(addAttributeRow.length === 0 || nameError || categoryError || manufactureError)}
+                    disabled={!!(combinedRows.length === 0 || nameError || categoryError || manufactureError)}
                     onClick={handleAddProduct}
                 />
             </div>
