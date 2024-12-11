@@ -84,16 +84,6 @@ const CustomerOrderInfo = ({ customerOrder, setCustomerOrder }: CustomerOrderInf
                 return <Tag value={PaymentMethodType[paymentMethod]} />
         }
     }
-    // const paymentModeBody = (paymentStatus: number) => {
-    //     switch (paymentStatus) {
-    //         case PaymentModeType.Online:
-    //             return <Tag value='Chờ Thanh Toán' severity='info' />
-    //         case PaymentModeType.IN_STORE:
-    //             return <Tag value='Đã Thanh Toán' severity='info' />
-    //         default:
-    //             return <Tag value={PaymentModeType[paymentStatus]} />
-    //     }
-    // }
     return (
         <div className='card'>
             <div className='flex justify-between items-center'>

@@ -82,22 +82,6 @@ export default function ProductOrderList({ id }: Props) {
         setProducts(data)
     }, [orderItemsResponse])
 
-    // const handleDecrement = (id: number) => {
-    //     const currentItem = orderItemsResponse.find((item) => item.id === id)
-    //     if (currentItem && currentItem.quantity > 1) {
-    //         const newQuantity = currentItem.quantity - 1
-    //         handleQuantityChange(id, newQuantity)
-    //     }
-    // }
-
-    // const handleIncrement = (id: number) => {
-    //     const currentItem = orderItemsResponse.find((item) => item.id === id)
-    //     if (currentItem) {
-    //         const newQuantity = currentItem.quantity + 1
-    //         handleQuantityChange(id, newQuantity)
-    //     }
-    // }
-
     const handleQuantityChange = async (id: number, value: number) => {
         try {
             await OrderService.updateOrderItem(id, value)
@@ -123,19 +107,9 @@ export default function ProductOrderList({ id }: Props) {
         }
     }
 
-    // const isEditable = [
-    //     OrderStatusType.CREATED,
-    //     OrderStatusType.PENDING,
-    //     OrderStatusType.CONFIRMED,
-    //     OrderStatusType.SHIPPING_PENDING
-    // ].includes(status as OrderStatusType)
-
     return (
         <div>
             <h4>Danh sách sản phẩm đơn hàng</h4>
-            {/* <div className='flex justify-end'>
-                <Button type='button' label='Add Item' onClick={() => setVisible(true)} />
-            </div> */}
 
             <Toast ref={toast} />
             {products.map((product) => (

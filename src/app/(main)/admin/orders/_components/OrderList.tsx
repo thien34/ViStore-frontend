@@ -1,11 +1,9 @@
 'use client'
-
 import { OrderResponse, OrderStatusType } from '@/interface/order.interface'
 import Link from 'next/dist/client/link'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
 import { Tag } from 'primereact/tag'
-import React from 'react'
 import { FaTimesCircle } from 'react-icons/fa'
 import { FaRegCheckCircle, FaTruck } from 'react-icons/fa'
 import { FaRegClock } from 'react-icons/fa'
@@ -83,7 +81,7 @@ export default function OrderList({ orders }: Props) {
 
     const orderDetailBody = (row: OrderResponse) => {
         return (
-            <Link href={`/admin/orders/${row.id}`}>
+            <Link href={`/admin/orders/${row.id}`} className='inline-block'>
                 <TbEyeEdit className='text-blue-500' style={{ cursor: 'pointer', width: '25px', height: '25px' }} />
             </Link>
         )
@@ -99,16 +97,24 @@ export default function OrderList({ orders }: Props) {
     return (
         <div className='card'>
             <DataTable
-                value={orders} paginator rows={5} rowsPerPageOptions={[10, 20, 50]}
+                value={orders}
+                removableSort
+                resizableColumns
+                showGridlines
+                paginator
+                rows={10}
+                rowsPerPageOptions={[5, 10, 25]}
+                paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
+                currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} đơn hàng'
                 emptyMessage='Không có đơn đơn hàng nào'
             >
                 <Column body={(_, { rowIndex }) => rowIndex + 1} header='#' />
-                <Column  align='center' field='billCode' header='Mã Hóa Đơn' />
-                <Column   align='center' field='customerName' header='Khách Hàng' body={customerNameBody} />
+                <Column align='center' field='billCode' header='Mã Hóa Đơn' />
+                <Column align='center' field='customerName' header='Khách Hàng' body={customerNameBody} />
                 <Column align='center' field='orderStatus' header='Trạng Thái' body={orderStatusBody} />
                 {/* <Column align='center' field='totalItem' header='Tổng Sản Phẩm' /> */}
                 <Column
-                    sortable    
+                    sortable
                     align='center'
                     field='orderTotal'
                     header='Tổng Tiền'
@@ -117,13 +123,13 @@ export default function OrderList({ orders }: Props) {
                 {/* <Column align='center' field='paymentMethod' header='Phương Thức Thanh Toán' body={paymentMethodBody} /> */}
                 {/* <Column align='center' field='paymentMode' header='Hình Thức Thanh Toán' body={paymentModeBody} /> */}
                 <Column
-                    sortable
-                    align='center'
                     field='paidDateUtc'
+                    align='center'
                     header='Ngày Thanh Toán'
+                    sortable
                     body={(row) => formatDate(row.paidDateUtc)}
                 />
-                <Column align='center' field='action' header='Chi Tiết' body={orderDetailBody} />
+                <Column align='center' field='action' body={orderDetailBody} />
             </DataTable>
         </div>
     )

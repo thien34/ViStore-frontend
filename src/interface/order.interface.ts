@@ -94,21 +94,21 @@ export interface OrderResponse {
 
 export interface OrderFilter {
     name?: string
-    paymentMode?: number,
-    status?: string,
-    startAmount?: number,
-    endAmount?: number,
-    paymentStatus?: number,
+    paymentMode?: number
+    status?: string
+    startAmount?: number
+    endAmount?: number
+    paymentStatus?: number
     startDate?: Date
     endDate?: Date
 }
 
 export interface InvoiceData {
-    invoiceNumber: string;
-    date: string;
-    dueDate: string;
-    company: Company;
-    client: Client;
+    invoiceNumber: string
+    date: string
+    dueDate: string
+    company: Company
+    client: Client
     items: Item[]
     subtotal: number
     discount: number
@@ -116,25 +116,23 @@ export interface InvoiceData {
 }
 
 export interface Company {
-    name: string;
-    logo: string;
-    address: string;
-    phone: string;
-    email: string;
+    name: string
+    logo: string
+    address: string
+    phone: string
+    email: string
 }
 
 export interface Client {
-    name: string;
-    address: string;
-    email: string;
-    phone: string;
+    name: string
+    address: string
+    email: string
+    phone: string
 }
 
 export interface Item {
-    productName: string;
+    productName: string
     quantity: number
     rate: number
     amount: number
 }
-
-
