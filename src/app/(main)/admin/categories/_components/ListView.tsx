@@ -16,7 +16,6 @@ import categoryService from '@/service/category.service'
 import Image from 'next/image'
 import { Image as PrimeImage } from 'primereact/image'
 import RequiredIcon from '@/components/icon/RequiredIcon'
-import { error } from 'console'
 
 interface CategoryProps {
     initialData: Category[]
@@ -200,6 +199,9 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
             <Button label='Lưu' icon='pi pi-check' onClick={saveCategory} />
         </>
     )
+    const indexBodyTemplate = (_: Category, options: { rowIndex: number }) => {
+        return <>{options.rowIndex + 1}</>
+    }
 
     return (
         <>
@@ -225,10 +227,11 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                     header={header}
                 >
                     <Column
-                        selectionMode='multiple'
                         headerStyle={{
                             width: '4rem'
                         }}
+                        header='#'
+                        body={indexBodyTemplate}
                     />
                     <Column
                         className='flex justify-center h-full'

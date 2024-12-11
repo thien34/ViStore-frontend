@@ -1,6 +1,6 @@
 'use client'
 import { ManufacturerName } from '@/interface/manufacturer.interface'
-import { ProductAttribute, ProductRequest } from '@/interface/Product'
+import { ProductAttribute, ProductRequest, ProductResponse } from '@/interface/Product'
 import { ProductAttributeName } from '@/interface/productAttribute.interface'
 import ProductService from '@/service/ProducrService'
 import Image from 'next/image'
@@ -609,6 +609,10 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         fetchAttributes()
     }
 
+    const indexBodyTemplate = (_: ProductResponse, options: { rowIndex: number }) => {
+        return <>{options.rowIndex + 1}</>
+    }
+
     return (
         <div>
             <ConfirmDialog />
@@ -844,6 +848,13 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                                 showGridlines
                                 tableStyle={{ minWidth: '50rem' }}
                             >
+                                <Column
+                                    header='#'
+                                    body={indexBodyTemplate}
+                                    headerStyle={{
+                                        width: '4rem'
+                                    }}
+                                />
                                 {columns.map(({ field, header }) => {
                                     if (field === 'name') {
                                         return (

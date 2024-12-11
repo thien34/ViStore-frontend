@@ -48,6 +48,9 @@ const ProductDialog = ({
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
     }
+    const indexBodyTemplate = (_: ProductResponse, options: { rowIndex: number }) => {
+        return <>{options.rowIndex + 1}</>
+    }
     return (
         <Dialog
             header='Tìm Sản Phẩm'
@@ -65,6 +68,13 @@ const ProductDialog = ({
                 emptyMessage='Không tìm thấy sản phẩm nào.'
                 onFilter={onFilter}
             >
+                <Column
+                    header='#'
+                    body={indexBodyTemplate}
+                    headerStyle={{
+                        width: '4rem'
+                    }}
+                />
                 <Column
                     field='imageUrl'
                     header='Hình Ảnh'

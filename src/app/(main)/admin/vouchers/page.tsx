@@ -283,7 +283,9 @@ const ListView = () => {
             })
         }
     }
-
+    const indexBodyTemplate = (_: Voucher, options: { rowIndex: number }) => {
+        return <>{options.rowIndex + 1}</>
+    }
     return (
         <>
             <Toast ref={toast} />
@@ -305,6 +307,7 @@ const ListView = () => {
                     currentPageReportTemplate='Showing {first} to {last} of {totalRecords} entries'
                     emptyMessage='No discounts found.'
                 >
+                    <Column header='#' body={indexBodyTemplate} />
                     <Column header='Voucher Name | Voucher Code' frozen body={voucherInfoTemplate} />
                     <Column header='Status' body={statusBodyTemplate} />
                     <Column header='Discount Value' body={formatDiscountAndStock} />

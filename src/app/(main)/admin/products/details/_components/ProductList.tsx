@@ -31,6 +31,9 @@ function ProductList({ products }: Props) {
     useEffect(() => {
         setFilterData(products)
     }, [products])
+    const indexBodyTemplate = (_: ProductResponse, options: { rowIndex: number }) => {
+        return <>{options.rowIndex + 1}</>
+    }
     return (
         <div className='card '>
             <div className='flex justify-content-between mb-1'>
@@ -59,6 +62,13 @@ function ProductList({ products }: Props) {
                 paginatorTemplate='RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink'
                 currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} sản phẩm'
             >
+                <Column
+                    header='#'
+                    body={indexBodyTemplate}
+                    headerStyle={{
+                        width: '4rem'
+                    }}
+                />
                 <Column
                     header='Ảnh'
                     body={(rowData) => (
