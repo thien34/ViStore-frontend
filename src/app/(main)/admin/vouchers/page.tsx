@@ -317,7 +317,6 @@ const ListView = () => {
                         body={(rowData) => (rowData.limitationTimes ? rowData.limitationTimes : 'Infinite')}
                     />
                     <Column header='Usage Count' field='usageCount' />
-                    <Column header='Is Cumulative' body={isCumulativeTemplate} />
                     <Column
                         header='Time of Discount Code'
                         body={(rowData) => {
