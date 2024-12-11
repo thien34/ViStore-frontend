@@ -1,65 +1,81 @@
 'use client'
+import React, { useState } from 'react'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { ProductResponse } from '@/interface/Product'
 import { Button } from 'primereact/button'
+import { InputText } from 'primereact/inputtext'
+import { FilterMatchMode } from 'primereact/api'
 import Link from 'next/link'
 import { Image } from 'primereact/image'
-import { InputText } from 'primereact/inputtext'
-import { useEffect, useState } from 'react'
+
 type Props = {
     products: ProductResponse[]
 }
 
 function ProductList({ products }: Props) {
-    const [filterData, setFilterData] = useState<ProductResponse[]>(products)
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const query = e.target.value.trim().toLowerCase()
-        if (query === '') {
-            setFilterData(products)
-        } else {
-            const filtered = products.filter(
-                (item) =>
-                    item.categoryName?.toLowerCase().includes(query) ||
-                    item.manufacturerName?.toLowerCase().includes(query) ||
-                    item.name?.toLowerCase().includes(query)
-            )
-            setFilterData(filtered)
-        }
+    const [filters, setFilters] = useState<{
+        global: { value: string | null; matchMode: FilterMatchMode }
+        name: { value: string | null; matchMode: FilterMatchMode }
+        categoryName: { value: string | null; matchMode: FilterMatchMode }
+        manufacturerName: { value: string | null; matchMode: FilterMatchMode }
+    }>({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        categoryName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        manufacturerName: { value: null, matchMode: FilterMatchMode.CONTAINS }
+    })
+
+    const [globalFilterValue, setGlobalFilterValue] = useState('')
+
+    const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+        const _filters = { ...filters }
+        _filters['global'].value = value
+        setFilters(_filters)
+        setGlobalFilterValue(value)
     }
 
-    useEffect(() => {
-        setFilterData(products)
-    }, [products])
     const indexBodyTemplate = (_: ProductResponse, options: { rowIndex: number }) => {
         return <>{options.rowIndex + 1}</>
     }
-    return (
-        <div className='card '>
-            <div className='flex justify-content-between mb-1'>
-                <h2>Danh Sách Sản Phẩm</h2>
+
+    const header = (
+        <div className='flex justify-content-between items-center'>
+            <span className='p-input-icon-left'>
+                <i className='pi pi-search' />
+                <InputText
+                    value={globalFilterValue}
+                    onChange={onGlobalFilterChange}
+                    placeholder='Tìm kiếm toàn bộ'
+                    className='w-full'
+                />
+            </span>
+            <div className='flex gap-2 items-center'>
                 <Link href='/admin/products/add'>
                     <Button label='Thêm Mới' />
                 </Link>
             </div>
-            <div className='p-inputgroup flex-1 mb-2'>
-                <span className='p-inputgroup-addon'>
-                    <i className='pi pi-search'></i>
-                </span>
-                <InputText
-                    placeholder='Tìm kiếm theo Tên sản phẩm, danh mục , nhà sản xuất'
-                    className='w-full'
-                    onChange={handleSearch}
-                />
-            </div>
+        </div>
+    )
+
+    return (
+        <div className='card'>
+            <h2>Danh Sách Sản Phẩm</h2>
             <DataTable
-                value={filterData}
+                value={products}
+                dataKey='id'
+                removableSort
+                resizableColumns
+                showGridlines
                 paginator
                 rows={5}
-                removableSort
-                rowsPerPageOptions={[5, 10, 25, 50]}
+                rowsPerPageOptions={[5, 10, 25]}
+                paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
+                filters={filters}
+                globalFilterFields={['name', 'categoryName', 'manufacturerName']}
                 tableStyle={{ minWidth: '50rem' }}
-                paginatorTemplate='RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink'
+                header={header}
                 currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} sản phẩm'
             >
                 <Column
@@ -76,6 +92,7 @@ function ProductList({ products }: Props) {
                             src={rowData.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}
                             width='70px'
                             height='70px'
+                            imageClassName='rounded-lg'
                             alt={rowData.name ?? 'Product Image'}
                             onError={(e) =>
                                 ((e.target as HTMLImageElement).src =
@@ -84,9 +101,14 @@ function ProductList({ products }: Props) {
                         />
                     )}
                 />
-                <Column field='name' header='Tên Sản Phẩm'></Column>
-                <Column field='categoryName' header='Danh Mục'></Column>
-                <Column field='manufacturerName' header='Nhà Sản Xuất'></Column>
+                <Column field='name' header='Tên Sản Phẩm' filter filterPlaceholder='Lọc theo tên' />
+                <Column field='categoryName' header='Danh Mục' filter filterPlaceholder='Lọc theo danh mục' />
+                <Column
+                    field='manufacturerName'
+                    header='Nhà Sản Xuất'
+                    filter
+                    filterPlaceholder='Lọc theo nhà sản xuất'
+                />
                 <Column sortable align='center' field='quantity' header='Số Lượng' />
 
                 <Column
