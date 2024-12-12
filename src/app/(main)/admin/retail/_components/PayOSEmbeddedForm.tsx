@@ -13,6 +13,7 @@ const PayOSForm = ({ paymentOSRequest, setVisible, setAmountPaid }: PayOSFormPro
     const [isOpen, setIsOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState<string | null>(null)
+    const [showContainer, setShowContainer] = useState(false)
 
     const [payOSConfig, setPayOSConfig] = useState({
         RETURN_URL: window.location.origin,
@@ -22,11 +23,21 @@ const PayOSForm = ({ paymentOSRequest, setVisible, setAmountPaid }: PayOSFormPro
         onSuccess: () => {
             setAmountPaid(paymentOSRequest.amount)
             setVisible(false)
-            setIsOpen(false)
+            handleClose()
         }
     })
 
     const { open, exit } = usePayOS(payOSConfig)
+
+    const handleClose = () => {
+        exit()
+        setIsOpen(false)
+        setShowContainer(false)
+        setPayOSConfig((prev) => ({
+            ...prev,
+            CHECKOUT_URL: ''
+        }))
+    }
 
     const createPaymentLink = async () => {
         setIsLoading(true)
@@ -37,6 +48,7 @@ const PayOSForm = ({ paymentOSRequest, setVisible, setAmountPaid }: PayOSFormPro
                 CHECKOUT_URL: checkoutUrl
             }))
             setIsOpen(true)
+            setShowContainer(true)
         } catch (error) {
             console.error('Error:', error)
             setMessage('Không thể tạo link thanh toán.')
@@ -59,12 +71,14 @@ const PayOSForm = ({ paymentOSRequest, setVisible, setAmountPaid }: PayOSFormPro
                 </div>
             ) : (
                 <div>
-                    <button onClick={createPaymentLink} disabled={isLoading} className='p-button p-component'>
-                        {isLoading ? 'Đang tạo link...' : 'Tạo link thanh toán'}
-                    </button>
-                    {isOpen && <div id='embedded-payment-container' style={{ height: '350px' }}></div>}
+                    {!isOpen && (
+                        <button onClick={createPaymentLink} disabled={isLoading} className='p-button p-component'>
+                            {isLoading ? 'Đang tạo link...' : 'Tạo link thanh toán'}
+                        </button>
+                    )}
+                    {showContainer && <div id='embedded-payment-container' style={{ height: '350px' }}></div>}
                     {isOpen && (
-                        <button onClick={() => exit()} className='p-button-secondary'>
+                        <button onClick={handleClose} className='p-button-secondary'>
                             Đóng link
                         </button>
                     )}
