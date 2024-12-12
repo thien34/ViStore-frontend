@@ -68,17 +68,6 @@ export default function OrderList({ orders }: Props) {
         }
     }
 
-    // const paymentModeBody = (row: OrderResponse) => {
-    //     switch (row.paymentMode) {
-    //         case PaymentModeType.Online:
-    //             return <Tag value='Online' severity='info' />
-    //         case PaymentModeType.IN_STORE:
-    //             return <Tag value='In Store' severity='info' />
-    //         default:
-    //             return <Tag value={PaymentModeType[row.paymentMode]} />
-    //     }
-    // }
-
     const orderDetailBody = (row: OrderResponse) => {
         return (
             <Link href={`/admin/orders/${row.id}`} className='inline-block'>
@@ -112,7 +101,6 @@ export default function OrderList({ orders }: Props) {
                 <Column align='center' field='billCode' header='Mã Hóa Đơn' />
                 <Column align='center' field='customerName' header='Khách Hàng' body={customerNameBody} />
                 <Column align='center' field='orderStatus' header='Trạng Thái' body={orderStatusBody} />
-                {/* <Column align='center' field='totalItem' header='Tổng Sản Phẩm' /> */}
                 <Column
                     sortable
                     align='center'
@@ -120,8 +108,7 @@ export default function OrderList({ orders }: Props) {
                     header='Tổng Tiền'
                     body={(row) => `${row.orderTotal.toLocaleString('vi-VN')}₫`}
                 />
-                {/* <Column align='center' field='paymentMethod' header='Phương Thức Thanh Toán' body={paymentMethodBody} /> */}
-                {/* <Column align='center' field='paymentMode' header='Hình Thức Thanh Toán' body={paymentModeBody} /> */}
+
                 <Column
                     field='paidDateUtc'
                     align='center'

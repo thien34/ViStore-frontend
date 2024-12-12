@@ -85,7 +85,7 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
     const leftToolbarTemplate = () => {
         return (
             <div className='flex flex-wrap gap-2'>
-                <Button label='New' icon='pi pi-plus' severity='success' onClick={openNew} />
+                <Button label='Thêm mới' icon='pi pi-plus' severity='success' onClick={openNew} />
             </div>
         )
     }
@@ -105,6 +105,18 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
         )
     }
 
+    const descriptionBodyTemplate = (rowData: ProductAttribute) => {
+        return (
+            <div
+                className='overflow-hidden text-ellipsis whitespace-nowrap'
+                style={{ maxWidth: '500px' }}
+                title={rowData.description}
+            >
+                {rowData.description}
+            </div>
+        )
+    }
+
     const actionBodyTemplate = (rowData: ProductAttribute) => {
         return (
             <>
@@ -121,13 +133,13 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
 
     const header = (
         <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
-            <h5 className='m-0'>Manage Product Attributes</h5>
+            <h5 className='m-0'>Quản lý thuộc tính</h5>
             <span className='block mt-2 md:mt-0 p-input-icon-left'>
                 <i className='pi pi-search' />
                 <InputText
                     type='search'
                     onInput={(e) => setGlobalFilter(e.currentTarget.value)}
-                    placeholder='Search...'
+                    placeholder='Tìm kiếm...'
                 />
             </span>
         </div>
@@ -170,13 +182,19 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
                     ></Column>
                     <Column
                         field='name'
-                        header='Name'
+                        header='Tên'
                         sortable
                         headerStyle={{
                             minWidth: '4rem'
                         }}
                     />
-                    <Column field='description' header='Description' />
+                    <Column
+                        field='description'
+                        header='Mô Tả'
+                        sortable
+                        body={descriptionBodyTemplate}
+                        headerStyle={{ width: '200px' }}
+                    />
                     <Column
                         body={actionBodyTemplate}
                         style={{

@@ -36,7 +36,7 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-dollar',
                     items: [
                         {
-                            label: 'Bán Hàng',
+                            label: 'Đợt giảm giá',
                             icon: 'pi pi-fw pi-tags',
                             to: '/admin/discounts'
                         },
@@ -54,40 +54,38 @@ const AppMenu = () => {
         {
             label: 'Đặt Hàng',
             items: [
-                { label: 'Đặt Hàng', icon: 'pi pi-fw pi-table', to: '/admin/orders' },
-                { label: 'Trả hàng', icon: 'pi pi-fw pi-list', to: '/admin/return-product' },
-                { label: 'Thanh Toán Định Kỳ', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
-                { label: 'Giỏ hàng & Danh sách yêu thích', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' }
+                { label: 'Đơn hàng', icon: 'pi pi-fw pi-table', to: '/admin/orders' },
+                { label: 'Trả hàng', icon: 'pi pi-fw pi-list', to: '/admin/return-product' }
             ]
         },
         {
-            label: 'Trang',
+            label: 'Page',
             icon: 'pi pi-fw pi-briefcase',
             to: '/pages',
             items: [
                 {
-                    label: '',
+                    label: 'Full page',
                     icon: 'pi pi-fw pi-user',
                     items: [
                         {
-                            label: 'Đăng Nhập',
+                            label: 'Login',
                             icon: 'pi pi-fw pi-sign-in',
                             to: '/auth/login'
                         },
                         {
-                            label: 'Lỗi',
+                            label: 'Error',
                             icon: 'pi pi-fw pi-times-circle',
                             to: '/auth/error'
                         },
                         {
-                            label: 'Từ Chối',
+                            label: 'Denied',
                             icon: 'pi pi-fw pi-lock',
                             to: '/auth/access'
                         }
                     ]
                 },
                 {
-                    label: 'Không Tìm Thấy',
+                    label: 'Not found',
                     icon: 'pi pi-fw pi-exclamation-circle',
                     to: '/pages/notfound'
                 }

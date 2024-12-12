@@ -179,6 +179,18 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
         )
     }
 
+    const descriptionBodyTemplate = (rowData: Category) => {
+        return (
+            <div
+                className='overflow-hidden text-ellipsis whitespace-nowrap'
+                style={{ maxWidth: '400px' }}
+                title={rowData.description}
+            >
+                {rowData.description}
+            </div>
+        )
+    }
+
     const header = (
         <div className='flex flex-column md:flex-row md:justify-content-between md:align-items-center'>
             <h5 className='m-0'>Quản Lý Danh Mục</h5>
@@ -251,7 +263,13 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
                             minWidth: '15rem'
                         }}
                     />
-                    <Column field='description' header='Mô Tả' sortable />
+                    <Column
+                        field='description'
+                        header='Mô Tả'
+                        sortable
+                        body={descriptionBodyTemplate}
+                        headerStyle={{ width: '200px' }}
+                    />
                     <Column
                         header='Thao Tác'
                         body={actionBodyTemplate}

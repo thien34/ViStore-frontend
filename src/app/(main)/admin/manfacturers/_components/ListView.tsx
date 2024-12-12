@@ -85,7 +85,7 @@ const ListView = ({ initialData }: ManufacturerProps) => {
     const leftToolbarTemplate = () => {
         return (
             <div className='flex flex-wrap gap-2'>
-                <Button label='New' icon='pi pi-plus' severity='success' onClick={openNew} />
+                <Button label='Thêm mới' icon='pi pi-plus' severity='success' onClick={openNew} />
             </div>
         )
     }
@@ -104,7 +104,17 @@ const ListView = ({ initialData }: ManufacturerProps) => {
             </>
         )
     }
-
+    const descriptionBodyTemplate = (rowData: Manufacturer) => {
+        return (
+            <div
+                className='overflow-hidden text-ellipsis whitespace-nowrap'
+                style={{ maxWidth: '500px' }}
+                title={rowData.description}
+            >
+                {rowData.description}
+            </div>
+        )
+    }
     const actionBodyTemplate = (rowData: Manufacturer) => {
         return (
             <>
@@ -181,7 +191,13 @@ const ListView = ({ initialData }: ManufacturerProps) => {
                             minWidth: '4rem'
                         }}
                     />
-                    <Column field='description' header='Mô Tả' />
+                    <Column
+                        field='description'
+                        header='Mô Tả'
+                        sortable
+                        body={descriptionBodyTemplate}
+                        headerStyle={{ width: '200px' }}
+                    />
                     <Column
                         header='Chi Tiết'
                         body={actionBodyTemplate}
