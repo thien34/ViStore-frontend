@@ -45,7 +45,7 @@ export default function Orders() {
 
         // Get the label of the selected tab
         const target = e.originalEvent.target as HTMLElement | null
-        const selectedLabel = target ? target.innerText.replace(/\(\d+\)$/, '').trim() : ''
+        const selectedLabel = target?.innerText?.replace(/\(\d+\)$/, '').trim() || ''
 
         if (selectedLabel === 'Tất cả') {
             setFilterData(orders)
