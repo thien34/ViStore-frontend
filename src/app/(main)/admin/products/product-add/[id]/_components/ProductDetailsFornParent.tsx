@@ -200,7 +200,6 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, id, name }) => {
                 detail: error instanceof Error ? error.message : 'Đã xảy ra lỗi',
                 life: 3000
             })
-            console.error('Không cập nhật được sản phẩm:', error)
         }
     }
 
