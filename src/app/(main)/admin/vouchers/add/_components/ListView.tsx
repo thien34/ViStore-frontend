@@ -329,12 +329,14 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                                 inputId='value'
                                 value={value}
                                 showButtons
-                                mode='decimal'
                                 onValueChange={(e) => setValue(e.value !== undefined ? e.value : null)}
                                 suffix={usePercentage ? '%' : ''}
                                 min={usePercentage ? 1 : 0.1}
-                                max={usePercentage ? 50 : 1000000}
+                                max={usePercentage ? 50 : 100000000}
                                 required
+                                mode={usePercentage ? 'decimal' : 'currency'}
+                                currency='VND'
+                                locale='vi-VN'
                                 placeholder='Enter discount value'
                                 tooltip='Enter discount value'
                                 tooltipOptions={{ position: 'top' }}
@@ -353,6 +355,9 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                                     onValueChange={(e) => setMaxDiscountAmount(e.value ?? 0)}
                                     min={1}
                                     max={5000}
+                                    mode='currency'
+                                    currency='VND'
+                                    locale='vi-VN'
                                     showButtons
                                     className={errors.maxDiscountAmount ? 'p-invalid' : ''}
                                 />
@@ -369,8 +374,11 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                             value={minOrderAmount}
                             onValueChange={(e) => setMinOrderAmount(e.value ?? 0)}
                             prefix=''
+                            mode='currency'
+                            currency='VND'
+                            locale='vi-VN'
                             min={1}
-                            max={1000000}
+                            max={100000000}
                             showButtons
                             className={errors.minOrderAmount ? 'p-invalid' : ''}
                         />

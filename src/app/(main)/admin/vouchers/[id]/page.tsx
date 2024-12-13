@@ -244,12 +244,14 @@ const VoucherUpdate = () => {
                                 inputId='value'
                                 value={value}
                                 showButtons
-                                mode='decimal'
                                 onValueChange={(e) => setValue(e.value ?? 0)}
                                 suffix={usePercentage ? '%' : ''}
                                 min={usePercentage ? 1 : 0.1}
-                                max={usePercentage ? 50 : 1000000}
+                                max={usePercentage ? 50 : 100000000}
                                 required
+                                mode={usePercentage ? 'decimal' : 'currency'}
+                                currency='VND'
+                                locale='vi-VN'
                                 placeholder='Enter discount value'
                             />
                         </div>
@@ -263,6 +265,9 @@ const VoucherUpdate = () => {
                                     id='maxDiscountAmount'
                                     value={maxDiscountAmount}
                                     prefix=''
+                                    mode='currency'
+                                    currency='VND'
+                                    locale='vi-VN'
                                     onValueChange={(e) => setMaxDiscountAmount(e.value ?? 0)}
                                     min={1}
                                     max={5000}
@@ -278,8 +283,11 @@ const VoucherUpdate = () => {
                             id='minOrderAmount'
                             value={minOrderAmount}
                             onValueChange={(e) => setMinOrderAmount(e.value ?? 0)}
+                            mode='currency'
+                            currency='VND'
+                            locale='vi-VN'
                             min={1}
-                            max={1000000}
+                            max={100000000}
                             showButtons
                         />
                     </div>
