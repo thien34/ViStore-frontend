@@ -106,7 +106,9 @@ export default function ProductOrderList({ id }: Props) {
             console.error('Failed to update order item:', error)
         }
     }
-
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+    }
     return (
         <div>
             <h4>Danh sách sản phẩm đơn hàng</h4>
@@ -164,24 +166,16 @@ export default function ProductOrderList({ id }: Props) {
                             <div className='text-gray-600 text-sm flex-shrink-0 w-1/4'>
                                 {product.discountPrice ? (
                                     <div>
-                                        <span className='line-through text-gray-400'>
-                                            $
-                                            {product.unitPrice && product.quantity
-                                                ? (Number(product.unitPrice) * product.quantity).toFixed(2)
-                                                : '0.00'}
-                                        </span>
-                                        <span className='ml-2 text-red-500 font-semibold'>
-                                            $
+                                        <span className='ml-2  font-semibold'>
                                             {product.discountPrice && product.quantity
-                                                ? (Number(product.discountPrice) * product.quantity).toFixed(2)
+                                                ? formatCurrency(Number(product.discountPrice) * product.quantity)
                                                 : '0.00'}
                                         </span>
                                     </div>
                                 ) : (
                                     <span>
-                                        $
                                         {product.unitPrice && product.quantity
-                                            ? (Number(product.unitPrice) * product.quantity).toFixed(2)
+                                            ? formatCurrency(Number(product.unitPrice) * product.quantity)
                                             : '0.00'}
                                     </span>
                                 )}

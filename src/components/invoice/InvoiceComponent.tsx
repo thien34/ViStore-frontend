@@ -8,6 +8,9 @@ interface InvoiceComponentProps {
 }
 
 const InvoiceComponent: React.FC<InvoiceComponentProps> = ({ data }) => {
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+    }
     return (
         <div className=' bg-gray-100 py-6 flex flex-col justify-center sm:py-12'>
             <div className='relative  sm:max-w-xl sm:mx-auto'>
@@ -68,8 +71,8 @@ const InvoiceComponent: React.FC<InvoiceComponentProps> = ({ data }) => {
                                     <tr key={index} className='text-sm text-gray-600'>
                                         <td className='py-2 text-left'>{item.productName}</td>
                                         <td className='py-2 text-right'>{item.quantity}</td>
-                                        <td className='py-2 text-right'>${item.rate.toFixed(2)}</td>
-                                        <td className='py-2 text-right'>${item.amount.toFixed(2)}</td>
+                                        <td className='py-2 text-right'>{formatCurrency(item.rate)}</td>
+                                        <td className='py-2 text-right'>{formatCurrency(item.amount)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -77,10 +80,10 @@ const InvoiceComponent: React.FC<InvoiceComponentProps> = ({ data }) => {
 
                         <div className='flex justify-end '>
                             <div className='text-right'>
-                                <p className='text-sm text-gray-600 mb-1'>Tổng tiền: ${data.total.toFixed(2)}</p>
-                                <p className='text-sm text-gray-600 mb-1'>Giảm giá : ${data.discount.toFixed(2)}</p>
+                                <p className='text-sm text-gray-600 mb-1'>Tổng tiền: {formatCurrency(data.total)}</p>
+                                <p className='text-sm text-gray-600 mb-1'>Giảm giá : {formatCurrency(data.discount)}</p>
                                 <p className='text-lg font-semibold text-gray-700'>
-                                    Tổng cộng: ${data.subtotal.toFixed(2)}
+                                    Tổng cộng: {formatCurrency(data.subtotal)}
                                 </p>
                             </div>
                         </div>

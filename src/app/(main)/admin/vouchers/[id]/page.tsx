@@ -101,7 +101,7 @@ const VoucherUpdate = () => {
                 severity: 'error',
                 summary: 'Update Failed',
                 detail: errorMessage,
-                life: 5000
+                life: 5000000
             })
         }
     }
@@ -166,7 +166,9 @@ const VoucherUpdate = () => {
         const newSelectedCustomers = e.value as Customer[]
         setSelectedCustomers(newSelectedCustomers)
     }
-
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+    }
     return (
         <div className='card'>
             {isExpired && (
@@ -242,12 +244,14 @@ const VoucherUpdate = () => {
                                 inputId='value'
                                 value={value}
                                 showButtons
-                                mode='decimal'
                                 onValueChange={(e) => setValue(e.value ?? 0)}
-                                suffix={usePercentage ? '%' : '$'}
+                                suffix={usePercentage ? '%' : ''}
                                 min={usePercentage ? 1 : 0.1}
-                                max={usePercentage ? 50 : 1000000}
+                                max={usePercentage ? 50 : 10000000000}
                                 required
+                                mode={usePercentage ? 'decimal' : 'currency'}
+                                currency='VND'
+                                locale='vi-VN'
                                 placeholder='Enter discount value'
                             />
                         </div>
@@ -260,10 +264,13 @@ const VoucherUpdate = () => {
                                     disabled
                                     id='maxDiscountAmount'
                                     value={maxDiscountAmount}
-                                    prefix='$'
+                                    prefix=''
+                                    mode='currency'
+                                    currency='VND'
+                                    locale='vi-VN'
                                     onValueChange={(e) => setMaxDiscountAmount(e.value ?? 0)}
                                     min={1}
-                                    max={5000}
+                                    max={5000000}
                                     showButtons
                                 />
                             </div>
@@ -276,9 +283,11 @@ const VoucherUpdate = () => {
                             id='minOrderAmount'
                             value={minOrderAmount}
                             onValueChange={(e) => setMinOrderAmount(e.value ?? 0)}
-                            prefix='$'
+                            mode='currency'
+                            currency='VND'
+                            locale='vi-VN'
                             min={1}
-                            max={1000000}
+                            max={10000000000}
                             showButtons
                         />
                     </div>

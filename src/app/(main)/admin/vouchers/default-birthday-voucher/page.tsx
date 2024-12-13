@@ -60,7 +60,7 @@ const VoucherUpdateDefaultBirthday = () => {
                 severity: 'error',
                 summary: 'Update Failed',
                 detail: errorMessage,
-                life: 5000
+                life: 5000000
             })
         }
     }
@@ -101,27 +101,27 @@ const VoucherUpdateDefaultBirthday = () => {
         if (minOrderAmount <= 0) {
             newErrors.minOrderAmount = 'Min order amount must be greater than 0.'
         }
-        if (minOrderAmount > 1000000) {
-            newErrors.minOrderAmount = 'Min order amount should not exceed 1,000,000.'
+        if (minOrderAmount > 10000000000) {
+            newErrors.minOrderAmount = 'Min order amount should not exceed 1,000,000,000.'
         }
 
         if (usePercentage) {
             if (value <= 0 || value > 50) {
                 newErrors.value = 'Discount percentage must be between 1% and 50%.'
             }
-            if (maxDiscountAmount && maxDiscountAmount > 5000) {
+            if (maxDiscountAmount && maxDiscountAmount > 5000000) {
                 newErrors.maxDiscountAmount =
-                    'Max discount amount should not exceed 5,000 VNĐ for percentage discounts.'
+                    'Max discount amount should not exceed 5,000,000 VNĐ for percentage discounts.'
             }
         } else {
             if (value <= 0) {
                 newErrors.value = 'Discount amount must be greater than 0.'
             }
-            if (value > 5000) {
-                newErrors.value = 'Discount amount should not exceed 5,000 VNĐ.'
+            if (value > 5000000) {
+                newErrors.value = 'Discount amount should not exceed 5,000,000 VNĐ.'
             }
-            if (maxDiscountAmount && maxDiscountAmount > 5000) {
-                newErrors.maxDiscountAmount = 'Max discount amount should not exceed 5,000 VNĐ.'
+            if (maxDiscountAmount && maxDiscountAmount > 5000000) {
+                newErrors.maxDiscountAmount = 'Max discount amount should not exceed 5,000,000 VNĐ.'
             }
         }
 
@@ -144,7 +144,9 @@ const VoucherUpdateDefaultBirthday = () => {
     useEffect(() => {
         fetchDefaultBirthdayVoucher()
     }, [])
-
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+    }
     return (
         <div className='card p-5' style={{ maxWidth: '800px', margin: '0 auto' }}>
             <Toast ref={toast} />
@@ -187,11 +189,13 @@ const VoucherUpdateDefaultBirthday = () => {
                                 inputId='value'
                                 value={value}
                                 showButtons
-                                mode='decimal'
                                 onValueChange={(e) => setValue(e.value ?? 0)}
-                                suffix={usePercentage ? '%' : '$'}
+                                suffix={usePercentage ? '%' : ''}
+                                mode={usePercentage ? 'decimal' : 'currency'}
+                                currency='VND'
+                                locale='vi-VN'
                                 min={usePercentage ? 1 : 0.1}
-                                max={usePercentage ? 50 : 1000000}
+                                max={usePercentage ? 50 : 100000000}
                                 required
                                 placeholder='Enter discount value'
                             />
@@ -204,10 +208,13 @@ const VoucherUpdateDefaultBirthday = () => {
                                 <InputNumber
                                     id='maxDiscountAmount'
                                     value={maxDiscountAmount}
-                                    prefix='$'
+                                    prefix=''
                                     onValueChange={(e) => setMaxDiscountAmount(e.value ?? 0)}
                                     min={1}
-                                    max={5000}
+                                    max={5000000}
+                                    mode='currency'
+                                    currency='VND'
+                                    locale='vi-VN'
                                     showButtons
                                 />
                                 {errors.maxDiscountAmount && (
@@ -223,9 +230,12 @@ const VoucherUpdateDefaultBirthday = () => {
                             id='minOderAmount'
                             value={minOrderAmount}
                             onValueChange={(e) => setMinOrderAmount(e.value ?? 0)}
-                            prefix='$'
+                            prefix=''
+                            mode='currency'
+                            currency='VND'
+                            locale='vi-VN'
                             min={1}
-                            max={1000000}
+                            max={100000000}
                             showButtons
                         />
                         {errors.minOrderAmount && <small className='p-error'>{errors.minOrderAmount}</small>}
