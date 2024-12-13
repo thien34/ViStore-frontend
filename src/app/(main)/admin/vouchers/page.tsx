@@ -56,6 +56,11 @@ const ListView = () => {
         </div>
     )
 
+    const statusBodyTemplate = (discount: Voucher) => {
+        const { severity, icon } = getStatus(discount.status)
+        return <Tag value={discount.status} severity={severity} icon={icon} />
+    }
+
     const formatDiscountAndStock = (rowData: Voucher) => {
         const isPercentage = rowData.usePercentage
         const stockClassName = classNames(
@@ -79,14 +84,9 @@ const ListView = () => {
 
         return (
             <div className={stockClassName}>
-                {isPercentage ? `${rowData.discountPercentage.toFixed(0)} %` : `$${rowData.discountAmount.toFixed(2)}`}
+                {isPercentage ? `${rowData.discountPercentage.toFixed(0)} %` : formatCurrency(rowData.discountAmount)}
             </div>
         )
-    }
-
-    const statusBodyTemplate = (discount: Voucher) => {
-        const { severity, icon } = getStatus(discount.status)
-        return <Tag value={discount.status} severity={severity} icon={icon} />
     }
 
     const getStatus = (
@@ -254,14 +254,8 @@ const ListView = () => {
             }
         })
     }
-    const isCumulativeTemplate = (rowData: Voucher) => {
-        return (
-            <Tag
-                severity={rowData.isCumulative ? 'success' : 'danger'}
-                icon={rowData.isCumulative ? 'pi pi-check' : 'pi pi-times'}
-                value={rowData.isCumulative ? 'True' : 'False'}
-            />
-        )
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
     }
     async function handleGenerateBirthdayVouchers() {
         try {

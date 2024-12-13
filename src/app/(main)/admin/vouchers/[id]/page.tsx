@@ -166,7 +166,9 @@ const VoucherUpdate = () => {
         const newSelectedCustomers = e.value as Customer[]
         setSelectedCustomers(newSelectedCustomers)
     }
-
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+    }
     return (
         <div className='card'>
             {isExpired && (
@@ -244,7 +246,7 @@ const VoucherUpdate = () => {
                                 showButtons
                                 mode='decimal'
                                 onValueChange={(e) => setValue(e.value ?? 0)}
-                                suffix={usePercentage ? '%' : '$'}
+                                suffix={usePercentage ? '%' : ''}
                                 min={usePercentage ? 1 : 0.1}
                                 max={usePercentage ? 50 : 1000000}
                                 required
@@ -260,7 +262,7 @@ const VoucherUpdate = () => {
                                     disabled
                                     id='maxDiscountAmount'
                                     value={maxDiscountAmount}
-                                    prefix='$'
+                                    prefix=''
                                     onValueChange={(e) => setMaxDiscountAmount(e.value ?? 0)}
                                     min={1}
                                     max={5000}
@@ -276,7 +278,6 @@ const VoucherUpdate = () => {
                             id='minOrderAmount'
                             value={minOrderAmount}
                             onValueChange={(e) => setMinOrderAmount(e.value ?? 0)}
-                            prefix='$'
                             min={1}
                             max={1000000}
                             showButtons

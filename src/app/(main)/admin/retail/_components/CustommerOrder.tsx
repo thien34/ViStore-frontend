@@ -808,7 +808,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     />
                                 </dt>
                                 <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                    ${amountPaid.toFixed(2)}
+                                    {formatCurrency(amountPaid)}
                                 </dd>
                             </dl>
                         </div>
