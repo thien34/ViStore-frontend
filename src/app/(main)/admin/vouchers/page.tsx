@@ -307,10 +307,13 @@ const ListView = () => {
                     <Column header='Discount Value' body={formatDiscountAndStock} />
                     <Column header='Type' body={typeBodyTemplate} />
                     <Column
-                        header='Limitation Times'
-                        body={(rowData) => (rowData.limitationTimes ? rowData.limitationTimes : 'Infinite')}
+                        header='Usage'
+                        body={(rowData) => {
+                            const total = rowData.limitationTimes || '∞'
+                            const used = rowData.usageCount || 0
+                            return `${used}/${total}`
+                        }}
                     />
-                    <Column header='Usage Count' field='usageCount' />
                     <Column
                         header='Time of Discount Code'
                         body={(rowData) => {
