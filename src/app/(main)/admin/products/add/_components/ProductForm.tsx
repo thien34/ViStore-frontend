@@ -86,7 +86,6 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         quantity: 0
     })
     const toast = useRef<Toast>(null)
-
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const [atbDialogVisible, setAtbDialogVisible] = useState(false)

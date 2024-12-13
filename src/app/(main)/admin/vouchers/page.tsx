@@ -254,15 +254,7 @@ const ListView = () => {
             }
         })
     }
-    const isCumulativeTemplate = (rowData: Voucher) => {
-        return (
-            <Tag
-                severity={rowData.isCumulative ? 'success' : 'danger'}
-                icon={rowData.isCumulative ? 'pi pi-check' : 'pi pi-times'}
-                value={rowData.isCumulative ? 'True' : 'False'}
-            />
-        )
-    }
+
     async function handleGenerateBirthdayVouchers() {
         try {
             debugger
@@ -313,10 +305,13 @@ const ListView = () => {
                     <Column header='Discount Value' body={formatDiscountAndStock} />
                     <Column header='Type' body={typeBodyTemplate} />
                     <Column
-                        header='Limitation Times'
-                        body={(rowData) => (rowData.limitationTimes ? rowData.limitationTimes : 'Infinite')}
+                        header='Usage'
+                        body={(rowData) => {
+                            const total = rowData.limitationTimes || '∞'
+                            const used = rowData.usageCount || 0
+                            return `${used}/${total}`
+                        }}
                     />
-                    <Column header='Usage Count' field='usageCount' />
                     <Column
                         header='Time of Discount Code'
                         body={(rowData) => {
