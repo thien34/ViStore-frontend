@@ -88,6 +88,11 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
             newErrors.name = 'Tên sản phẩm là bắt buộc'
             isValid = false
         }
+        if (/[{}\[\]\/\\+*.$^|?@!#%&()_=`~:;"'<>,]/.test(formData.name)) {
+            newErrors.name = 'Tên sản phẩm không hợp lệ'
+            isValid = false
+        }
+
         if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 10000) {
             newErrors.price = 'Giá phải lớn hơn 10,000'
             isValid = false
@@ -167,15 +172,21 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
         }
 
         try {
-            await ProductService.updateProduct(formData.id, productData)
-            toast.current?.show({
-                severity: 'success',
-                summary: 'Successful',
-                detail: 'Sản phẩm đã được cập nhật thành công',
-                life: 3000
+            await ProductService.updateProduct(formData.id, productData).then(() => {
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Sản phẩm đã được cập nhật thành công',
+                    life: 3000
+                })
             })
         } catch (error) {
-            console.error('Không cập nhật được sản phẩm:', error)
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: error instanceof Error ? error.message : 'Đã xảy ra lỗi',
+                life: 3000
+            })
         }
     }
 

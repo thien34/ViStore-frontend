@@ -371,7 +371,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         if (!name || name.trim() === '') {
             errors.name = 'Tên sản phẩm là bắt buộc'
         }
-
+        if (/[{}\[\]\/\\+*.$^|?@!#%&()_=`~:;"'<>,]/.test(name)) {
+            errors.name = 'Tên sản phẩm không hợp lệ'
+        }
         if (!selectedCategory) {
             errors.category = 'Danh mục sản phẩm là bắt buộc'
         }

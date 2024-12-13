@@ -26,6 +26,7 @@ import { AutoComplete } from 'primereact/autocomplete'
 import VoucherSidebar from './VoucherSidebar'
 import dayjs from 'dayjs'
 import { AxiosError } from 'axios'
+import voucherService from '@/service/voucher.service'
 
 interface CustommerOrderProps {
     orderTotals: {
@@ -41,6 +42,7 @@ interface CustommerOrderProps {
 }
 interface CustomIsApplicable {
     isApplicable: boolean
+    couponCode: string
 }
 
 export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: CustommerOrderProps) {
@@ -73,6 +75,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [validVouchers, setValidVouchers] = useState([])
     const [totalDiscount, setTotalDiscount] = useState<number>(0)
     const [hoveredVoucher, setHoveredVoucher] = useState<Voucher | null>(null)
+    const [vouchers, setVouchers] = useState<Voucher[]>([])
 
     const handleHoverEnter = (voucher: Voucher) => {
         setHoveredVoucher(voucher)
@@ -152,12 +155,53 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         }
     }
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+        await fetchVouchers()
+
         if (event.key === 'Enter' && couponCode.trim() !== '') {
-            setCouponCodes((prevCoupons) => [...prevCoupons, couponCode.trim().toUpperCase()])
-            setCouponCode('')
+            const voucherCodeUpperCase = couponCode.trim().toUpperCase()
+
+            const response = await axios.post('http://localhost:8080/api/admin/vouchers/validate-coupons', {
+                subTotal: orderTotals.subtotal,
+                email: customer?.email,
+                couponCodes: [voucherCodeUpperCase]
+            })
+            const { voucherResponses } = response.data
+
+            const isVoucherValid = vouchers.some((voucher) => voucher.couponCode.toUpperCase() === voucherCodeUpperCase)
+
+            const isVoucherAlreadyAdded = couponCodes.includes(voucherCodeUpperCase)
+
+            const isVoucherInResponses = voucherResponses.some(
+                (responseVoucher: CustomIsApplicable) =>
+                    responseVoucher.couponCode.toUpperCase() === voucherCodeUpperCase && responseVoucher.isApplicable
+            )
+
+            if (isVoucherValid && !isVoucherAlreadyAdded && isVoucherInResponses) {
+                setCouponCodes((prevCoupons) => [...prevCoupons, voucherCodeUpperCase])
+                setCouponCode('')
+            } else if (isVoucherAlreadyAdded) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Mã voucher đã được thêm trước đó'
+                })
+            } else if (!isVoucherInResponses) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Voucher không hợp lệ hoặc không thể sử dụng'
+                })
+            } else {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Mã voucher không hợp lệ'
+                })
+            }
         }
     }
+
     const handleRemoveValidVoucher = (index: number) => {
         setValidVouchers((prevVouchers) => prevVouchers.filter((_, i) => i !== index))
     }
@@ -278,7 +322,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     }
 
     const validatePayment = () => {
-        if (!checked && amountPaid < orderTotals.total) {
+        const totalOrder = Number(orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount)
+        const amountPaidNumber = Number(amountPaid)
+        if (amountPaidNumber < totalOrder) {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
@@ -355,7 +401,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (!validateAddress()) return
         if (!validateDiscount()) return
         if (!validatePayment()) return
-        if (amountPaid < orderTotals.total) {
+        if (amountPaid < orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount) {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Lỗi',
@@ -507,6 +553,12 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     }, [amountPaid])
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+    }
+
+    const fetchVouchers = async () => {
+        const vouchersData = await voucherService.getAllIsPublished()
+        const filteredVouchers = vouchersData.filter((voucher: Voucher) => voucher.usageCount > 0)
+        setVouchers(filteredVouchers)
     }
 
     return (

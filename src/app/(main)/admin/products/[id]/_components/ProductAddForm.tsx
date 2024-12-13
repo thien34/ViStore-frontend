@@ -34,6 +34,7 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
     const [text, setText] = useState<string>('')
     const [submitted, setSubmitted] = useState(false)
     const toast = useRef<Toast>(null)
+    const [error, setError] = useState<string>('')
 
     useEffect(() => {
         if (product) {
@@ -48,7 +49,15 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
     const handleSave = async () => {
         setSubmitted(true)
         if (!name || !selectedCategory || !selectedManufacture || !weight) return
-
+        setError('')
+        if (name.trim() === '') {
+            setError('Tên sản phẩm không được để trống')
+            return
+        }
+        if (/[{}\[\]\/\\+*.$^|?@!#%&()_=`~:;"'<>,]/.test(name)) {
+            setError('Tên sản phẩm không hợp lệ')
+            return
+        }
         await ProductService.updateProductParent(
             {
                 name,
@@ -88,11 +97,15 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
                             tooltipOptions={{ position: 'bottom' }}
                             id='productName'
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => {
+                                setName(e.target.value)
+                                setError('')
+                            }}
                             placeholder='Nhập tên sản phẩm'
                             className={classNames({ 'p-invalid': submitted && !name })}
                         />
                         {submitted && !name && <small className='p-error'>Tên sản phẩm là bắt buộc.</small>}
+                        {error && <small className='p-error'>{error}</small>}
                     </div>
                     <div className='flex flex-column gap-2 w-full'>
                         <label htmlFor='weight'>
