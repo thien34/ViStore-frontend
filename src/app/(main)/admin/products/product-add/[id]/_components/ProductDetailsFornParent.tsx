@@ -106,14 +106,6 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, id, name }) => {
             newErrors.sku = 'SKU là bắt buộc'
             isValid = false
         }
-        if (!formData.name.trim()) {
-            newErrors.name = 'Tên sản phẩm là bắt buộc'
-            isValid = false
-        }
-        if (/[{}\[\]\/\\+*.$^|?@!#%&()_=`~:;"'<>,]/.test(formData.name)) {
-            newErrors.name = 'Tên sản phẩm không hợp lệ'
-            isValid = false
-        }
 
         if (!formData.price || isNaN(Number(formData.price)) || formData.price <= 10000) {
             newErrors.price = 'Giá phải lớn hơn 10,000'

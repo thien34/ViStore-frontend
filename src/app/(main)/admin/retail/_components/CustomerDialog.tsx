@@ -21,7 +21,7 @@ export default function CustomerDialog({ visible, setVisible, setCustomer }: Pro
 
     const fetchCustomers = async () => {
         const { payload: data } = await customerService.getAll()
-        setInitialData(data.items.filter((item) => item.active))
+        setInitialData(data.items.filter((item) => item.active && item.id !== 1))
     }
 
     useUpdateEffect(() => {

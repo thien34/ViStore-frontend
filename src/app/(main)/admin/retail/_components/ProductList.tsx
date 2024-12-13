@@ -19,7 +19,7 @@ import CustommerOrder from './CustommerOrder'
 import { Scanner } from '@yudiel/react-qr-scanner'
 import { Dialog } from 'primereact/dialog'
 import { BsQrCodeScan } from 'react-icons/bs'
-
+import Image from 'next/image'
 const defaultFilters: DataTableFilterMeta = {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     name: {
@@ -291,6 +291,11 @@ export default function ProductListComponent({
                         numberBill={numberBill}
                     />
                 </>
+            )}
+            {carts.length === 0 && (
+                <div className='flex justify-center items-center h-[50vh]'>
+                    <Image src={'/layout/images/empty-cart.png'} alt='ViStore' width='200' height='200' />
+                </div>
             )}
         </div>
     )
