@@ -213,6 +213,15 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, id, name }) => {
     }
 
     const addAttributeRow = () => {
+        if (attributeRows.length >= 5) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Số lượng thuộc tính không được vượt quá 5',
+                life: 3000
+            })
+            return
+        }
         setAttributeRows([...attributeRows, { selectedAttribute: null, selectedValues: '' }])
     }
 
