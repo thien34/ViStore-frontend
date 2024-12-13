@@ -241,8 +241,8 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
             isValid = false
         }
         const limitationTimeValid = limitationTimes != null ? limitationTimes : 0
-        if (limitationTimeValid <= 0 || limitationTimeValid > 1000000) {
-            newErrors.limitationTimes = 'Limitation times must be between 1 and 1000000.'
+        if (limitationTimeValid <= 0 || limitationTimeValid > 100000000) {
+            newErrors.limitationTimes = 'Limitation times must be between 1 and 100000000.'
             isValid = false
         }
         const perCustomerLimitValid = perCustomerLimit !== null ? perCustomerLimit : 0
@@ -265,9 +265,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
         setErrors(newErrors)
         return isValid
     }
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
-    }
+
     return (
         <div className='card'>
             <Toast ref={toast} />
@@ -332,7 +330,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                                 onValueChange={(e) => setValue(e.value !== undefined ? e.value : null)}
                                 suffix={usePercentage ? '%' : ''}
                                 min={usePercentage ? 1 : 0.1}
-                                max={usePercentage ? 50 : 100000000}
+                                max={usePercentage ? 50 : 10000000000}
                                 required
                                 mode={usePercentage ? 'decimal' : 'currency'}
                                 currency='VND'
@@ -354,7 +352,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                                     prefix=''
                                     onValueChange={(e) => setMaxDiscountAmount(e.value ?? 0)}
                                     min={1}
-                                    max={5000}
+                                    max={5000000}
                                     mode='currency'
                                     currency='VND'
                                     locale='vi-VN'
@@ -378,7 +376,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                             currency='VND'
                             locale='vi-VN'
                             min={1}
-                            max={100000000}
+                            max={10000000000}
                             showButtons
                             className={errors.minOrderAmount ? 'p-invalid' : ''}
                         />

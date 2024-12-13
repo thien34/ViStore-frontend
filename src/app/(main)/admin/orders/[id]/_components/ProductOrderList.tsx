@@ -166,12 +166,7 @@ export default function ProductOrderList({ id }: Props) {
                             <div className='text-gray-600 text-sm flex-shrink-0 w-1/4'>
                                 {product.discountPrice ? (
                                     <div>
-                                        <span className='line-through text-gray-400'>
-                                            {product.unitPrice && product.quantity
-                                                ? formatCurrency(Number(product.unitPrice) * product.quantity)
-                                                : '0.00'}
-                                        </span>
-                                        <span className='ml-2 text-red-500 font-semibold'>
+                                        <span className='ml-2  font-semibold'>
                                             {product.discountPrice && product.quantity
                                                 ? formatCurrency(Number(product.discountPrice) * product.quantity)
                                                 : '0.00'}

@@ -101,7 +101,7 @@ const VoucherUpdate = () => {
                 severity: 'error',
                 summary: 'Update Failed',
                 detail: errorMessage,
-                life: 5000
+                life: 5000000
             })
         }
     }
@@ -247,7 +247,7 @@ const VoucherUpdate = () => {
                                 onValueChange={(e) => setValue(e.value ?? 0)}
                                 suffix={usePercentage ? '%' : ''}
                                 min={usePercentage ? 1 : 0.1}
-                                max={usePercentage ? 50 : 100000000}
+                                max={usePercentage ? 50 : 10000000000}
                                 required
                                 mode={usePercentage ? 'decimal' : 'currency'}
                                 currency='VND'
@@ -270,7 +270,7 @@ const VoucherUpdate = () => {
                                     locale='vi-VN'
                                     onValueChange={(e) => setMaxDiscountAmount(e.value ?? 0)}
                                     min={1}
-                                    max={5000}
+                                    max={5000000}
                                     showButtons
                                 />
                             </div>
@@ -287,7 +287,7 @@ const VoucherUpdate = () => {
                             currency='VND'
                             locale='vi-VN'
                             min={1}
-                            max={100000000}
+                            max={10000000000}
                             showButtons
                         />
                     </div>

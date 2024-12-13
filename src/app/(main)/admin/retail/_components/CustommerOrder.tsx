@@ -194,6 +194,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         const billId = localStorage.getItem('billIdCurrent')
         if (!billId) return
         const validVoucherIds = validVouchers.map((voucher: Voucher) => voucher.id).filter((id) => id !== undefined)
+
         CartService.getCart(billId).then(async (res: CartResponse[]) => {
             const totalOrder = orderTotals.total - totalDiscount
             const totalOrderDiscount = orderTotals.subtotal - totalDiscount
@@ -420,6 +421,23 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             : null,
                         idVouchers: validVoucherIds
                     }
+                    const subtotalCheck = res.reduce((total, cartItem) => {
+                        const price = cartItem.productResponse.discountPrice || cartItem.productResponse.price
+                        return total + price * cartItem.quantity
+                    }, 0)
+                    if (orderTotals.subtotal != subtotalCheck) {
+                        confirmDialog({
+                            message: 'Đơn hàng không hợp lệ vui lòng kiểm tra lại',
+                            header: 'Xác Nhận',
+                            icon: 'pi pi-exclamation-triangle',
+                            defaultFocus: 'accept',
+                            accept: () => {
+                                window.location.reload()
+                            }
+                        })
+                        return
+                    }
+
                     OrderService.createOrder(order)
                         .then(async (res) => {
                             if (res.status === 200) {
