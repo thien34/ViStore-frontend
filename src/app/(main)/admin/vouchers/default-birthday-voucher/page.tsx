@@ -1,13 +1,14 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
 import { InputNumber } from 'primereact/inputnumber'
 import { InputSwitch } from 'primereact/inputswitch'
 import { Checkbox } from 'primereact/checkbox'
 import { Toast } from 'primereact/toast'
-import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import voucherService from '@/service/voucher.service'
+import { BirthdayVoucherUpdate } from '@/interface/voucher.interface'
 
 const VoucherUpdateDefaultBirthday = () => {
     const [discountName, setDiscountName] = useState('')
@@ -19,7 +20,6 @@ const VoucherUpdateDefaultBirthday = () => {
     const [limitationTimes, setLimitationTimes] = useState(0)
     const [perCustomerLimit, setPerCustomerLimit] = useState(1)
     const toast = useRef<Toast>(null)
-    const [, setVoucherDetail] = useState(null)
     const [errors, setErrors] = useState<Record<string, string>>({})
     const router = useRouter()
 
@@ -34,7 +34,7 @@ const VoucherUpdateDefaultBirthday = () => {
             return
         }
 
-        const updatedVoucher = {
+        const updatedVoucher: BirthdayVoucherUpdate = {
             usePercentage,
             discountAmount: usePercentage ? 0 : value,
             discountPercentage: usePercentage ? value : 0,
@@ -46,7 +46,7 @@ const VoucherUpdateDefaultBirthday = () => {
         }
 
         try {
-            await axios.put('http://localhost:8080/api/admin/vouchers/default-birthday-discount', updatedVoucher)
+            await voucherService.updateDefaultBirthdayVoucher(updatedVoucher)
             toast.current?.show({
                 severity: 'success',
                 summary: 'Voucher Updated',
@@ -55,24 +55,21 @@ const VoucherUpdateDefaultBirthday = () => {
             })
             router.push('/admin/vouchers')
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || 'Failed to update voucher. Please try again later.'
+            const errorMessage = error.message || 'Failed to update voucher. Please try again later.'
             toast.current?.show({
                 severity: 'error',
                 summary: 'Update Failed',
                 detail: errorMessage,
-                life: 5000000
+                life: 5000
             })
         }
     }
 
     const fetchDefaultBirthdayVoucher = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/admin/vouchers/default-birthday')
-            const voucherData = response.data
-
-            setVoucherDetail(voucherData)
-            setDiscountName(voucherData.name ?? '')
-            setUsePercentage(voucherData.usePercentage ?? true)
+            const voucherData = await voucherService.getDefaultBirthdayVoucher()
+            setDiscountName(voucherData.name)
+            setUsePercentage(voucherData.usePercentage)
             setValue(voucherData.usePercentage ? voucherData.discountPercentage : voucherData.discountAmount)
             setMaxDiscountAmount(voucherData.maxDiscountAmount ?? null)
             setMinOrderAmount(voucherData.minOderAmount ?? 1)
@@ -144,11 +141,9 @@ const VoucherUpdateDefaultBirthday = () => {
     useEffect(() => {
         fetchDefaultBirthdayVoucher()
     }, [])
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
-    }
+
     return (
-        <div className='card p-5' style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div className='card p-5'>
             <Toast ref={toast} />
             <h2 className='text-center mb-4'>Birthday Default</h2>
             <div className='p-fluid grid mt-4'>
