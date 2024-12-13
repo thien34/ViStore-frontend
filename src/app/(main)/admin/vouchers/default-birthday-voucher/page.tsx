@@ -125,13 +125,9 @@ const VoucherUpdateDefaultBirthday = () => {
         if (perCustomerLimit <= 0) {
             newErrors.perCustomerLimit = 'Per customer limit must be greater than 0.'
         }
+
         if (perCustomerLimit > 5) {
             newErrors.perCustomerLimit = 'Per customer limit should not exceed 5.'
-        }
-
-        if (isCumulative && maxDiscountAmount && value > maxDiscountAmount) {
-            newErrors.isCumulative =
-                'When cumulative discounts are allowed, max discount amount should be greater than or equal to the discount value.'
         }
 
         setErrors(newErrors)
