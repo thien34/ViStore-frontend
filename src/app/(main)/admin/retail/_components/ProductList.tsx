@@ -123,7 +123,7 @@ export default function ProductListComponent({
 
         const orderTotals = {
             subtotal,
-            shippingCost: 0,
+            shippingCost: 30000,
             tax: 0,
             discount: 0,
             total: subtotal

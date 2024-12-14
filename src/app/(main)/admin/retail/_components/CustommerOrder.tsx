@@ -109,7 +109,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             setTotalDiscount(totalDiscount || 0)
             const validVoucherList = voucherResponses.filter((voucher: CustomIsApplicable) => voucher.isApplicable)
             setValidVouchers(validVoucherList)
-            setAmountPaidLocal(orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount)
+            setAmountPaidLocal(
+                orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount
+            )
 
             if (validVoucherList.length === 0 && couponCodes.length > 0 && customer) {
                 setMessage('Không tìm thấy phiếu giảm giá hợp lệ.')
@@ -254,7 +256,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 paymentMode: PaymentModeType.IN_STORE,
                 orderSubtotal: orderTotals.subtotal,
                 orderSubtotalDiscount: totalOrderDiscount,
-                orderShipping: orderTotals.shippingCost,
+                orderShipping: checked ? orderTotals.shippingCost : 0,
                 orderDiscount: totalDiscount,
                 orderTotal: totalOrder,
                 refundedAmount: 0,
@@ -321,7 +323,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     }
 
     const validatePayment = () => {
-        const totalOrder = Number(orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount)
+        const totalOrder = Number(
+            orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount
+        )
         const amountPaidNumber = Number(amountPaid)
         if (amountPaidNumber < totalOrder) {
             toast.current?.show({
@@ -400,7 +404,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (!validateAddress()) return
         if (!validateDiscount()) return
         if (!validatePayment()) return
-        if (amountPaid < orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount) {
+        if (
+            amountPaid <
+            orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount
+        ) {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Lỗi',
@@ -434,7 +441,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         paymentMode: PaymentModeType.IN_STORE,
                         orderSubtotal: orderTotals.subtotal,
                         orderSubtotalDiscount: totalOrderDiscount,
-                        orderShipping: orderTotals.shippingCost,
+                        orderShipping: checked ? orderTotals.shippingCost : 0,
                         orderDiscount: totalDiscount,
                         orderTotal: totalOrder,
                         refundedAmount: 0,
@@ -864,21 +871,22 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     )}
                                 </dl>
                             ) : null}
-
                             <dl className='flex items-center justify-between gap-4 py-3'>
                                 <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Tổng phụ</dt>
                                 <dd className='text-base font-medium text-gray-900 dark:text-white'>
                                     {formatCurrency(orderTotals.subtotal)}
                                 </dd>
                             </dl>
-                            <dl className='flex items-center justify-between gap-4 py-3'>
-                                <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
-                                    Chi phí vận chuyển
-                                </dt>
-                                <dd className='text-base font-medium text-gray-900 dark:text-white'>
-                                    {formatCurrency(orderTotals.shippingCost)}
-                                </dd>
-                            </dl>
+                            {checked && (
+                                <dl className='flex items-center justify-between gap-4 py-3'>
+                                    <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>
+                                        Chi phí vận chuyển
+                                    </dt>
+                                    <dd className='text-base font-medium text-gray-900 dark:text-white'>
+                                        {formatCurrency(orderTotals.shippingCost)}
+                                    </dd>
+                                </dl>
+                            )}
                             <dl className='flex items-center justify-between gap-4 py-3'>
                                 <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Giảm giá</dt>
                                 <dd className='text-base font-medium text-gray-900 dark:text-white'>
@@ -890,7 +898,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 <dd className='text-base font-medium text-gray-900 dark:text-white'>
                                     {formatCurrency(
                                         orderTotals.subtotal +
-                                            orderTotals.shippingCost +
+                                            (checked ? orderTotals.shippingCost : 0) +
                                             orderTotals.tax -
                                             totalDiscount
                                     )}
@@ -924,7 +932,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             <PaymentDialog
                 visible={visible}
                 setVisible={setVisible}
-                totalAmount={orderTotals.subtotal + orderTotals.shippingCost + orderTotals.tax - totalDiscount}
+                totalAmount={
+                    orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount
+                }
                 setAmountPaid={setAmountPaid}
                 amountPaid={amountPaid}
             />
