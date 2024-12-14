@@ -16,7 +16,7 @@ interface QuantityDialogProps {
 const QuantityDialog = ({ visible, setVisible, product, quantity, setQuantity, onSave }: QuantityDialogProps) => {
     return (
         <Dialog
-            header={product?.name}
+            header={<div className='text-xl font-bold text-gray-800'>{product?.name}</div>}
             visible={visible}
             style={{ width: '50vw' }}
             onHide={() => {
@@ -24,15 +24,27 @@ const QuantityDialog = ({ visible, setVisible, product, quantity, setQuantity, o
                 setQuantity(1)
             }}
         >
-            <div>
-                <span className='text-lg font-semibold text-gray-600'>Số lượng có sẵn: {product?.quantity}</span>
-                {product?.attributes.map((attribute) => (
-                    <div key={attribute.id} className='flex items-center gap-2 p-2 mb-2 rounded-lg bg-gray-50'>
-                        <span className='font-semibold text-gray-700 min-w-[50px]'>{attribute.name}:</span>
-                        <span className='text-gray-600'>{attribute.value?.toUpperCase()}</span>
-                    </div>
-                ))}
+            <div className='p-2'>
+                <div className='mb-2'>
+                    <span className='text-lg font-semibold text-gray-600'>Số lượng có sẵn: {product?.quantity}</span>
+                </div>
+
+                <div className='space-y-3'>
+                    {product?.attributes.map((attribute) => (
+                        <div
+                            key={attribute.id}
+                            className='flex items-center gap-3 p-3 rounded-lg bg-gray-100 shadow-md hover:shadow-lg transition-shadow duration-200'
+                        >
+                            <span className='font-medium text-gray-800 text-sm md:text-base'>{attribute.name}:</span>
+                            <span className='text-white rounded-md bg-blue-600 px-3 py-1 text-sm md:text-base shadow-sm'>
+                                {attribute.value?.toUpperCase()}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
                 <div className='mt-2'>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>Chọn số lượng:</label>
                     <InputNumber
                         onValueChange={(e) => setQuantity(e.value ?? 1)}
                         value={quantity}
@@ -45,10 +57,17 @@ const QuantityDialog = ({ visible, setVisible, product, quantity, setQuantity, o
                         incrementButtonClassName='p-button-secondary'
                         incrementButtonIcon='pi pi-plus'
                         decrementButtonIcon='pi pi-minus'
+                        className='w-full'
+                        inputClassName='text-center'
                     />
                 </div>
-                <div className='flex justify-end mt-2'>
-                    <Button label='Lưu' onClick={onSave} />
+
+                <div className='flex justify-end mt-5'>
+                    <Button
+                        label='Lưu'
+                        onClick={onSave}
+                        className='bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition-colors duration-200'
+                    />
                 </div>
             </div>
         </Dialog>

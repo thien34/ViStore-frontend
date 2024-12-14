@@ -10,13 +10,15 @@ import { Dropdown } from 'primereact/dropdown'
 import { Editor } from 'primereact/editor'
 import { InputNumber } from 'primereact/inputnumber'
 import { InputText } from 'primereact/inputtext'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { Image } from 'primereact/image'
 import ProductService from '@/service/ProducrService'
 import { classNames } from 'primereact/utils'
 import { Toast } from 'primereact/toast'
 import RequiredIcon from '@/components/icon/RequiredIcon'
+import { useMountEffect } from 'primereact/hooks'
+import { useParams } from 'next/navigation'
 
 interface ProductAddFormProps {
     categories: Category[]
@@ -26,7 +28,7 @@ interface ProductAddFormProps {
     products: ProductResponseDetails[]
 }
 
-const ProductAddForm = ({ categories, manufacturers, product, products }: ProductAddFormProps) => {
+const ProductAddForm = ({ categories, manufacturers, products }: ProductAddFormProps) => {
     const [name, setName] = useState<string>('')
     const [weight, setWeight] = useState<number>(0)
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
@@ -35,16 +37,22 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
     const [submitted, setSubmitted] = useState(false)
     const toast = useRef<Toast>(null)
     const [error, setError] = useState<string>('')
+    const { id } = useParams()
+    const [product, setProduct] = useState<ProductResponse | null>(null)
 
-    useEffect(() => {
-        if (product) {
-            setName(product.name)
-            setWeight(product.weight || 0)
-            setSelectedCategory(categories.find((c) => c.id === product.categoryId) || null)
-            setSelectedManufacture(manufacturers.find((m) => m.id === product.manufacturerId) || null)
-            setText(product.description || '')
-        }
-    }, [product, categories, manufacturers])
+    const fetchProduct = async () => {
+        const data = await ProductService.getProductById(+id)
+        setProduct(data)
+        setName(data.name)
+        setWeight(data.weight || 0)
+        setSelectedCategory(categories.find((c) => c.id === data.categoryId) || null)
+        setSelectedManufacture(manufacturers.find((m) => m.id === data.manufacturerId) || null)
+        setText(data.fullDescription || '')
+    }
+
+    useMountEffect(() => {
+        fetchProduct()
+    })
 
     const handleSave = async () => {
         setSubmitted(true)
@@ -63,9 +71,10 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
                 name,
                 weight,
                 categoryId: selectedCategory?.id || 0,
-                manufacturerId: selectedManufacture?.id || 0
+                manufacturerId: selectedManufacture?.id || 0,
+                description: text
             },
-            product.id
+            product?.id || 0
         )
         toast.current?.show({
             severity: 'success',
@@ -165,7 +174,7 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
 
                 <div className='flex flex-row gap-4 align-items-center'>
                     <div className='flex flex-column gap-2 w-full'>
-                        <label htmlFor='description'>Mô Tả</label>
+                        <label htmlFor='description'>Mô Tả </label>
                         <Editor
                             id='description'
                             value={text}
@@ -177,7 +186,7 @@ const ProductAddForm = ({ categories, manufacturers, product, products }: Produc
                 </div>
 
                 <div>
-                    <Link href={`/admin/products/product-add/${product.id}`}>
+                    <Link href={`/admin/products/product-add/${product?.id}`}>
                         <Button label='Thêm chi tiết sản phẩm' className='float-right' />
                     </Link>
                 </div>

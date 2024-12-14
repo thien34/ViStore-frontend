@@ -51,6 +51,7 @@ export interface ProductResponse {
     discountPrice: number
     price: number
     quantity: number
+    fullDescription: string
 }
 
 export interface ProductResponseDetails {
@@ -76,4 +77,5 @@ export interface ProductParentRequest {
     weight: number
     categoryId: number
     manufacturerId: number
+    description: string
 }
