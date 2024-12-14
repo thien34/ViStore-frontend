@@ -332,7 +332,6 @@ const ListView = () => {
                 >
                     <Column header='#' body={indexBodyTemplate} />
                     <Column field='name' header='Tên Giảm Giá' sortable />
-                    <Column header='Giá Trị Giảm Giá ' body={formatDiscountAndStock} />
                     <Column
                         field='startDateUtc'
                         header='Ngày Bắt Đầu'

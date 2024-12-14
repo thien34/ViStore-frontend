@@ -84,7 +84,7 @@ const ListView = () => {
 
         return (
             <div className={stockClassName}>
-                {isPercentage ? `${rowData.discountPercentage.toFixed(0)} %` : formatCurrency(rowData.discountAmount)}
+                {isPercentage ? `${rowData.discountPercentage} %` : formatCurrency(rowData.discountAmount)}
             </div>
         )
     }

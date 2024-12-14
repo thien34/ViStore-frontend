@@ -121,7 +121,7 @@ export default function ChangeStatusOrderHistory({
                 </div>
             )}
             <Dialog
-                header='Xác Nhận Giao Hàng'
+                header={getButtonLabel(latestStatus)}
                 visible={visibleConfirm}
                 footer={<Button type='button' label='Xác Nhận' onClick={handleConfirm} />}
                 position='top'

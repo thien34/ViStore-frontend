@@ -104,6 +104,7 @@ export interface OrderFilter {
 }
 
 export interface InvoiceData {
+    orderCode: string
     invoiceNumber: string
     date: string
     dueDate: string

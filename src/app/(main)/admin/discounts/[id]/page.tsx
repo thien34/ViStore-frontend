@@ -58,7 +58,7 @@ const DiscountUpdate = () => {
         return (
             <Image
                 preview
-                src={`${rowData.imageUrl}`}
+                src={`${rowData.imageUrl || '/demo/images/default/—Pngtree—sneakers_3989154.png'}`}
                 alt={rowData.imageUrl!}
                 className='shadow-2 border-round'
                 style={{ width: '64px' }}
@@ -349,7 +349,8 @@ const DiscountUpdate = () => {
                                 value={discountName}
                                 onChange={(e) => setDiscountName(e.target.value)}
                                 placeholder='Nhập tên giảm giá'
-                                tooltip="Nhập tên giảm giá" tooltipOptions={{ position: 'top' }}
+                                tooltip='Nhập tên giảm giá'
+                                tooltipOptions={{ position: 'top' }}
                                 required
                             />
                             {errors.discountName && <small className='p-error'>{errors.discountName}</small>}
@@ -365,7 +366,8 @@ const DiscountUpdate = () => {
                                 onValueChange={(e) => setValue(e.value !== undefined ? e.value : null)}
                                 suffix='%'
                                 placeholder='Nhập giá trị'
-                                tooltip="Nhập giá trị" tooltipOptions={{ position: 'top' }}
+                                tooltip='Nhập giá trị'
+                                tooltipOptions={{ position: 'top' }}
                                 min={1}
                                 max={50}
                                 required
@@ -382,7 +384,8 @@ const DiscountUpdate = () => {
                                 showTime
                                 disabled={isActive}
                                 placeholder='Chọn ngày bắt đầu'
-                                tooltip="Nhập ngày bắt đầu" tooltipOptions={{ position: 'top' }}
+                                tooltip='Nhập ngày bắt đầu'
+                                tooltipOptions={{ position: 'top' }}
                                 dateFormat='dd/mm/yy'
                                 hourFormat='12'
                                 required
@@ -398,7 +401,8 @@ const DiscountUpdate = () => {
                                 onChange={(e) => setToDate(e.value)}
                                 showTime
                                 placeholder='Chọn ngày kết thúc'
-                                tooltip="Nhập ngày kết thúc" tooltipOptions={{ position: 'top' }}
+                                tooltip='Nhập ngày kết thúc'
+                                tooltipOptions={{ position: 'top' }}
                                 dateFormat='dd/mm/yy'
                                 hourFormat='12'
                                 required
@@ -411,7 +415,8 @@ const DiscountUpdate = () => {
                                 value={comments}
                                 onChange={(e) => setComments(e.target.value)}
                                 placeholder='Bình luận'
-                                tooltip="Nhập bình luận" tooltipOptions={{ position: 'top' }}
+                                tooltip='Nhập bình luận'
+                                tooltipOptions={{ position: 'top' }}
                                 rows={5}
                                 cols={30}
                             />

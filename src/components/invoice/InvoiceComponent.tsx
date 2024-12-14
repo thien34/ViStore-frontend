@@ -2,6 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import { InvoiceData } from '@/interface/order.interface'
 import dayjs from 'dayjs'
+import QRCode from 'react-qr-code'
 
 interface InvoiceComponentProps {
     data: InvoiceData
@@ -26,6 +27,13 @@ const InvoiceComponent: React.FC<InvoiceComponentProps> = ({ data }) => {
                                 priority
                             />
                             <h1 className='text-2xl font-semibold text-gray-700'>Hóa Đơn</h1>
+                            <QRCode
+                                size={100}
+                                style={{ height: 'auto', width: '70px' }}
+                                value={data.orderCode}
+                                className='p-2'
+                                viewBox={`0 0 256 256`}
+                            />
                         </div>
 
                         <div className='flex justify-between '>
