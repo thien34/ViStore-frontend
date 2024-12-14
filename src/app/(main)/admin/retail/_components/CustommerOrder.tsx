@@ -575,6 +575,22 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         setVouchers(filteredVouchers)
     }
 
+    const isCheckedAndCustomerExists = () => {
+        return customer != null && checked
+    }
+
+    const handleInputSwitchChange = (e: InputSwitchChangeEvent) => {
+        if (!customer && e.value) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Vui lòng chọn khách hàng'
+            })
+            return
+        }
+        setChecked(e.value)
+    }
+
     return (
         <div className='space-y-4 w-full'>
             <div className='card'>
@@ -604,10 +620,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                     </div>
                     <div className='flex items-center justify-between gap-4 py-3 border px-4 rounded-lg my-2 shadow-inner'>
                         <label className='text-base font-normal text-gray-500 dark:text-gray-400'>Vận Chuyển</label>
-                        <InputSwitch
-                            checked={customer != null && checked}
-                            onChange={(e: InputSwitchChangeEvent) => setChecked(e.value)}
-                        />
+                        <InputSwitch checked={isCheckedAndCustomerExists()} onChange={handleInputSwitchChange} />
                     </div>
                 </div>
                 <ConfirmDialog />
