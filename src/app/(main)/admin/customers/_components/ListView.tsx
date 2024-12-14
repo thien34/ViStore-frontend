@@ -123,7 +123,19 @@ const ListView = ({ initialData }: CustomerProps) => {
                         sortable
                     />
                     <Column field='customerRoles' header='Vai Trò' sortable />
-                    <Column field='active' header='Trạng Thái' sortable />
+                    <Column
+                        field='active'
+                        header='Trạng Thái'
+                        sortable
+                        align={'center'}
+                        body={(rowData: Customer) =>
+                            rowData.active ? (
+                                <i className='pi pi-check bg-green-500 text-white p-2 rounded-full' />
+                            ) : (
+                                <i className='pi pi-times bg-red-500 text-white p-2 rounded-full' />
+                            )
+                        }
+                    />
                     <Column header='Thao Tác' body={actionBodyTemplate}></Column>
                 </DataTable>
             </div>
