@@ -50,6 +50,7 @@ export interface ProductResponse {
     largestDiscountPercentage: number
     discountPrice: number
     price: number
+    quantity: number
 }
 
 export interface ProductResponseDetails {

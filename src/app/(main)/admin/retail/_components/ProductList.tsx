@@ -91,7 +91,10 @@ export default function ProductListComponent({
     const [visibleQuantity, setVisibleQuantity] = useState<boolean>(false)
 
     const fetchProducts = () => {
-        ProductService.getProuctsDetails().then((res) => setProducts(res))
+        ProductService.getProuctsDetails().then((res) => {
+            const data = res.filter((product) => product.quantity > 0)
+            setProducts(data)
+        })
     }
 
     useUpdateEffect(() => {

@@ -295,13 +295,12 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             if (
                 (address && !address.firstName) ||
                 (address && !address.lastName) ||
-                (address && !address.phoneNumber) ||
-                (address && !address.addressDetail)
+                (address && !address.phoneNumber)
             ) {
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Lỗi',
-                    detail: 'Vui lòng chọn một địa chỉ'
+                    detail: 'Vui lòng nhập đầy đủ thông tin '
                 })
                 return false
             }
@@ -467,6 +466,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             : null,
                         idVouchers: validVoucherIds
                     }
+
                     const subtotalCheck = res.reduce((total, cartItem) => {
                         const price = cartItem.productResponse.discountPrice || cartItem.productResponse.price
                         return total + price * cartItem.quantity
@@ -483,7 +483,21 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         })
                         return
                     }
-
+                    if (order.addressRequest && checked) {
+                        if (
+                            order.addressRequest.provinceId === '' ||
+                            order.addressRequest.districtId === '' ||
+                            order.addressRequest.wardId === '' ||
+                            order.addressRequest.addressName === ''
+                        ) {
+                            toast.current?.show({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: 'Vui lòng chọn nhập địa chỉ'
+                            })
+                            return
+                        }
+                    }
                     OrderService.createOrder(order)
                         .then(async (res) => {
                             if (res.status === 200) {

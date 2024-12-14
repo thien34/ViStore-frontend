@@ -17,6 +17,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 interface FormProps {
     roles: RoleName[]
+    isRedirect?: boolean
+    onClose?: () => void
 }
 const emptyCustomer: Customer = {
     email: '',
@@ -24,7 +26,8 @@ const emptyCustomer: Customer = {
     lastName: '',
     gender: '0',
     dateOfBirth: null,
-    customerRoles: []
+    customerRoles: [],
+    active: false
 }
 const domains = ['@gmail.com', '@yahoo.com', '@outlook.com', '@hotmail.com']
 const genders = [
@@ -32,7 +35,7 @@ const genders = [
     { name: 'Nữ', key: '1' }
 ]
 
-const CustomerForm = ({ roles }: FormProps) => {
+const CustomerForm = ({ roles, isRedirect = false, onClose }: FormProps) => {
     const toast = useRef<Toast>(null)
     const [items, setItems] = useState<string[]>([])
     const [customer, setCustomer] = useState<Customer>(emptyCustomer)
@@ -46,14 +49,34 @@ const CustomerForm = ({ roles }: FormProps) => {
     const saveCustomer = async () => {
         setSubmitted(true)
         if (customer.email.trim()) {
-            await customerService.create(customer)
-            toast.current?.show({
-                severity: 'success',
-                summary: 'Thành công',
-                detail: 'Khách hàng đã được tạo',
-                life: 3000
-            })
-            router.push('/admin/customers')
+            if (isRedirect) {
+                setCustomer({ ...customer, active: true })
+            }
+            await customerService
+                .create(customer)
+                .then(() => {
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Thành công',
+                        detail: 'Khách hàng đã được tạo',
+                        life: 3000
+                    })
+                    setTimeout(() => {
+                        if (!isRedirect) {
+                            router.push('/admin/customers')
+                        } else {
+                            onClose?.()
+                        }
+                    }, 1000)
+                })
+                .catch((error) => {
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Thất bại',
+                        detail: error.message,
+                        life: 3000
+                    })
+                })
         }
     }
 

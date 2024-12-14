@@ -7,6 +7,7 @@ import { Dialog } from 'primereact/dialog'
 import { useUpdateEffect } from 'primereact/hooks'
 import { InputText } from 'primereact/inputtext'
 import { useRef, useState } from 'react'
+import DialogAddCustomer from './DialogAddCustomer'
 
 type Props = {
     visible: boolean
@@ -18,6 +19,7 @@ export default function CustomerDialog({ visible, setVisible, setCustomer }: Pro
     const [globalFilter, setGlobalFilter] = useState('')
     const dt = useRef<DataTable<Customer[]>>(null)
     const [initialData, setInitialData] = useState<Customer[]>([])
+    const [addCustomerVisible, setAddCustomerVisible] = useState(false)
 
     const fetchCustomers = async () => {
         const { payload: data } = await customerService.getAll()
@@ -59,43 +61,62 @@ export default function CustomerDialog({ visible, setVisible, setCustomer }: Pro
             </span>
         </div>
     )
+    const onOpenAddCustomer = () => {
+        setAddCustomerVisible(true)
+        setVisible(false)
+    }
+    const onCloseAddCustomer = () => {
+        fetchCustomers()
+        setAddCustomerVisible(false)
+        setVisible(true)
+    }
     return (
-        <Dialog
-            modal
-            draggable={false}
-            header='Khách Hàng'
-            visible={visible}
-            style={{ width: '70vw', marginLeft: '15vw' }}
-            onHide={() => {
-                if (!visible) return
-                setVisible(false)
-            }}
-        >
-            <DataTable
-                ref={dt}
-                value={initialData}
-                dataKey='id'
-                removableSort
-                resizableColumns
-                showGridlines
-                paginator
-                rows={10}
-                rowsPerPageOptions={[5, 10, 25]}
-                paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-                currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} khách hàng'
-                globalFilter={globalFilter}
-                emptyMessage='Không tìm thấy khách hàng nào'
-                header={header}
+        <>
+            <Dialog
+                modal
+                draggable={false}
+                header='Khách Hàng'
+                visible={visible}
+                style={{ width: '70vw', marginLeft: '15vw' }}
+                onHide={() => {
+                    if (!visible) return
+                    setVisible(false)
+                }}
             >
-                <Column field='email' header='Email' sortable />
-                <Column
-                    field='name'
-                    header='Tên Khách Hàng'
-                    body={(rowData: Customer) => `${rowData.firstName} ${rowData.lastName}`}
-                    sortable
-                />
-                <Column header='Thao Tác' className='text-center' body={actionBodyTemplate}></Column>
-            </DataTable>
-        </Dialog>
+                <div className='flex justify-end items-center mb-5'>
+                    <Button icon='pi pi-plus' label='Thêm Khách Hàng' onClick={onOpenAddCustomer} />
+                </div>
+                <DataTable
+                    ref={dt}
+                    value={initialData}
+                    dataKey='id'
+                    removableSort
+                    resizableColumns
+                    showGridlines
+                    paginator
+                    rows={10}
+                    rowsPerPageOptions={[5, 10, 25]}
+                    paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
+                    currentPageReportTemplate='Hiển thị từ {first} đến {last} trong tổng số {totalRecords} khách hàng'
+                    globalFilter={globalFilter}
+                    emptyMessage='Không tìm thấy khách hàng nào'
+                    header={header}
+                >
+                    <Column field='email' header='Email' sortable />
+                    <Column
+                        field='name'
+                        header='Tên Khách Hàng'
+                        body={(rowData: Customer) => `${rowData.firstName} ${rowData.lastName}`}
+                        sortable
+                    />
+                    <Column header='Thao Tác' className='text-center' body={actionBodyTemplate}></Column>
+                </DataTable>
+            </Dialog>
+            <DialogAddCustomer
+                visible={addCustomerVisible}
+                setVisible={setAddCustomerVisible}
+                onClose={onCloseAddCustomer}
+            />
+        </>
     )
 }
