@@ -439,7 +439,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         orderTotal: totalOrder,
                         refundedAmount: 0,
                         paidDateUtc: '',
-                        billCode: 'Hóa Đơn' + numberBill,
+                        billCode: 'HĐ' + numberBill,
                         deliveryMode: checked ? 0 : 1,
                         orderItems: res.map((item) => ({
                             productId: item.productResponse.id,

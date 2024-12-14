@@ -37,7 +37,7 @@ export default function Retail() {
                     .sort(([, { numberBill: a }], [, { numberBill: b }]) => a - b)
                     .map(([billId, { numberBill, totalItems }]) => ({
                         id: billId,
-                        header: `Bill ${numberBill}`,
+                        header: `Hóa Đơn ${numberBill}`,
                         content: (
                             <ProductListComponent
                                 updateTabTotalItems={updateTabTotalItems}
@@ -151,7 +151,7 @@ export default function Retail() {
     const confirmDelete = (tabIndex: number, header: string, target: HTMLElement) => {
         const billId = tabs[tabIndex].billId
         confirmPopup({
-            message: `Do you want to delete this ${header} ?`,
+            message: `Bạn có muốn xóa hóa đơn ${header} ?`,
             icon: 'pi pi-info-circle',
             defaultFocus: 'reject',
             acceptClassName: 'p-button-danger',
