@@ -3,18 +3,12 @@ import http from '@/libs/http'
 
 class DiscountService {
     private basePath = '/api/admin/discounts'
-    async getAll() {
-        const response = await fetch('http://localhost:8080/api/admin/discounts?discountTypeId=ASSIGNED_TO_PRODUCTS', {
-            cache: 'no-store'
-        })
 
-        if (!response.ok) {
-            const errorResponse = await response.json()
-            throw new Error(`Failed to get discounts: ${errorResponse.message || 'Unknown error'}`)
-        }
-        const result = await response.json()
-        return result.data
+    async getAll() {
+        const response = await http.get<Promotion[]>(`${this.basePath}?discountTypeId=ASSIGNED_TO_PRODUCTS`)
+        return response
     }
+
     async createDiscount(discountData: Promotion) {
         const response = await fetch('http://localhost:8080/api/admin/discounts', {
             method: 'POST',
@@ -35,6 +29,7 @@ class DiscountService {
     async getById(id: number) {
         return await http.get<Promotion>(`${this.basePath}/${id}`)
     }
+
     async markAsExpired(id: number | undefined) {
         const response = await fetch(`http://localhost:8080/api/admin/discounts/${id}/end-date-now`, {
             method: 'PUT',
@@ -50,6 +45,7 @@ class DiscountService {
 
         return response.json()
     }
+
     async cancelDiscount(id: number | undefined) {
         const response = await fetch(`http://localhost:8080/api/admin/discounts/${id}/cancel`, {
             method: 'PUT',
@@ -65,6 +61,7 @@ class DiscountService {
 
         return response.json()
     }
+
     async update(id: number, address: Omit<Promotion, 'id'>): Promise<Promotion> {
         const response = await http.put<Promotion>(`${this.basePath}/${id}`, address)
         return response.payload

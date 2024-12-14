@@ -1,20 +1,25 @@
-import { Voucher } from '@/interface/voucher.interface'
+import { BirthdayVoucherUpdate, Voucher } from '@/interface/voucher.interface'
 import http from '@/libs/http'
-import axios from 'axios'
 class VoucherService {
-    private basePath = 'http://localhost:8080/api/admin/vouchers'
-    private path = '/api/admin/vouchers'
+    private basePath = '/api/admin/vouchers'
 
     async getAll() {
-        const response = await axios.get<{ data: Voucher[] }>(
-            `${this.basePath}?discountTypeId=ASSIGNED_TO_ORDER_TOTAL`)
-        return response.data.data
+        const response = await http.get<Voucher[]>(`${this.basePath}?discountTypeId=ASSIGNED_TO_ORDER_TOTAL`)
+        return response.payload
     }
+
     async getAllIsPublished() {
-        const response = await axios.get<{ data: Voucher[] }>(
-            this.basePath + `?discountTypeId=ASSIGNED_TO_ORDER_TOTAL&isPublished=true&status=ACTIVE`
+        const response = await http.get<Voucher[]>(
+            `${this.basePath}?discountTypeId=ASSIGNED_TO_ORDER_TOTAL&isPublished=true&status=ACTIVE`
         )
-        return response.data.data
+        return response.payload
+    }
+
+    async validateCoupons(couponCodes: string[]) {
+        const path = `/validate-coupons`
+        const data = { couponCodes }
+        const response = await http.post(path, data)
+        return response.payload
     }
 
     async getById(id: number) {
@@ -23,7 +28,7 @@ class VoucherService {
     }
 
     async create(voucher: Omit<Voucher, 'id'>): Promise<Voucher> {
-        const response = await http.post<Voucher>(`${this.path}`, voucher)
+        const response = await http.post<Voucher>(`${this.basePath}`, voucher)
         return response.payload
     }
 
@@ -31,10 +36,14 @@ class VoucherService {
         const response = await http.put<Voucher>(`${this.basePath}/${id}`, voucher)
         return response.payload
     }
-    async validateCoupons(couponCodes: string[]) {
-        const path = `/validate-coupons`
-        const data = { couponCodes }
-        const response = await http.post(path, data)
+
+    async getDefaultBirthdayVoucher() {
+        const response = await http.get<Voucher>(`${this.basePath}/default-birthday`)
+        return response.payload
+    }
+
+    async updateDefaultBirthdayVoucher(data: BirthdayVoucherUpdate) {
+        const response = await http.put<Voucher>(`${this.basePath}/default-birthday-discount`, data)
         return response.payload
     }
 }

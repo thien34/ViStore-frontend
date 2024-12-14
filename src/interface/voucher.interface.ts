@@ -29,3 +29,14 @@ export interface Vouchers {
 export interface VouchersPagingResponse {
     data: Vouchers
 }
+
+export interface BirthdayVoucherUpdate {
+    usePercentage: boolean
+    discountAmount: number
+    discountPercentage: number
+    maxDiscountAmount: number | null
+    isCumulative: boolean
+    limitationTimes: number
+    perCustomerLimit: number
+    minOrderAmount: number
+}

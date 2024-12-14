@@ -1,5 +1,4 @@
 'use client'
-
 import { Button } from 'primereact/button'
 import { DataTable } from 'primereact/datatable'
 import { Toast } from 'primereact/toast'
@@ -22,7 +21,6 @@ import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
-
 const vietnamTime = (date: string) => dayjs.utc(date).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm')
 
 const ListView = () => {
@@ -37,11 +35,10 @@ const ListView = () => {
     const toast = useRef<Toast>(null)
     useEffect(() => {
         const fetchDiscounts = async () => {
-            const response = await discountService.getAll()
+            const { payload: response } = await discountService.getAll()
             setDiscounts(response)
             setFilteredDiscounts(response)
         }
-
         fetchDiscounts()
     }, [])
 
