@@ -149,7 +149,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                         showFailedToast(backendMessage || 'An error occurred.')
                     }
                 } else {
-                    showFailedToast('An unexpected error occurred.')
+                    showFailedToast(error.message || 'An unexpected error occurred.')
                 }
             })
     }
@@ -260,6 +260,10 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
 
         if (validValue > validMinOrderAmount) {
             newErrors.value = 'Voucher value cannot exceed the minimum order amount.'
+            isValid = false
+        }
+        if (couponCode === undefined || couponCode === null || couponCode === '') {
+            newErrors.couponCode = 'Coupon code is required.'
             isValid = false
         }
         setErrors(newErrors)
