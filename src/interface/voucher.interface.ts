@@ -12,7 +12,7 @@ export interface Voucher {
     selectedCustomerIds: number[]
     status: string
     requiresCouponCode: boolean
-    isCumulative : boolean
+    isCumulative: boolean
     couponCode: string
     discountLimitationId: number
     maxDiscountAmount: number
