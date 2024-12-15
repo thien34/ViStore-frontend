@@ -187,11 +187,7 @@ const DiscountForm = () => {
         if (selectedFetchedProducts.length === 0) {
             newErrors.productError = 'Phải chọn ít nhất một sản phẩm.'
             isValid = false
-        } else if (selectedFetchedProducts.some((product) => product.quantity <= 1)) {
-            newErrors.productError = 'Tất cả các biến thể được chọn phải có số lượng lớn hơn 1.'
-            isValid = false
         }
-
         setErrors(newErrors)
         return isValid
     }
@@ -226,8 +222,68 @@ const DiscountForm = () => {
         fetchProducts()
     }, [])
 
+    const handleDiscountNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDiscountName(e.target.value)
+        if (e.target.value.trim()) {
+            setErrors((prev) => ({ ...prev, discountName: null }))
+        }
+    }
+
+    const handleValueChange = (e: { value: number | null }) => {
+        setValue(e.value)
+        if (e.value !== null && e.value > 0 && e.value <= 50) {
+            setErrors((prev) => ({ ...prev, value: null }))
+        }
+    }
+
+    const handleFromDateChange = (e: { value: Date | null }) => {
+        const selectedDate = e.value
+        setFromDate(selectedDate)
+
+        // Clear from date error
+        let newErrors = { ...errors, fromDate: null }
+
+        // Update date validation if both dates are set
+        if (selectedDate && toDate) {
+            const durationInMs = toDate.getTime() - selectedDate.getTime()
+            const durationInHours = durationInMs / (1000 * 60 * 60)
+            const durationInDays = durationInMs / (1000 * 60 * 60 * 24)
+
+            if (durationInDays <= 180 && durationInHours >= 1 && selectedDate < toDate) {
+                newErrors.dateError = null
+            }
+        }
+
+        setErrors(newErrors)
+    }
+
+    const handleToDateChange = (e: { value: Date | null }) => {
+        const selectedDate = e.value
+        setToDate(selectedDate)
+
+        // Clear to date error
+        let newErrors = { ...errors, toDate: null }
+
+        // Update date validation if both dates are set
+        if (fromDate && selectedDate) {
+            const durationInMs = selectedDate.getTime() - fromDate.getTime()
+            const durationInHours = durationInMs / (1000 * 60 * 60)
+            const durationInDays = durationInMs / (1000 * 60 * 60 * 24)
+
+            if (durationInDays <= 180 && durationInHours >= 1 && fromDate < selectedDate) {
+                newErrors.dateError = null
+            }
+        }
+
+        setErrors(newErrors)
+    }
+
     const onFetchedProductsSelectionChange = (e: any) => {
-        setSelectedFetchedProducts(e.value as ProductResponseDetails[])
+        const selectedProducts = e.value as ProductResponseDetails[]
+        setSelectedFetchedProducts(selectedProducts)
+        if (selectedProducts.length > 0 && selectedProducts.every((product) => product.quantity > 1)) {
+            setErrors((prev) => ({ ...prev, productError: null }))
+        }
     }
 
     return (
@@ -242,7 +298,7 @@ const DiscountForm = () => {
                         <InputText
                             id='discountName'
                             value={discountName}
-                            onChange={(e) => setDiscountName(e.target.value)}
+                            onChange={handleDiscountNameChange}
                             required
                             placeholder='Nhập tên giảm giá'
                         />
@@ -255,7 +311,7 @@ const DiscountForm = () => {
                             inputId='value'
                             value={value}
                             mode='decimal'
-                            onValueChange={(e) => setValue(e.value !== undefined ? e.value : null)}
+                            onValueChange={handleValueChange}
                             suffix='%'
                             min={1}
                             max={50}
@@ -272,10 +328,7 @@ const DiscountForm = () => {
                                 id='fromDate'
                                 value={fromDate}
                                 showIcon
-                                onChange={(e) => {
-                                    const selectedDate = e.value as Date | null
-                                    setFromDate(selectedDate)
-                                }}
+                                onChange={handleFromDateChange}
                                 minDate={minStartDate}
                                 showTime
                                 hourFormat='12'
@@ -293,10 +346,7 @@ const DiscountForm = () => {
                             <Calendar
                                 id='toDate'
                                 value={toDate}
-                                onChange={(e) => {
-                                    const selectedDate = e.value as Date | null
-                                    setToDate(selectedDate)
-                                }}
+                                onChange={handleToDateChange}
                                 showTime
                                 touchUI
                                 showIcon
@@ -320,12 +370,7 @@ const DiscountForm = () => {
                             cols={30}
                         />
                     </div>
-                    <Button
-                        className='mt-4'
-                        label='Tạo Giảm Giá'
-                        icon='pi pi-check'
-                        onClick={handleCreateDiscount}
-                    />
+                    <Button className='mt-4' label='Tạo Giảm Giá' icon='pi pi-check' onClick={handleCreateDiscount} />
                 </div>
 
                 <div className='col-12 md:col-6'>
