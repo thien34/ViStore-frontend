@@ -468,7 +468,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                             priceTotal: item.quantity * item.productResponse.price,
                             discountAmount: 0,
                             originalProductCost: item.productResponse.price,
-                            attributeDescription: ''
+                            attributeDescription: '',
+                            discountPrice: item.productResponse.discountPrice * item.quantity || null
                         })),
                         addressRequest: checked
                             ? {

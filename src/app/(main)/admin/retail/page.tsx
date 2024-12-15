@@ -30,30 +30,34 @@ export default function Retail() {
     }, [billId])
 
     const fetchBill = () => {
-        CartService.getBills().then((res) => {
-            if (res) {
-                const billData = res as unknown as Record<string, { numberBill: number; totalItems: number }>
-                const newTabs = Object.entries(billData)
-                    .sort(([, { numberBill: a }], [, { numberBill: b }]) => a - b)
-                    .map(([billId, { numberBill, totalItems }]) => ({
-                        id: billId,
-                        header: `Hóa Đơn ${numberBill}`,
-                        content: (
-                            <ProductListComponent
-                                updateTabTotalItems={updateTabTotalItems}
-                                fetchBill={fetchBill}
-                                numberBill={numberBill}
-                            />
-                        ),
-                        billId: billId,
-                        totalItems: totalItems
-                    }))
+        CartService.getBills()
+            .then((res) => {
+                if (res) {
+                    const billData = res as unknown as Record<string, { numberBill: number; totalItems: number }>
+                    const newTabs = Object.entries(billData)
+                        .sort(([, { numberBill: a }], [, { numberBill: b }]) => a - b)
+                        .map(([billId, { numberBill, totalItems }]) => ({
+                            id: billId,
+                            header: `Hóa Đơn ${numberBill}`,
+                            content: (
+                                <ProductListComponent
+                                    updateTabTotalItems={updateTabTotalItems}
+                                    fetchBill={fetchBill}
+                                    numberBill={numberBill}
+                                />
+                            ),
+                            billId: billId,
+                            totalItems: totalItems
+                        }))
 
-                setTabs(newTabs)
-                setBillId(newTabs[0]?.id || '')
-                localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
-            }
-        })
+                    setTabs(newTabs)
+                    setBillId(newTabs[0]?.id || '')
+                    localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     const tabHeaderTemplate = (options: TabPanelHeaderTemplateOptions, header: string, totalItems: number) => {

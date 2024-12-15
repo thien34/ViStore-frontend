@@ -102,13 +102,17 @@ export default function ProductListComponent({
     }, [billId])
 
     const fetchCart = () => {
-        CartService.getCart(billId).then((res) => {
-            const sortedCarts = res.sort((a, b) => a.cartUUID.localeCompare(b.cartUUID))
+        CartService.getCart(billId)
+            .then((res) => {
+                const sortedCarts = res.sort((a, b) => a.cartUUID.localeCompare(b.cartUUID))
 
-            setCarts(sortedCarts)
-            updateTabTotalItems(billId, res.length)
-            calculateTotals(res)
-        })
+                setCarts(sortedCarts)
+                updateTabTotalItems(billId, res.length)
+                calculateTotals(res)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     const calculateTotals = (carts: CartResponse[]) => {

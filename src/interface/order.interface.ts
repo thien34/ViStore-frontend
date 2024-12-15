@@ -31,6 +31,7 @@ export interface OrderItemRequest {
     discountAmount: number
     originalProductCost: number
     attributeDescription: string
+    discountPrice: number | null
 }
 
 export interface AddressRequest {

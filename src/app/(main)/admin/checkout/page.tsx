@@ -39,10 +39,14 @@ export default function CheckoutPage() {
 
     const fetchCart = () => {
         if (!billId) return
-        CartService.getCart(billId).then((res) => {
-            const sortedCarts = res.sort((a, b) => a.cartUUID.localeCompare(b.cartUUID))
-            setCarts(sortedCarts)
-        })
+        CartService.getCart(billId)
+            .then((res) => {
+                const sortedCarts = res.sort((a, b) => a.cartUUID.localeCompare(b.cartUUID))
+                setCarts(sortedCarts)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     function handleCartItemDelete(cart: CartResponse, event: React.MouseEvent<HTMLElement>): void {
