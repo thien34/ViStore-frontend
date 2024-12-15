@@ -85,9 +85,11 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     }
     const handleClearCouponCodes = () => {
         setCouponCodes([])
+        setValidVouchers([])
+        setTotalDiscount(0)
     }
 
-    const validateCouponCode = async () => {
+    const validateCouponCode = async (couponCodes: string[]) => {
         setLoading(true)
         setMessage('')
         try {
@@ -192,7 +194,9 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'Voucher không hợp lệ hoặc không thể sử dụng'
+                    detail: voucherResponses
+                        .map((voucher: any) => voucher.reason || `Voucher ${voucher.couponCode} không hợp lệ.`)
+                        .join(', ')
                 })
             } else {
                 toast.current?.show({
@@ -204,8 +208,17 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         }
     }
 
-    const handleRemoveValidVoucher = (index: number) => {
-        setValidVouchers((prevVouchers) => prevVouchers.filter((_, i) => i !== index))
+    const handleRemoveValidVoucher = (voucher: Voucher) => {
+        setValidVouchers((prevVouchers) => {
+            const updatedVouchers = prevVouchers.filter((v) => v.couponCode !== voucher.couponCode)
+            return updatedVouchers
+        })
+
+        setCouponCodes((prevCoupons) => {
+            const updatedCoupons = prevCoupons.filter((code) => code !== voucher.couponCode)
+            validateCouponCode(updatedCoupons)
+            return updatedCoupons
+        })
     }
 
     const handleRemoveCouponCode = (index: number) => {
@@ -400,7 +413,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const handleOrder = async () => {
         const billId = localStorage.getItem('billIdCurrent')
         if (!billId) return
-        if (validVouchers.length > 0) validateCouponCode()
+        if (validVouchers.length > 0) validateCouponCode(couponCodes)
         if (!validateAddress()) return
         if (!validateDiscount()) return
         if (!validatePayment()) return
@@ -558,7 +571,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     }
 
     useEffect(() => {
-        if (couponCodes.length > 0) validateCouponCode()
+        if (couponCodes.length > 0 && customer) validateCouponCode(couponCodes)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [orderTotals.subtotal])
 
@@ -746,7 +759,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             />
                                             <Button
                                                 icon='pi pi-thumbtack'
-                                                onClick={validateCouponCode}
+                                                onClick={() => validateCouponCode(couponCodes)}
                                                 loading={loading}
                                                 disabled={loading || couponCodes.length === 0}
                                             />
@@ -768,11 +781,12 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             {message}
                                         </div>
                                     )}
+                                    <h3>{validVouchers.length}</h3>
 
                                     {validVouchers.length > 0 && (
                                         <div className='mt-4'>
                                             <h3 className='text-sm font-semibold text-green-700 mb-3'>
-                                                Valid Vouchers:
+                                                Mã Voucher Hợp Lệ:
                                             </h3>
                                             <ul className='grid grid-cols-2 gap-3 max-h-40 border border-green-200 rounded-md p-3'>
                                                 {validVouchers.map((voucher: Voucher, index) => (
@@ -786,7 +800,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                                             {voucher.couponCode}
                                                         </span>
                                                         <button
-                                                            onClick={() => handleRemoveValidVoucher(index)}
+                                                            onClick={() => handleRemoveValidVoucher(voucher)}
                                                             className='text-red-500 hover:text-red-700 ml-2'
                                                         >
                                                             ×
