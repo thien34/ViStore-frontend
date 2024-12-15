@@ -912,10 +912,13 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Tổng cộng</dt>
                                 <dd className='text-base font-medium text-gray-900 dark:text-white'>
                                     {formatCurrency(
-                                        orderTotals.subtotal +
-                                            (checked ? orderTotals.shippingCost : 0) +
-                                            orderTotals.tax -
-                                            totalDiscount
+                                        Math.max(
+                                            orderTotals.subtotal +
+                                                (checked ? orderTotals.shippingCost : 0) +
+                                                orderTotals.tax -
+                                                totalDiscount,
+                                            0
+                                        )
                                     )}
                                 </dd>
                             </dl>
