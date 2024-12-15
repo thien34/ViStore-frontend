@@ -88,9 +88,6 @@ const CustomerForm = ({ roles, isRedirect = false, onClose }: FormProps) => {
                     <div className='card'>
                         <div className='flex justify-between items-center gap-2'>
                             <h4>Thêm Khách Hàng</h4>
-                            <Link href={`/admin/customers`}>
-                                <Image src={'/layout/images/btn-back.png'} alt='ViStore' width='20' height='20' />
-                            </Link>
                         </div>
                         <div className='field'>
                             <label htmlFor='email' className='font-medium w-full'>
