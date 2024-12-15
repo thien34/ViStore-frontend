@@ -5,6 +5,7 @@ import { StatisticalService } from '@/service/statistical.service'
 import { IoStatsChartOutline, IoCartOutline, IoCardOutline, IoGiftOutline } from 'react-icons/io5'
 import SalesMetricsCard from '@/components/statistical/SalesMetricsCard'
 import GrowthRatesCard from '@/components/statistical/GrowthRatesCard'
+import DetailedStatisticsView from '@/components/statistical/DetailedStatisticsView'
 
 const salesMetricEmty: SalesMetrics = {
     totalInvoices: 0,
@@ -64,6 +65,7 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div>
+            <DetailedStatisticsView />
         </div>
     )
 }

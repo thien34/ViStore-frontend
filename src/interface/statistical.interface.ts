@@ -25,18 +25,36 @@ export interface SalesStatistics {
     }
 }
 
-export interface SalesSummary {
-    dailySales: DailySales[]
+export interface DetailedStatistics {
+    totalRevenue: TotalRevenue
+    bestSellingProducts: BestSellingProduct[]
+    outOfStockProducts: OutOfStockProduct[]
+    orderStatusChart: OrderStatus[]
+}
+
+export interface TotalRevenue {
+    doanhThu: number
+    soLuongSanPhamBanDuoc: number
+    donHangThanhCong: number
+    donHuy: number
+}
+
+export interface OutOfStockProduct {
+    tenSanPham: string
+    soLuong: number
+    giaTien: number
+    anh: string
+}
+
+export interface BestSellingProduct {
+    productId: number
+    productName: string
+    totalQuantitySold: number
     totalRevenue: number
-    totalOrders: number
-    averageOrderValue: number
 }
 
-export interface DailySales {
-    date: string
-    revenue: number
-    orders: number
-    products: number
+export interface OrderStatus {
+    status: string
+    count: number
+    percent: number
 }
-
-export type DateRangeType = 'day' | 'week' | 'month' | 'year' | 'custom'
