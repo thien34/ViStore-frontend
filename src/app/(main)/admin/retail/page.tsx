@@ -2,7 +2,7 @@
 import CartService from '@/service/cart.service'
 import { Button } from 'primereact/button'
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup'
-import { useLocalStorage, useUpdateEffect } from 'primereact/hooks'
+import { useLocalStorage, useMountEffect, useUpdateEffect } from 'primereact/hooks'
 import { TabPanel, TabPanelHeaderTemplateOptions, TabView } from 'primereact/tabview'
 import { Toast } from 'primereact/toast'
 import { useRef, useState } from 'react'
@@ -25,9 +25,9 @@ export default function Retail() {
     const [billId, setBillId] = useLocalStorage<string>('billId', '')
     const toast = useRef<Toast>(null)
 
-    useUpdateEffect(() => {
+    useMountEffect(() => {
         fetchBill()
-    }, [billId])
+    })
 
     const fetchBill = () => {
         CartService.getBills()
