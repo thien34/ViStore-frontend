@@ -785,8 +785,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             {message}
                                         </div>
                                     )}
-                                    <h3>{validVouchers.length}</h3>
-
                                     {validVouchers.length > 0 && (
                                         <div className='mt-4'>
                                             <h3 className='text-sm font-semibold text-green-700 mb-3'>
