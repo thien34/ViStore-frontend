@@ -96,6 +96,7 @@ export default function Retail() {
         }
         await CartService.addBill(newId)
         setBillId(newId)
+        localStorage.setItem('billIdCurrent', newId)
         setTabs([
             ...tabs,
             {
