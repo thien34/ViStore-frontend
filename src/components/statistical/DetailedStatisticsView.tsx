@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
     startOfDay,
     endOfDay,
@@ -31,7 +31,7 @@ const DetailedStatisticsView = () => {
     const [customStartDate, setCustomStartDate] = useState<Date | null>(null)
     const [customEndDate, setCustomEndDate] = useState<Date | null>(null)
 
-    const getDateRange = React.useCallback(() => {
+    const getDateRange = useCallback(() => {
         const today = new Date()
         switch (filter) {
             case 'today':
