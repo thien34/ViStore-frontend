@@ -52,7 +52,19 @@ export default function Retail() {
 
                     setTabs(newTabs)
                     // setBillId(newTabs[0]?.id || '')
-                    // localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
+                    if (newTabs.length > 0) {
+                        if (activeIndex === newTabs.length) {
+                            const newActiveIndex = activeIndex === newTabs.length ? activeIndex - 1 : activeIndex
+                            setActiveIndex(newActiveIndex)
+                            setBillId(newTabs[newActiveIndex].billId)
+                        } else {
+                            setActiveIndex(activeIndex > newTabs.length ? activeIndex - 1 : activeIndex)
+                            setBillId(newTabs[activeIndex > newTabs.length ? activeIndex - 1 : activeIndex].billId)
+                        }
+                    } else {
+                        setActiveIndex(0)
+                        setBillId('')
+                    }
                 }
             })
             .catch((error) => {
