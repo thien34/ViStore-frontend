@@ -43,7 +43,9 @@ export default function OrderToltalPrice({ order }: Props) {
                 </div>
                 <div className='flex justify-between items-center border-t pt-2'>
                     <span className='text-gray-800 font-bold'>Tổng tiền: </span>
-                    <span className='text-green-600 font-bold'>{formatPrice(order.orderSubtotalDiscount)}</span>
+                    <span className='text-green-600 font-bold'>
+                        {formatPrice(order.orderTotal - order.orderDiscountTotal)}
+                    </span>
                 </div>
             </div>
         </div>
