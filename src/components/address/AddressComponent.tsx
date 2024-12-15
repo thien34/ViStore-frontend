@@ -89,9 +89,7 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                             filter
                             className={(classNames({ 'p-invalid': submitted && !address.provinceId }), 'w-full')}
                         />
-                        {submitted && !address.provinceId && (
-                            <small className='p-error block'>Tỉnh là bắt buộc.</small>
-                        )}
+                        {submitted && !address.provinceId && <small className='p-error block'>Tỉnh là bắt buộc.</small>}
                     </div>
                     <div className='field w-1/3'>
                         <label htmlFor='district' className='font-medium block'>
@@ -115,9 +113,7 @@ const AddressComponent = ({ provinces, submitted, className, onAddressChange, ad
                             disabled={!address.provinceId}
                             className={(classNames({ 'p-invalid': submitted && !address.districtId }), 'w-full')}
                         />
-                        {submitted && !address.districtId && (
-                            <small className='p-error block'>Quận là bắt buộc.</small>
-                        )}
+                        {submitted && !address.districtId && <small className='p-error block'>Quận là bắt buộc.</small>}
                     </div>
                     <div className='field w-1/3'>
                         <label htmlFor='ward' className='font-medium block'>

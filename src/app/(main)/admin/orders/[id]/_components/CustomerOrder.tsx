@@ -1,5 +1,5 @@
 import { Button } from 'primereact/button'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaEdit, FaRegCalendarCheck, FaRegCheckCircle, FaRegClock, FaTimesCircle, FaTruck } from 'react-icons/fa'
 import OrderService from '@/service/order.service'
 import { CustomerOrderResponse } from '@/interface/orderItem.interface'

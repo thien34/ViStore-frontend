@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { OrderItemsResponse } from '@/interface/orderItem.interface'
 import { InputNumber } from 'primereact/inputnumber'
 import Image from 'next/image'

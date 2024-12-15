@@ -1,7 +1,7 @@
 import { OrderResponse } from '@/interface/order.interface'
 import OrderService from '@/service/order.service'
 import { Tag } from 'primereact/tag'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 type Props = {
     order: OrderResponse
