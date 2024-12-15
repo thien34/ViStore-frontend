@@ -666,6 +666,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             value={address?.firstName || ''}
                                             id='firstName'
                                             className='w-full'
+                                            disabled={!checked}
                                         />
                                     </div>
                                     <div className='field w-full md:w-1/2'>
@@ -685,6 +686,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             value={address?.lastName || ''}
                                             id='lastName'
                                             className='w-full'
+                                            disabled={!checked}
                                         />
                                     </div>
                                 </div>
@@ -706,6 +708,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                             value={address?.phoneNumber || ''}
                                             id='phoneNumber'
                                             className='w-full'
+                                            disabled={!checked}
                                         />
                                     </div>
                                 </div>
