@@ -436,8 +436,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         pickupInStore: false,
                         orderStatusId: checked ? 1 : 7,
                         paymentStatusId: PaymentStatusType.Paid,
-                        paymentMethodId:
-                            amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
+                        paymentMethodId: PaymentMethodType.Cash,
                         paymentMode: PaymentModeType.IN_STORE,
                         orderSubtotal: orderTotals.subtotal,
                         orderSubtotalDiscount: totalOrderDiscount,
