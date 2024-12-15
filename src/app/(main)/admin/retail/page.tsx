@@ -138,9 +138,11 @@ export default function Retail() {
 
     const handleTabChange = (e: { index: number }) => {
         const currentTabId = tabs[e.index].id
-        localStorage.setItem('billIdCurrent', currentTabId)
         setActiveIndex(e.index)
         setBillId(currentTabId)
+        setTimeout(() => {
+            localStorage.setItem('billIdCurrent', currentTabId)
+        }, 100)
     }
 
     const showError = () => {
