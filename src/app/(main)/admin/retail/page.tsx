@@ -51,8 +51,8 @@ export default function Retail() {
                         }))
 
                     setTabs(newTabs)
-                    setBillId(newTabs[0]?.id || '')
-                    localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
+                    // setBillId(newTabs[0]?.id || '')
+                    // localStorage.setItem('billIdCurrent', newTabs[0]?.id || '')
                 }
             })
             .catch((error) => {
@@ -140,9 +140,7 @@ export default function Retail() {
         const currentTabId = tabs[e.index].id
         setActiveIndex(e.index)
         setBillId(currentTabId)
-        setTimeout(() => {
-            localStorage.setItem('billIdCurrent', currentTabId)
-        }, 100)
+        localStorage.setItem('billIdCurrent', currentTabId)
     }
 
     const showError = () => {
