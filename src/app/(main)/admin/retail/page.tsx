@@ -132,7 +132,12 @@ export default function Retail() {
         const newTabs = tabs.filter((_, index) => index !== tabIndex)
 
         CartService.deleteBill(billId)
-        setTabs(newTabs)
+            .then(() => {
+                setTabs(newTabs)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
 
         if (newTabs.length > 0) {
             if (tabIndex === activeIndex) {
