@@ -441,8 +441,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             defaultFocus: 'reject',
             accept: () => {
                 CartService.getCart(billId).then(async (res: CartResponse[]) => {
-                    const totalOrder = orderTotals.total - totalDiscount + orderTotals.shippingCost
-                    const totalOrderDiscount = orderTotals.subtotal - totalDiscount
+                    const totalOrder = orderTotals.total - totalDiscount + (checked ? orderTotals.shippingCost : 0)
                     const order: OrderRequest = {
                         customerId: customer?.id || 1,
                         orderGuid: billId,
@@ -454,7 +453,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         paymentMethodId: PaymentMethodType.Cash,
                         paymentMode: PaymentModeType.IN_STORE,
                         orderSubtotal: orderTotals.subtotal,
-                        orderSubtotalDiscount: totalOrderDiscount,
+                        orderSubtotalDiscount: 0,
                         orderShipping: checked ? orderTotals.shippingCost : 0,
                         orderDiscount: totalDiscount,
                         orderTotal: totalOrder,
