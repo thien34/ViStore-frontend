@@ -259,7 +259,6 @@ const ListView = () => {
     }
     async function handleGenerateBirthdayVouchers() {
         try {
-            debugger
             await axios.post('http://localhost:8080/api/admin/vouchers/generate-birthday-vouchers')
             toast.current?.show({
                 severity: 'success',

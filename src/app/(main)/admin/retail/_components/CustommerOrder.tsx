@@ -172,8 +172,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             })
             const { voucherResponses } = response.data
 
-            const isVoucherValid = vouchers.some((voucher) => voucher.couponCode.toUpperCase() === voucherCodeUpperCase)
-
             const isVoucherAlreadyAdded = couponCodes.includes(voucherCodeUpperCase)
 
             const isVoucherInResponses = voucherResponses.some(
@@ -181,7 +179,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                     responseVoucher.couponCode.toUpperCase() === voucherCodeUpperCase && responseVoucher.isApplicable
             )
 
-            if (isVoucherValid && !isVoucherAlreadyAdded && isVoucherInResponses) {
+            if (!isVoucherAlreadyAdded && isVoucherInResponses) {
                 setCouponCodes((prevCoupons) => [...prevCoupons, voucherCodeUpperCase])
                 setCouponCode('')
             } else if (isVoucherAlreadyAdded) {
@@ -226,7 +224,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     }
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        let value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')
+        let value = event.target.value.toUpperCase()
         if (value.length > 18) {
             value = value.slice(0, 18)
         }
