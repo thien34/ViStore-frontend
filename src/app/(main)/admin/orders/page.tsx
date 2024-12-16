@@ -6,6 +6,7 @@ import OrderService from '@/service/order.service'
 import { TabView, TabPanel, TabViewTabChangeEvent } from 'primereact/tabview'
 import { IconType } from 'react-icons'
 import { FaRegCalendarCheck, FaRegClock, FaRegCheckCircle, FaTruck, FaTimesCircle, FaListAlt } from 'react-icons/fa'
+import { debounce } from 'lodash'
 
 export default function Orders() {
     const [orders, setOrders] = useState<OrderResponse[]>([])
@@ -40,10 +41,9 @@ export default function Orders() {
         return orders.filter((order) => order.orderStatus === status).length
     }
 
-    const handleTabChange = (e: TabViewTabChangeEvent) => {
+    const handleTabChange = debounce((e: TabViewTabChangeEvent) => {
         setActiveIndex(e.index)
 
-        // Get the label of the selected tab
         const target = e.originalEvent.target as HTMLElement | null
         const selectedLabel = target?.innerText?.replace(/\(\d+\)$/, '').trim() || ''
 
@@ -58,7 +58,7 @@ export default function Orders() {
                 setFilterData(filtered)
             }
         }
-    }
+    }, 300)
 
     return (
         <div className='card'>
