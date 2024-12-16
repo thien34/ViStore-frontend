@@ -340,7 +340,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount
         )
         const amountPaidNumber = Number(amountPaid)
-        if (amountPaidNumber < totalOrder) {
+        if (amountPaidNumber < totalOrder && !checked) {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
@@ -419,7 +419,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (!validatePayment()) return
         if (
             amountPaid <
-            orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount
+                orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount &&
+            !checked
         ) {
             toast.current?.show({
                 severity: 'error',
