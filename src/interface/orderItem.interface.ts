@@ -38,13 +38,12 @@ export interface CustomerOrder {
 export interface CustomerOrderResponse {
     id: number
     customerId: number
-    billId: string;
-    firstName: string;
-    lastName: string;
+    billId: string
+    firstName: string
+    lastName: string
     phoneNumber: string
     delivery: string
     orderStatusType: number
     paymentStatusType: number
     paymentMethod: number
 }
-
