@@ -778,14 +778,14 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 handleApplyVoucher={handleApplyVoucher}
                             />
                             {validVouchers.length > 0 || couponCodes.length > 0 || message ? (
-                                <dl className='bg-white p-4 rounded-md shadow-sm max-w-md mx-auto mt-3 border border-gray-200'>
+                                <dl className='bg-white p-4 my-2 rounded-md shadow-sm max-w mx-auto mt-3 border border-gray-200'>
                                     {message && (
                                         <div className='mt-2 text-xs text-red-600 font-medium border-l-4 border-red-600 pl-2 py-1 bg-red-50 rounded-sm'>
                                             {message}
                                         </div>
                                     )}
                                     {validVouchers.length > 0 && (
-                                        <div className='mt-4'>
+                                        <div className='mt-2'>
                                             <h3 className='text-sm font-semibold text-green-700 mb-3'>
                                                 Mã Voucher Hợp Lệ:
                                             </h3>
@@ -848,8 +848,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     )}
                                     {couponCodes.length > 0 && (
                                         <div className='mt-4'>
-                                            <h3 className='text-sm font-semibold text-blue-700 mb-2'>
-                                                Entered Coupon Codes:
+                                            <h3 className='text-sm font-semibold text-blue-700 mb-3'>
+                                                Mã giảm giá đã nhập:
                                             </h3>
                                             <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2'>
                                                 {couponCodes.map((code, index) => (

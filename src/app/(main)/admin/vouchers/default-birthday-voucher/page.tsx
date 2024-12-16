@@ -73,7 +73,7 @@ const VoucherUpdateDefaultBirthday = () => {
             setValue(voucherData.usePercentage ? voucherData.discountPercentage : voucherData.discountAmount)
             setMaxDiscountAmount(voucherData.maxDiscountAmount ?? null)
             setMinOrderAmount(voucherData.minOderAmount ?? 1)
-            setIsCumulative(voucherData.isCumulative ?? false)
+            setIsCumulative(false)
             setLimitationTimes(voucherData.limitationTimes ?? 1)
             setPerCustomerLimit(voucherData.discountLimitationId ?? 1)
         } catch (error) {
