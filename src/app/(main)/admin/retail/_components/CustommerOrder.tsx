@@ -432,7 +432,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             .filter((id): id is number => id !== undefined)
 
         confirmDialog({
-            message: 'Bạn có chắc muốn tiếp tục đơn hàng này không?',
+            message:
+                amountPaid == 0
+                    ? 'Thanh toán khi nhận hàng, xác nhận để tiếp tục'
+                    : 'Bạn có chắc muốn tiếp tục đơn hàng này không?',
             header: 'Xác Nhận Đơn Hàng',
             icon: 'pi pi-exclamation-triangle',
             defaultFocus: 'reject',
