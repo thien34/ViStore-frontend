@@ -39,6 +39,7 @@ export default function OrderDetail({ params }: Props) {
         fetchOrder()
     }, [id])
     const [invoiceData, setInvoiceData] = useState<InvoiceData>()
+    const [reasonError, setReasonError] = useState(false)
 
     const fetchOrderStatusHistory = async () => {
         OrderService.getOrderStatusHistory(id).then((response) => {
@@ -110,6 +111,10 @@ export default function OrderDetail({ params }: Props) {
     }
 
     const cancelOrder = async (reason: string) => {
+        if (reason.length < 30) {
+            setReasonError(true)
+            return
+        }
         setVisibleConfirm(false)
 
         await OrderService.cancelOrder(Number(id), reason).then((response) => {
@@ -157,8 +162,14 @@ export default function OrderDetail({ params }: Props) {
                         minLength={30}
                         maxLength={255}
                         value={reason}
-                        onChange={(e) => setReason(e.target.value)}
+                        onChange={(e) => {
+                            setReason(e.target.value)
+                            setReasonError(e.target.value.length < 30)
+                        }}
                     />
+                    {reasonError && (
+                        <div className='text-red-500 text-sm'>Lý do hủy đơn hàng phải có ít nhất 30 ký tự</div>
+                    )}
                 </Dialog>
                 <Toast ref={toast} />
                 <HistoryOrder
