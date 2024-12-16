@@ -166,7 +166,6 @@ const DiscountUpdate = () => {
 
             router.push('/admin/discounts')
         } catch (error: any) {
-            // debugger
             // if (error.response && error.response.status === 409) {
             //     toast.current?.show({
             //         severity: 'error',

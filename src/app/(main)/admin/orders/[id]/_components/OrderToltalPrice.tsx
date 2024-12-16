@@ -31,7 +31,7 @@ export default function OrderToltalPrice({ order }: Props) {
             <div className='space-y-4'>
                 <div className='flex justify-between items-center'>
                     <span className='text-gray-600'>Tổng đơn hàng: </span>
-                    <span className='text-gray-900 font-semibold'>{formatPrice(order.orderTotal)}</span>
+                    <span className='text-gray-900 font-semibold'>{formatPrice(order.orderSubtotal)}</span>
                 </div>
                 <div className='flex justify-between items-center'>
                     <span className='text-gray-600'>Giảm giá: </span>
@@ -43,9 +43,7 @@ export default function OrderToltalPrice({ order }: Props) {
                 </div>
                 <div className='flex justify-between items-center border-t pt-2'>
                     <span className='text-gray-800 font-bold'>Tổng tiền: </span>
-                    <span className='text-green-600 font-bold'>
-                        {formatPrice(order.orderTotal - order.orderDiscountTotal)}
-                    </span>
+                    <span className='text-green-600 font-bold'>{formatPrice(order.orderTotal)}</span>
                 </div>
             </div>
         </div>

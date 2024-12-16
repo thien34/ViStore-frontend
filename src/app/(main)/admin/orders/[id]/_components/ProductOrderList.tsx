@@ -76,7 +76,7 @@ export default function ProductOrderList({ id }: Props) {
                 })),
                 largestDiscountPercentage: product.largestDiscountPercentage || 0,
                 cartUUID: item.orderItemGuid,
-                imageUrl: product.imageUrl || ''
+                imageUrl: product.image || ''
             }
         })
         setProducts(data)

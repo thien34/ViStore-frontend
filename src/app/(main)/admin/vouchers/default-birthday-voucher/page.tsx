@@ -73,7 +73,7 @@ const VoucherUpdateDefaultBirthday = () => {
             setValue(voucherData.usePercentage ? voucherData.discountPercentage : voucherData.discountAmount)
             setMaxDiscountAmount(voucherData.maxDiscountAmount ?? null)
             setMinOrderAmount(voucherData.minOderAmount ?? 1)
-            setIsCumulative(voucherData.isCumulative ?? false)
+            setIsCumulative(false)
             setLimitationTimes(voucherData.limitationTimes ?? 1)
             setPerCustomerLimit(voucherData.discountLimitationId ?? 1)
         } catch (error) {
@@ -232,40 +232,13 @@ const VoucherUpdateDefaultBirthday = () => {
                         {errors.minOrderAmount && <small className='p-error'>{errors.minOrderAmount}</small>}
                     </div>
                     <div className='my-4'>
-                        <Checkbox
-                            id='ingredient'
-                            onChange={(e) => setIsCumulative(e.checked ?? false)}
-                            checked={isCumulative}
-                        />
+                        <Checkbox id='ingredient' checked={false} />
                         <label htmlFor='ingredient' className='ml-2'>
                             Cumulative with other discounts
                         </label>
-                    </div>
-                    <div className='flex justify-between'>
-                        <div className='field flex items-center gap-4 mb-0'>
-                            <label className='mb-0' htmlFor='limitationTimes'>
-                                Limitation Times
-                            </label>
-                            <InputNumber
-                                style={{ width: '80px' }}
-                                id='limitationTimes'
-                                value={limitationTimes}
-                                onValueChange={(e) => setLimitationTimes(e.value ?? 0)}
-                            />
-                            {errors.limitationTimes && <small className='p-error'>{errors.limitationTimes}</small>}
-                        </div>
-                        <div className='field flex items-center gap-4 mb-0'>
-                            <label className='mb-0' htmlFor='perCustomerLimit'>
-                                Per Customer Limit
-                            </label>
-                            <InputNumber
-                                style={{ width: '80px' }}
-                                id='perCustomerLimit'
-                                value={perCustomerLimit}
-                                onValueChange={(e) => setPerCustomerLimit(e.value ?? 0)}
-                            />
-                            {errors.perCustomerLimit && <small className='p-error'>{errors.perCustomerLimit}</small>}
-                        </div>
+                        <small className='block mt-1 ml-4'>
+                            <i className='pi pi-info-circle mr-2 text-xs'></i>Voucher sinh nhật không thể cộng dồn
+                        </small>
                     </div>
                     <Button className='mt-4' label='Update Voucher' icon='pi pi-check' onClick={handleUpdateVoucher} />
                 </div>

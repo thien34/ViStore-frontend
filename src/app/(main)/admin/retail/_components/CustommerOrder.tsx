@@ -172,8 +172,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             })
             const { voucherResponses } = response.data
 
-            const isVoucherValid = vouchers.some((voucher) => voucher.couponCode.toUpperCase() === voucherCodeUpperCase)
-
             const isVoucherAlreadyAdded = couponCodes.includes(voucherCodeUpperCase)
 
             const isVoucherInResponses = voucherResponses.some(
@@ -181,7 +179,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                     responseVoucher.couponCode.toUpperCase() === voucherCodeUpperCase && responseVoucher.isApplicable
             )
 
-            if (isVoucherValid && !isVoucherAlreadyAdded && isVoucherInResponses) {
+            if (!isVoucherAlreadyAdded && isVoucherInResponses) {
                 setCouponCodes((prevCoupons) => [...prevCoupons, voucherCodeUpperCase])
                 setCouponCode('')
             } else if (isVoucherAlreadyAdded) {
@@ -226,7 +224,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     }
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        let value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')
+        let value = event.target.value.toUpperCase()
         if (value.length > 18) {
             value = value.slice(0, 18)
         }
@@ -340,7 +338,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount
         )
         const amountPaidNumber = Number(amountPaid)
-        if (amountPaidNumber < totalOrder) {
+        if (amountPaidNumber < totalOrder && !checked) {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
@@ -419,7 +417,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (!validatePayment()) return
         if (
             amountPaid <
-            orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount
+                orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount &&
+            !checked
         ) {
             toast.current?.show({
                 severity: 'error',
@@ -433,14 +432,16 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
             .filter((id): id is number => id !== undefined)
 
         confirmDialog({
-            message: 'Bạn có chắc muốn tiếp tục đơn hàng này không?',
+            message:
+                amountPaid == 0
+                    ? 'Thanh toán khi nhận hàng, xác nhận để tiếp tục'
+                    : 'Bạn có chắc muốn tiếp tục đơn hàng này không?',
             header: 'Xác Nhận Đơn Hàng',
             icon: 'pi pi-exclamation-triangle',
             defaultFocus: 'reject',
             accept: () => {
                 CartService.getCart(billId).then(async (res: CartResponse[]) => {
-                    const totalOrder = orderTotals.total - totalDiscount
-                    const totalOrderDiscount = orderTotals.subtotal - totalDiscount
+                    const totalOrder = orderTotals.total - totalDiscount + (checked ? orderTotals.shippingCost : 0)
                     const order: OrderRequest = {
                         customerId: customer?.id || 1,
                         orderGuid: billId,
@@ -452,7 +453,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         paymentMethodId: PaymentMethodType.Cash,
                         paymentMode: PaymentModeType.IN_STORE,
                         orderSubtotal: orderTotals.subtotal,
-                        orderSubtotalDiscount: totalOrderDiscount,
+                        orderSubtotalDiscount: 0,
                         orderShipping: checked ? orderTotals.shippingCost : 0,
                         orderDiscount: totalDiscount,
                         orderTotal: totalOrder,
@@ -779,14 +780,14 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 handleApplyVoucher={handleApplyVoucher}
                             />
                             {validVouchers.length > 0 || couponCodes.length > 0 || message ? (
-                                <dl className='bg-white p-4 rounded-md shadow-sm max-w-md mx-auto mt-3 border border-gray-200'>
+                                <dl className='bg-white p-4 my-2 rounded-md shadow-sm max-w mx-auto mt-3 border border-gray-200'>
                                     {message && (
                                         <div className='mt-2 text-xs text-red-600 font-medium border-l-4 border-red-600 pl-2 py-1 bg-red-50 rounded-sm'>
                                             {message}
                                         </div>
                                     )}
                                     {validVouchers.length > 0 && (
-                                        <div className='mt-4'>
+                                        <div className='mt-2'>
                                             <h3 className='text-sm font-semibold text-green-700 mb-3'>
                                                 Mã Voucher Hợp Lệ:
                                             </h3>
@@ -849,8 +850,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                     )}
                                     {couponCodes.length > 0 && (
                                         <div className='mt-4'>
-                                            <h3 className='text-sm font-semibold text-blue-700 mb-2'>
-                                                Entered Coupon Codes:
+                                            <h3 className='text-sm font-semibold text-blue-700 mb-3'>
+                                                Mã giảm giá đã nhập:
                                             </h3>
                                             <ul className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2'>
                                                 {couponCodes.map((code, index) => (
@@ -912,10 +913,13 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                                 <dt className='text-base font-normal text-gray-500 dark:text-gray-400'>Tổng cộng</dt>
                                 <dd className='text-base font-medium text-gray-900 dark:text-white'>
                                     {formatCurrency(
-                                        orderTotals.subtotal +
-                                            (checked ? orderTotals.shippingCost : 0) +
-                                            orderTotals.tax -
-                                            totalDiscount
+                                        Math.max(
+                                            orderTotals.subtotal +
+                                                (checked ? orderTotals.shippingCost : 0) +
+                                                orderTotals.tax -
+                                                totalDiscount,
+                                            0
+                                        )
                                     )}
                                 </dd>
                             </dl>

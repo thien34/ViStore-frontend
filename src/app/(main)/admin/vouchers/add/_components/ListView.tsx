@@ -235,11 +235,6 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                 isValid = false
             }
         }
-        const validDiscountPercentage = !usePercentage && value != null ? value : 0
-        if (minOrderAmount >= 0 && validDiscountPercentage > 0.69 * minOrderAmount) {
-            newErrors.value = 'Voucher value cannot exceed 69% of the minimum order amount.'
-            isValid = false
-        }
         const limitationTimeValid = limitationTimes != null ? limitationTimes : 0
         if (limitationTimeValid <= 0 || limitationTimeValid > 100000000) {
             newErrors.limitationTimes = 'Limitation times must be between 1 and 100000000.'
@@ -255,13 +250,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
             newErrors.productError = 'At least one customer must be selected.'
             isValid = false
         }
-        const validValue = value !== null ? value : 0
-        const validMinOrderAmount = minOrderAmount !== null ? minOrderAmount : 0
 
-        if (validValue > validMinOrderAmount) {
-            newErrors.value = 'Voucher value cannot exceed the minimum order amount.'
-            isValid = false
-        }
         if (couponCode === undefined || couponCode === null || couponCode === '') {
             newErrors.couponCode = 'Coupon code is required.'
             isValid = false

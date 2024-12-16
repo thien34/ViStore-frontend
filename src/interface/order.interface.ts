@@ -80,7 +80,6 @@ export interface OrderResponse {
     orderCode: string
     billCode: string
     customerName: string
-    orderTotal: number
     totalItem: number
     paidDateUtc: string
     orderStatus: number
@@ -88,6 +87,8 @@ export interface OrderResponse {
     paymentMethod: number
     paymentMode: number
     customerId: number
+    orderSubtotal: number
+    orderTotal: number
     orderShippingTotal: number
     orderDiscountTotal: number
     orderSubtotalDiscount: number
