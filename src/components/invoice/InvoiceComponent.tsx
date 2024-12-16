@@ -63,6 +63,10 @@ const InvoiceComponent: React.FC<InvoiceComponentProps> = ({ data }) => {
                             {data.client.phone && (
                                 <p className='text-sm text-gray-600'>Số điện thoại: {data.client.phone}</p>
                             )}
+
+                            <p className='text-sm text-gray-600'>
+                                Hình thức : {data.isShipping ? 'Giao hàng' : 'Nhận hàng tại quầy'}
+                            </p>
                         </div>
 
                         <table className='w-full '>
@@ -88,10 +92,13 @@ const InvoiceComponent: React.FC<InvoiceComponentProps> = ({ data }) => {
 
                         <div className='flex justify-end '>
                             <div className='text-right'>
-                                <p className='text-sm text-gray-600 mb-1'>Tổng tiền: {formatCurrency(data.total)}</p>
+                                <p className='text-sm text-gray-600 mb-1'>Tổng tiền: {formatCurrency(data.subtotal)}</p>
                                 <p className='text-sm text-gray-600 mb-1'>Giảm giá : {formatCurrency(data.discount)}</p>
+                                <p className='text-sm text-gray-600 mb-1'>
+                                    Phí vận chuyển : {formatCurrency(data.shipping)}
+                                </p>
                                 <p className='text-lg font-semibold text-gray-700'>
-                                    Tổng cộng: {formatCurrency(data.subtotal)}
+                                    Tổng cộng: {formatCurrency(data.total)}
                                 </p>
                             </div>
                         </div>

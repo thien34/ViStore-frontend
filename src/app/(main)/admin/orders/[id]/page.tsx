@@ -121,7 +121,11 @@ export default function OrderDetail({ params }: Props) {
     }
 
     const fetchInvoiceData = async () => {
-        OrderService.getInvoiceData(Number(id)).then((response) => setInvoiceData(response.payload))
+        OrderService.getInvoiceData(Number(id))
+            .then((response) => setInvoiceData(response.payload))
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     return (

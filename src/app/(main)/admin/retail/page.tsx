@@ -65,6 +65,7 @@ export default function Retail() {
                         setActiveIndex(0)
                         setBillId('')
                     }
+                    localStorage.setItem('billIdCurrent', newTabs[activeIndex].billId)
                 }
             })
             .catch((error) => {

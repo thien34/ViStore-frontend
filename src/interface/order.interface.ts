@@ -116,6 +116,8 @@ export interface InvoiceData {
     subtotal: number
     discount: number
     total: number
+    shipping: number
+    isShipping: boolean
 }
 
 export interface Company {
