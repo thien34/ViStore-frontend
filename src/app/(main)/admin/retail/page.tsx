@@ -108,6 +108,8 @@ export default function Retail() {
         }
         await CartService.addBill(newId)
         setBillId(newId)
+        fetchBill()
+
         localStorage.setItem('billIdCurrent', newId)
         setTabs([
             ...tabs,
@@ -125,7 +127,6 @@ export default function Retail() {
                 totalItems: 0
             }
         ])
-        setActiveIndex(tabs.length)
     }
 
     const removeTab = (tabIndex: number, billId: string) => {
