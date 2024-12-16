@@ -75,7 +75,7 @@ export default function Orders() {
                 ].map((status) => (
                     <TabPanel
                         header={
-                            <div className='flex items-center space-x-2'>
+                            <div className='flex items-center space-x-2 me-10'>
                                 <status.icon className='text-blue-500' />
                                 <span>{status.label}</span>
                                 <span className='text-red-500'>
