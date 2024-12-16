@@ -58,7 +58,7 @@ export default function Orders() {
                 setFilterData(filtered)
             }
         }
-    }, 300)
+    }, 500)
 
     return (
         <div className='card'>
