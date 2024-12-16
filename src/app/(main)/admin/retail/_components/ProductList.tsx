@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 'use client'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FilterMatchMode, FilterOperator } from 'primereact/api'
 import { DataTableFilterMeta } from 'primereact/datatable'
 import { Button } from 'primereact/button'
 import { ProductResponse, ProductResponseDetails } from '@/interface/Product'
 import ProductService from '@/service/ProducrService'
-import { useLocalStorage, useUpdateEffect } from 'primereact/hooks'
+import { useLocalStorage, useMountEffect, useUpdateEffect } from 'primereact/hooks'
 import { CartResponse, ShoppingCart } from '@/interface/cart.interface'
 import CartService from '@/service/cart.service'
 import { v4 as uuidv4 } from 'uuid'
@@ -96,6 +96,10 @@ export default function ProductListComponent({
             setProducts(data)
         })
     }
+
+    useMountEffect(() => {
+        fetchProducts()
+    })
 
     useUpdateEffect(() => {
         fetchCart()
