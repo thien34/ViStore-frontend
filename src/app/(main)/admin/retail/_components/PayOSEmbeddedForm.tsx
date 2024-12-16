@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react'
 import { usePayOS } from '@payos/payos-checkout'
 import { PaymentOSRequest } from '@/interface/payment.interface'
 import { PayOSService } from '@/service/payment.service'
+import { PaymentMethodType } from '@/interface/order.interface'
 
 interface PayOSFormProps {
     paymentOSRequest: PaymentOSRequest
     setVisible: (visible: boolean) => void
     setAmountPaid: (amount: number) => void
+    setPaymentMethodMode: (method: PaymentMethodType) => void
 }
 
-const PayOSForm = ({ paymentOSRequest, setVisible, setAmountPaid }: PayOSFormProps) => {
+const PayOSForm = ({ paymentOSRequest, setVisible, setAmountPaid, setPaymentMethodMode }: PayOSFormProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState<string | null>(null)
@@ -23,6 +25,7 @@ const PayOSForm = ({ paymentOSRequest, setVisible, setAmountPaid }: PayOSFormPro
         onSuccess: () => {
             setAmountPaid(paymentOSRequest.amount)
             setVisible(false)
+            setPaymentMethodMode(PaymentMethodType.BankTransfer)
             handleClose()
         }
     })

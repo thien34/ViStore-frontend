@@ -45,6 +45,11 @@ interface CustomIsApplicable {
     couponCode: string
 }
 
+interface VoucherErrorResponse {
+    reason?: string
+    couponCode: string
+}
+
 export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: CustommerOrderProps) {
     const [checked, setChecked] = useState<boolean>(false)
     const [provinces, setProvinces] = useState<Province[]>([])
@@ -67,7 +72,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [addresses, setAddresses] = useState<AddressesResponse[]>([])
     const [selectedAddress, setSelectedAddress] = useState<AddressesResponse | null>(null)
     const toast = useRef<Toast>(null)
-    const [, setOrderLocal] = useLocalStorage<string>('', 'orderLocal')
     const [couponCode, setCouponCode] = useState('')
     const [couponCodes, setCouponCodes] = useState<string[]>([])
     const [message, setMessage] = useState('')
@@ -75,7 +79,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
     const [validVouchers, setValidVouchers] = useState([])
     const [totalDiscount, setTotalDiscount] = useState<number>(0)
     const [hoveredVoucher, setHoveredVoucher] = useState<Voucher | null>(null)
-    const [vouchers, setVouchers] = useState<Voucher[]>([])
+    const [, setVouchers] = useState<Voucher[]>([])
+    const [paymentMethodMode, setPaymentMethodMode] = useState<PaymentMethodType>(PaymentMethodType.Cash)
 
     const handleHoverEnter = (voucher: Voucher) => {
         setHoveredVoucher(voucher)
@@ -193,7 +198,10 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                     severity: 'error',
                     summary: 'Error',
                     detail: voucherResponses
-                        .map((voucher: any) => voucher.reason || `Voucher ${voucher.couponCode} không hợp lệ.`)
+                        .map(
+                            (voucher: VoucherErrorResponse) =>
+                                voucher.reason || `Voucher ${voucher.couponCode} không hợp lệ.`
+                        )
                         .join(', ')
                 })
             } else {
@@ -248,59 +256,6 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
         if (!validateAddress()) return
         if (!validateDiscount()) return
         setVisible(true)
-        const billId = localStorage.getItem('billIdCurrent')
-        if (!billId) return
-        const validVoucherIds = validVouchers.map((voucher: Voucher) => voucher.id).filter((id) => id !== undefined)
-
-        CartService.getCart(billId).then(async (res: CartResponse[]) => {
-            const totalOrder = orderTotals.total - totalDiscount
-            const totalOrderDiscount = orderTotals.subtotal - totalDiscount
-            const order: OrderRequest = {
-                customerId: customer?.id || 1,
-                orderGuid: billId,
-                addressType: checked ? 2 : -1,
-                orderId: '',
-                pickupInStore: false,
-                orderStatusId: checked ? 0 : 8,
-                paymentStatusId: PaymentStatusType.Paid,
-                paymentMethodId: amountPaid === orderTotals.total ? PaymentMethodType.Cash : PaymentMethodType.Cod,
-                paymentMode: PaymentModeType.IN_STORE,
-                orderSubtotal: orderTotals.subtotal,
-                orderSubtotalDiscount: totalOrderDiscount,
-                orderShipping: checked ? orderTotals.shippingCost : 0,
-                orderDiscount: totalDiscount,
-                orderTotal: totalOrder,
-                refundedAmount: 0,
-                paidDateUtc: '',
-                billCode: 'HĐ' + numberBill,
-                deliveryMode: checked ? 0 : 1,
-                orderItems: res.map((item) => ({
-                    productId: item.productResponse.id,
-                    orderItemGuid: '',
-                    quantity: item.quantity,
-                    unitPrice: item.productResponse.price,
-                    priceTotal: item.quantity * item.productResponse.price,
-                    discountAmount: 0,
-                    originalProductCost: item.productResponse.price,
-                    attributeDescription: ''
-                })),
-                addressRequest: checked
-                    ? {
-                          customerId: customer?.id || 1,
-                          firstName: address.firstName,
-                          lastName: address.lastName,
-                          email: address.email,
-                          addressName: addressDetail?.address || '',
-                          provinceId: addressDetail?.provinceId || '',
-                          districtId: addressDetail?.districtId || '',
-                          wardId: addressDetail?.wardId || '',
-                          phoneNumber: address.phoneNumber
-                      }
-                    : null,
-                idVouchers: validVoucherIds
-            }
-            setOrderLocal(JSON.stringify(order))
-        })
     }
 
     const validateAddress = () => {
@@ -450,7 +405,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                         pickupInStore: false,
                         orderStatusId: checked ? 1 : 7,
                         paymentStatusId: PaymentStatusType.Paid,
-                        paymentMethodId: PaymentMethodType.Cash,
+                        paymentMethodId: paymentMethodMode,
                         paymentMode: PaymentModeType.IN_STORE,
                         orderSubtotal: orderTotals.subtotal,
                         orderSubtotalDiscount: 0,
@@ -956,6 +911,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill }: C
                 }
                 setAmountPaid={setAmountPaid}
                 amountPaid={amountPaid}
+                setPaymentMethodMode={setPaymentMethodMode}
             />
             <CustomerDialog
                 setCustomer={setCustomer}

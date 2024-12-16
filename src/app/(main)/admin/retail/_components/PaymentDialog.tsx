@@ -5,6 +5,7 @@ import { Toast } from 'primereact/toast'
 import { ToggleButton } from 'primereact/togglebutton'
 import { useMemo, useRef, useState } from 'react'
 import PayOSForm from './PayOSEmbeddedForm'
+import { PaymentMethodType } from '@/interface/order.interface'
 
 type PaymentDialogProps = {
     visible: boolean
@@ -12,9 +13,16 @@ type PaymentDialogProps = {
     totalAmount: number
     setAmountPaid: (amount: number) => void
     amountPaid: number
+    setPaymentMethodMode: (method: PaymentMethodType) => void
 }
 
-export default function PaymentDialog({ visible, setVisible, totalAmount, setAmountPaid }: PaymentDialogProps) {
+export default function PaymentDialog({
+    visible,
+    setVisible,
+    totalAmount,
+    setAmountPaid,
+    setPaymentMethodMode
+}: PaymentDialogProps) {
     const [checked, setChecked] = useState(true)
     const toast = useRef<Toast>(null)
     const [amountPaidState, setAmountPaidState] = useState(0)
@@ -124,6 +132,7 @@ export default function PaymentDialog({ visible, setVisible, totalAmount, setAmo
                             }}
                             setVisible={setVisible}
                             setAmountPaid={setAmountPaid}
+                            setPaymentMethodMode={setPaymentMethodMode}
                         />
                     </>
                 )}

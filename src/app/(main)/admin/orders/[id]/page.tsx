@@ -33,6 +33,7 @@ export default function OrderDetail({ params }: Props) {
     const toast = useRef<Toast>(null)
     const [visible, setVisible] = useState(false)
     const [customerOrder, setCustomerOrder] = useState<CustomerOrderResponse>()
+    const [checkStatusPaid, setCheckStatusPaid] = useState(false)
     useUpdateEffect(() => {
         fetchOrderStatusHistory()
         fetchOrder()
@@ -43,6 +44,7 @@ export default function OrderDetail({ params }: Props) {
         OrderService.getOrderStatusHistory(id).then((response) => {
             setOrderStatusHistoryResponses(response.payload)
             setLatestStatus(response.payload[response.payload.length - 1])
+            setCheckStatusPaid(response.payload.some((status) => status.status === OrderStatusType.PAID))
             getCustomerOrder()
             fetchInvoiceData()
         })
@@ -64,7 +66,11 @@ export default function OrderDetail({ params }: Props) {
 
     const handleNextStatus = async () => {
         if (latestStatus?.status && reason) {
-            const nextStatus: OrderStatusType = (latestStatus?.status as OrderStatusType) + 1
+            let nextStatus: OrderStatusType = (latestStatus?.status as OrderStatusType) + 1
+            if (nextStatus == OrderStatusType.PAID && checkStatusPaid) {
+                nextStatus = OrderStatusType.COMPLETED
+            }
+
             await OrderService.changeStatusOrder(Number(id), reason, nextStatus).then((response) => {
                 if (response.status === 200) {
                     setVisibleConfirm(false)
@@ -171,6 +177,7 @@ export default function OrderDetail({ params }: Props) {
                     reason={reason}
                     setReason={setReason}
                     setVisible={setVisible}
+                    checkStatusPaid={checkStatusPaid}
                 />
                 {customerOrder && (
                     <CustomerOrderInfo customerOrder={customerOrder} setCustomerOrder={setCustomerOrder} />

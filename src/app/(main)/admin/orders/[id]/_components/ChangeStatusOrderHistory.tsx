@@ -15,6 +15,7 @@ interface ChangeStatusOrderHistoryProps {
     handleConfirmPrevious: () => void
 
     setVisible: (visible: boolean) => void
+    checkStatusPaid: boolean
 }
 
 export default function ChangeStatusOrderHistory({
@@ -25,7 +26,8 @@ export default function ChangeStatusOrderHistory({
     reason,
     setReason,
     handleConfirmPrevious,
-    setVisible
+    setVisible,
+    checkStatusPaid
 }: ChangeStatusOrderHistoryProps) {
     const handleConfirm = () => {
         handleConfirmNext()
@@ -44,6 +46,9 @@ export default function ChangeStatusOrderHistory({
     }
 
     const getButtonLabel = (status: OrderStatusType): string => {
+        if (status === OrderStatusType.DELIVERED && checkStatusPaid) {
+            return 'Hoàn Thành Đơn Hàng'
+        }
         switch (status) {
             case OrderStatusType.CREATED:
                 return 'Xác Nhận Đơn Hàng'
