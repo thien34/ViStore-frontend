@@ -13,10 +13,9 @@ interface CartItemProps {
     onQuantityChange: () => void
 }
 
-const CartItem = ({ cart, onDelete, onQuantityChange }: CartItemProps) => {
+const CartItem = ({ cart, onDelete, onQuantityChange}: CartItemProps) => {
     const [quantity, setQuantity] = useState(cart.quantity)
     const toast = useRef<Toast>(null)
-
     useUpdateEffect(() => {
         setQuantity(cart.quantity)
     }, [cart.quantity])
@@ -44,6 +43,7 @@ const CartItem = ({ cart, onDelete, onQuantityChange }: CartItemProps) => {
     }
 
     const updateCartQuantity = async (newQuantity: number): Promise<boolean> => {
+
         try {
             await CartService.updateCartQuantity(cart.id, newQuantity)
             toast.current?.show({
@@ -55,6 +55,10 @@ const CartItem = ({ cart, onDelete, onQuantityChange }: CartItemProps) => {
             onQuantityChange()
             return true
         } catch (error) {
+            if(error.message === 'Lỗi Khánh') {
+                window.location.reload()
+                return false
+            }
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
