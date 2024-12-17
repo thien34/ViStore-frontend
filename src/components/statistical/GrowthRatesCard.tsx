@@ -28,10 +28,10 @@ const GrowthRatesCard = ({ statistics }: GrowthRatesProps) => {
 
     const growthRateData = statistics?.growthRate
         ? [
-              { period: 'Today', ...statistics.growthRate.todayGrowthRate },
-              { period: 'This Week', ...statistics.growthRate.weekGrowthRate },
-              { period: 'This Month', ...statistics.growthRate.monthGrowthRate },
-              { period: 'This Year', ...statistics.growthRate.yearGrowthRate }
+              { period: 'Hôm nay', ...statistics.growthRate.todayGrowthRate },
+              { period: 'Tuần này', ...statistics.growthRate.weekGrowthRate },
+              { period: 'Tháng này', ...statistics.growthRate.monthGrowthRate },
+              { period: 'Năm nay', ...statistics.growthRate.yearGrowthRate }
           ]
         : []
 
