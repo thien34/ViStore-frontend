@@ -96,7 +96,7 @@ export default function ChangeStatusOrderHistory({
                                     />
                                 )}
 
-                            {latestStatus <= OrderStatusType.CONFIRMED && (
+                            {latestStatus <= OrderStatusType.CONFIRMED && !checkStatusPaid && (
                                 <Button
                                     type='button'
                                     severity='danger'
