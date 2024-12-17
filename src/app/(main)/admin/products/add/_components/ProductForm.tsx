@@ -26,7 +26,6 @@ import AtbDialog from './AtbDialog'
 import productAttributeService from '@/service/productAttribute.service'
 import { useMountEffect } from 'primereact/hooks'
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
-import Link from 'next/link'
 
 export interface AttributeRow {
     selectedAttribute: ProductAttributeName | null
@@ -614,6 +613,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
         return <>{options.rowIndex + 1}</>
     }
 
+    const handleGoBack = () => {
+        router.back()
+    }
     return (
         <div>
             <ConfirmDialog />
@@ -622,9 +624,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
             <div className='card'>
                 <div className='flex justify-between items-center gap-2'>
                     <h4>Thêm Sản Phẩm</h4>
-                    <Link href={'/admin/products'}>
+                    <button onClick={handleGoBack}>
                         <Image src={'/layout/images/btn-back.png'} alt='ViStore' width={20} height={20} />
-                    </Link>
+                    </button>
                 </div>
                 <div className='flex flex-column gap-4'>
                     <div className='flex flex-row gap-4'>

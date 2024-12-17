@@ -23,7 +23,7 @@ import productAttributeService from '@/service/productAttribute.service'
 import { useMountEffect } from 'primereact/hooks'
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog'
 import AtbDialog from '../../add/_components/AtbDialog'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
@@ -334,14 +334,19 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
         const availableAttributes = getAvailableAttributes()
         return availableAttributes.length === 0
     }
+    const router = useRouter()
+
+    const handleGoBack = () => {
+        router.back()
+    }
     return (
         <div className='card'>
             <Toast ref={toast} />
             <div className='flex justify-between items-center gap-2'>
                 <h4>Cập Nhật Chi Tiết Sản Phẩm</h4>
-                <Link href={`/admin/products/${product.id}`}>
+                <button onClick={handleGoBack}>
                     <Image src={'/layout/images/btn-back.png'} alt='ViStore' width='20' height='20' />
-                </Link>
+                </button>
             </div>
 
             <div className='flex flex-column gap-4'>

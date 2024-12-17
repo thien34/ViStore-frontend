@@ -23,7 +23,6 @@ import RequiredIcon from '@/components/icon/RequiredIcon'
 import productAttributeService from '@/service/productAttribute.service'
 import { useMountEffect } from 'primereact/hooks'
 import AtbDialog from '../../../add/_components/AtbDialog'
-import Link from 'next/link'
 type AttributeRow = {
     selectedAttribute: ProductAttributeName | null
     selectedValues: string | undefined
@@ -316,14 +315,17 @@ const ProductDetailsFormParent: React.FC<Props> = ({ product, id, name }) => {
         const availableAttributes = getAvailableAttributes()
         return availableAttributes.length === 0
     }
+    const handleGoBack = () => {
+        router.back()
+    }
     return (
         <div className='card'>
             <Toast ref={toast} />
             <div className='flex justify-between items-center gap-2'>
                 <h5>Thêm Chi Tiết Sản Phẩm</h5>
-                <Link href={`/admin/products/${id}`}>
+                <button onClick={handleGoBack}>
                     <Image src={'/layout/images/btn-back.png'} alt='ViStore' width='20' height='20' />
-                </Link>
+                </button>
             </div>
             <div className='flex flex-column gap-4'>
                 {discount && (

@@ -146,13 +146,6 @@ const ListView = ({ initialData, initialNodes }: CategoryProps) => {
     const rightToolbarTemplate = () => {
         return (
             <>
-                <FileUpload
-                    mode='basic'
-                    accept='image/*'
-                    maxFileSize={1000000}
-                    chooseLabel='Nhập File'
-                    className='mr-2 inline-block'
-                />
                 <Button label='Xuất File' icon='pi pi-upload' severity='help' onClick={exportCSV} />
             </>
         )

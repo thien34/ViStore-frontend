@@ -17,8 +17,8 @@ import ProductService from '@/service/ProducrService'
 import { classNames } from 'primereact/utils'
 import { Toast } from 'primereact/toast'
 import RequiredIcon from '@/components/icon/RequiredIcon'
-import { useMountEffect } from 'primereact/hooks'
-import { useParams } from 'next/navigation'
+import { useMountEffect, useUpdateEffect } from 'primereact/hooks'
+import { useParams, useRouter } from 'next/navigation'
 
 interface ProductAddFormProps {
     categories: Category[]
@@ -28,7 +28,7 @@ interface ProductAddFormProps {
     products: ProductResponseDetails[]
 }
 
-const ProductAddForm = ({ categories, manufacturers, products }: ProductAddFormProps) => {
+const ProductAddForm = ({ categories, manufacturers }: ProductAddFormProps) => {
     const [name, setName] = useState<string>('')
     const [weight, setWeight] = useState<number>(0)
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
@@ -39,6 +39,16 @@ const ProductAddForm = ({ categories, manufacturers, products }: ProductAddFormP
     const [error, setError] = useState<string>('')
     const { id } = useParams()
     const [product, setProduct] = useState<ProductResponse | null>(null)
+    const [products, setProducts] = useState<ProductResponseDetails[]>([])
+
+    const fetchProducts = async () => {
+        const data = await ProductService.getProductsByParentId(+id)
+        setProducts(data)
+    }
+
+    useUpdateEffect(() => {
+        fetchProducts()
+    }, [id])
 
     const fetchProduct = async () => {
         const data = await ProductService.getProductById(+id)
@@ -86,14 +96,19 @@ const ProductAddForm = ({ categories, manufacturers, products }: ProductAddFormP
         setSubmitted(false)
     }
 
+    const router = useRouter()
+
+    const handleGoBack = () => {
+        router.back()
+    }
     return (
         <div className='card'>
             <Toast ref={toast} />
             <div className='flex justify-between items-center gap-2'>
                 <h4>Cập Nhật Sản Phẩm</h4>
-                <Link href={'/admin/products'}>
+                <button onClick={handleGoBack}>
                     <Image src={'/layout/images/btn-back.png'} alt='ViStore' width='20' height='20' />
-                </Link>
+                </button>
             </div>
             <div className='flex flex-column gap-4'>
                 <div className='flex flex-row gap-4'>

@@ -2,7 +2,6 @@
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
-import { FileUpload } from 'primereact/fileupload'
 import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { Toolbar } from 'primereact/toolbar'
@@ -93,13 +92,6 @@ const ListView = ({ initialData }: ProductAttributeProps) => {
     const rightToolbarTemplate = () => {
         return (
             <>
-                <FileUpload
-                    mode='basic'
-                    accept='image/*'
-                    maxFileSize={1000000}
-                    chooseLabel='Import'
-                    className='mr-2 inline-block'
-                />
                 <Button label='Export' icon='pi pi-upload' severity='help' onClick={exportCSV} />
             </>
         )
