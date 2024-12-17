@@ -371,8 +371,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill, bil
         if (!validatePayment()) return
         if (
             amountPaid <
-                orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount &&
-            !checked
+            orderTotals.subtotal + (checked ? orderTotals.shippingCost : 0) + orderTotals.tax - totalDiscount
         ) {
             toast.current?.show({
                 severity: 'error',
@@ -437,7 +436,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill, bil
                                   provinceId: addressDetail?.provinceId || '',
                                   districtId: addressDetail?.districtId || '',
                                   wardId: addressDetail?.wardId || '',
-                                  phoneNumber: address.phoneNumber, 
+                                  phoneNumber: address.phoneNumber
                               }
                             : null,
                         idVouchers: validVoucherIds

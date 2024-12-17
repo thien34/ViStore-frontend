@@ -429,8 +429,8 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.price}
                                 onValueChange={(e) => {
-                                    if (!e.value || e.value < 100000 || e.value > 100000000) {
-                                        setErrors({ ...errors, price: 'Giá phải từ 100,000 đến 100,000,000' })
+                                    if (!e.value || e.value < 10000 || e.value > 100000000) {
+                                        setErrors({ ...errors, price: 'Giá phải từ 10,000 đến 100,000,000' })
                                     } else {
                                         setErrors({ ...errors, price: '' })
                                     }
@@ -461,8 +461,8 @@ const ProductDetailsForm: React.FC<Props> = ({ product }) => {
                                 tooltipOptions={{ position: 'bottom' }}
                                 value={formData.productCost}
                                 onValueChange={(e) => {
-                                    if (e.value && e.value <= 100000) {
-                                        setErrors({ ...errors, productCost: 'Giá nhập phải lớn hơn 100,000' })
+                                    if (e.value && e.value <= 10000) {
+                                        setErrors({ ...errors, productCost: 'Giá nhập phải lớn hơn 10.000' })
                                     } else {
                                         setErrors({ ...errors, productCost: '' })
                                     }
