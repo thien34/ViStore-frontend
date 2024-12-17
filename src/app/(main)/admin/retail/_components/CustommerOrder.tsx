@@ -424,7 +424,8 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill, bil
                             discountAmount: 0,
                             originalProductCost: item.productResponse.price,
                             attributeDescription: '',
-                            discountPrice: item.productResponse.discountPrice * item.quantity || null
+                            discountPrice: item.productResponse.discountPrice * item.quantity || null,
+                            checkQuantity: true
                         })),
                         addressRequest: checked
                             ? {
@@ -436,7 +437,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill, bil
                                   provinceId: addressDetail?.provinceId || '',
                                   districtId: addressDetail?.districtId || '',
                                   wardId: addressDetail?.wardId || '',
-                                  phoneNumber: address.phoneNumber
+                                  phoneNumber: address.phoneNumber, 
                               }
                             : null,
                         idVouchers: validVoucherIds

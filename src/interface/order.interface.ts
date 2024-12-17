@@ -20,6 +20,7 @@ export interface OrderRequest {
     billCode: string
     deliveryMode: number
     idVouchers: number[]
+    checkQuantity: boolean
 }
 
 export interface OrderItemRequest {
