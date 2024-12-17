@@ -18,6 +18,7 @@ import Spinner from '@/components/spinner/Spinner'
 import discountService from '@/service/discount.service'
 import { Image } from 'primereact/image'
 import axios from 'axios'
+import { formatCurrency } from '@/utils/format'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -48,10 +49,10 @@ const ListView = () => {
     const leftToolbarTemplate = () => (
         <div className='flex flex-wrap gap-2 my-5'>
             <Link href='/admin/vouchers/add'>
-                <Button label='Add new discount' icon='pi pi-plus' severity='success' />
+                <Button label='Thêm phiếu giảm giá' icon='pi pi-plus' severity='success' />
             </Link>
             <Link href='/admin/vouchers/default-birthday-voucher'>
-                <Button label='Update default birthday voucher' icon='pi pi-plus' severity='info' />
+                <Button label='Phiếu giảm giá sinh nhật' icon='pi pi-plus' severity='info' />
             </Link>
         </div>
     )
@@ -254,24 +255,20 @@ const ListView = () => {
             }
         })
     }
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
-    }
     async function handleGenerateBirthdayVouchers() {
         try {
             await axios.post('http://localhost:8080/api/admin/vouchers/generate-birthday-vouchers')
             toast.current?.show({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Birthday Vouchers generated successfully',
+                detail: 'Tạo phiếu giảm giá sinh nhật thành công',
                 life: 3000
             })
         } catch (error) {
-            console.error('Error generating birthday vouchers:', error)
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Failed to generate birthday vouchers',
+                detail: 'Phiếu giảm giá sinh nhật hôm nay đã phát rồi',
                 life: 3000
             })
         }
@@ -287,26 +284,26 @@ const ListView = () => {
             <div className='card'>
                 {leftToolbarTemplate()}
                 <Button className='my-4' onClick={handleGenerateBirthdayVouchers}>
-                    Generate Birthday Vouchers
+                    Tạo phiếu giảm giá sinh nhật hôm nay
                 </Button>
                 <DataTable
                     scrollable
                     value={filteredDiscounts}
                     paginator
-                    rows={6}
+                    rows={10}
                     rowsPerPageOptions={[10, 25, 50]}
                     paginatorTemplate='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
                     dataKey='id'
-                    currentPageReportTemplate='Showing {first} to {last} of {totalRecords} entries'
+                    currentPageReportTemplate='Hiển thị {first} đến {last} trong {totalRecords} phiếu giảm giá'
                     emptyMessage='No discounts found.'
                 >
                     <Column header='#' body={indexBodyTemplate} />
-                    <Column header='Voucher Name | Voucher Code' frozen body={voucherInfoTemplate} />
-                    <Column header='Status' body={statusBodyTemplate} />
-                    <Column header='Discount Value' body={formatDiscountAndStock} />
-                    <Column header='Type' body={typeBodyTemplate} />
+                    <Column header='Tên | Mã giảm giá' frozen body={voucherInfoTemplate} />
+                    <Column header='Trạng thái' body={statusBodyTemplate} />
+                    <Column header='Giá trị' body={formatDiscountAndStock} />
+                    <Column header='Thể loại' body={typeBodyTemplate} />
                     <Column
-                        header='Usage'
+                        header='Lượt sử dụng'
                         body={(rowData) => {
                             const total = rowData.limitationTimes || '∞'
                             const used = rowData.usageCount || 0
@@ -314,14 +311,14 @@ const ListView = () => {
                         }}
                     />
                     <Column
-                        header='Time of Discount Code'
+                        header='Thời hạn phiếu giảm giá'
                         body={(rowData) => {
                             const startTime = vietnamTime(rowData.startDateUtc)
                             const endTime = vietnamTime(rowData.endDateUtc)
                             return `${startTime} - ${endTime}`
                         }}
                     />
-                    <Column header='Actions' body={editAndExpiredButtonTemplate} />
+                    <Column body={editAndExpiredButtonTemplate} />
                 </DataTable>
             </div>
         </>

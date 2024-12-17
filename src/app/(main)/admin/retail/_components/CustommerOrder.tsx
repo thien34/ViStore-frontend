@@ -766,16 +766,16 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill, bil
                                                         {hoveredVoucher?.id === voucher.id && (
                                                             <div className='absolute bg-white shadow-lg p-4 rounded-lg w-64 border border-gray-300 mt-60 z-20'>
                                                                 <h4 className='font-semibold text-sm text-green-700'>
-                                                                    Voucher Conditions
+                                                                    Thông tin voucher
                                                                 </h4>
                                                                 <div className='text-xs text-gray-600 mt-2 space-y-2'>
                                                                     {(voucher.discountPercent ||
                                                                         voucher.discountAmount) && (
                                                                         <p>
-                                                                            Discount:{' '}
+                                                                            Giá trị:{' '}
                                                                             {voucher.discountPercent
                                                                                 ? `${voucher.discountPercent}%`
-                                                                                : `$${voucher.discountAmount}`}
+                                                                                : `${formatCurrency(voucher.discountAmount)}`}
                                                                         </p>
                                                                     )}
                                                                     {voucher.minOderAmount && (
@@ -791,7 +791,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill, bil
                                                                         </p>
                                                                     )}
                                                                     <p>
-                                                                        Validity: {formatDate(voucher.startDateUtc)} -{' '}
+                                                                        Thời hạn: {formatDate(voucher.startDateUtc)} -{' '}
                                                                         {formatDate(voucher.endDateUtc)}
                                                                     </p>
                                                                 </div>
@@ -828,7 +828,7 @@ export default function CustommerOrder({ orderTotals, fetchBill, numberBill, bil
                                                     onClick={handleClearCouponCodes}
                                                     className='px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition-colors text-sm'
                                                 >
-                                                    Clear All
+                                                    Xóa tất cả
                                                 </button>
                                             </div>
                                         </div>

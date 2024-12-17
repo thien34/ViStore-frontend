@@ -188,8 +188,8 @@ const VoucherUpdate = () => {
             <Toast ref={toast} />
             <div className='p-fluid grid mt-4'>
                 <div className='col-12 md:col-6'>
-                    <h3>Update Voucher</h3>
-                    <p>{isPublished ? 'Published vouchers' : 'Private vouchers'}</p>
+                    <h3>Sửa đổi mã giảm giá</h3>
+                    <p>{isPublished ? 'Phiếu giảm giá công khai' : 'Phiếu giảm giá riêng tư'}</p>
                     <ToggleButton
                         disabled
                         onLabel='Public'
@@ -208,20 +208,20 @@ const VoucherUpdate = () => {
                     />
 
                     <div className='field'>
-                        <label htmlFor='voucherName'>Voucher Name</label>
+                        <label htmlFor='voucherName'>Tên phiếu giảm giá</label>
                         <InputText
                             id='voucherName'
                             value={discountName}
                             onChange={(e) => setDiscountName(e.target.value)}
                             required
                             disabled={isExpired}
-                            placeholder='Enter voucher name'
+                            placeholder='Nhập tên phiếu giảm giá'
                         />
                         {errors.discountName && <small className='p-error'>{errors.discountName}</small>}
                     </div>
                     <div className='field'>
                         <div className='flex align-items-center gap-3'>
-                            <span>Use Percentage</span>
+                            <span>Giảm giá phần trăm</span>
                             <InputSwitch
                                 disabled
                                 id='discountTypeSwitch'
@@ -238,7 +238,7 @@ const VoucherUpdate = () => {
                     </div>
                     <div className='flex'>
                         <div className='field'>
-                            <label htmlFor='value'>Value</label>
+                            <label htmlFor='value'>Giá trị</label>
                             <InputNumber
                                 disabled
                                 inputId='value'
@@ -252,13 +252,13 @@ const VoucherUpdate = () => {
                                 mode={usePercentage ? 'decimal' : 'currency'}
                                 currency='VND'
                                 locale='vi-VN'
-                                placeholder='Enter discount value'
+                                placeholder='Nhập giá trị giảm giá'
                             />
                         </div>
                         {usePercentage && (
                             <div className='field ml-5'>
                                 <label className='w-full' htmlFor='maxDiscountAmount'>
-                                    Max Discount Amount
+                                    Giảm giá tối đa
                                 </label>
                                 <InputNumber
                                     disabled
@@ -277,7 +277,7 @@ const VoucherUpdate = () => {
                         )}
                     </div>
                     <div className='field'>
-                        <label htmlFor='minOrderAmount'>Min Order Amount</label>
+                        <label htmlFor='minOrderAmount'>Giá trị đơn hàng tối thiểu</label>
                         <InputNumber
                             disabled
                             id='minOrderAmount'
@@ -293,7 +293,7 @@ const VoucherUpdate = () => {
                     </div>
                     <div className='flex flex-direction-column gap-6'>
                         <div className='field'>
-                            <label htmlFor='fromDate'>From Date</label>
+                            <label htmlFor='fromDate'>Từ ngày</label>
                             <Calendar
                                 disabled
                                 id='fromDate'
@@ -303,14 +303,14 @@ const VoucherUpdate = () => {
                                 dateFormat='dd/mm/yy'
                                 showTime
                                 hourFormat='24'
-                                placeholder='Select start date'
+                                placeholder='Chọn ngày bắt đầu'
                                 showButtonBar
                                 required
                             />
                         </div>
 
                         <div className='field'>
-                            <label htmlFor='toDate'>To Date</label>
+                            <label htmlFor='toDate'>Đến ngày</label>
                             <Calendar
                                 disabled={isExpired}
                                 id='toDate'
@@ -320,7 +320,7 @@ const VoucherUpdate = () => {
                                 dateFormat='dd/mm/yy'
                                 showTime
                                 hourFormat='24'
-                                placeholder='Select end date'
+                                placeholder='Chọn ngày kết thúc'
                                 minDate={fromDate ? new Date(fromDate.getTime() + 60 * 60 * 1000) : undefined}
                                 showButtonBar
                                 required
@@ -336,13 +336,13 @@ const VoucherUpdate = () => {
                             checked={isCumulative}
                         />
                         <label htmlFor='ingredient' className='ml-2'>
-                            Cumulative with other discounts
+                            Kết hợp với các phiếu giảm giá khác
                         </label>
                     </div>
                     <div className='flex justify-between'>
                         <div className='field flex items-center gap-4 mb-0'>
                             <label className='mb-0' htmlFor='limitationTimes'>
-                                Limitation Times
+                                Số lần sử dụng tối đa
                             </label>
                             <InputNumber
                                 disabled={isExpired}
@@ -355,7 +355,7 @@ const VoucherUpdate = () => {
                         </div>
                         <div className='field flex items-center gap-4 mb-0'>
                             <label className='mb-0' htmlFor='perCustomerLimit'>
-                                Per Customer Limit
+                                Giới hạn khách hàng
                             </label>
                             <InputNumber
                                 disabled
@@ -371,14 +371,14 @@ const VoucherUpdate = () => {
                             disabled={isExpired}
                             value={comments}
                             onChange={(e) => setComments(e.target.value)}
-                            placeholder='Comments'
+                            placeholder='Ghi chú'
                             rows={5}
                             cols={30}
                         />
                     </div>
                     <Button
                         className='mt-4'
-                        label='Update Voucher'
+                        label='Lưu'
                         icon='pi pi-check'
                         onClick={handleUpdateVoucher}
                         disabled={isExpired}
@@ -386,13 +386,13 @@ const VoucherUpdate = () => {
                 </div>
 
                 <div className='col-12 md:col-6'>
-                    <h4>Select Customers</h4>
+                    <h4>Chọn khách hàng</h4>
                     <div className='field'>
                         <InputText
                             id='productSearch'
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder='Search by name'
+                            placeholder='Tìm kiếm khách hàng'
                         />
                     </div>
                     <DataTable
@@ -409,7 +409,7 @@ const VoucherUpdate = () => {
                         <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
                         <Column header='STT' body={(_, { rowIndex }) => rowIndex + 1} sortable />
                         <Column
-                            header='Customer Name'
+                            header='Họ và tên'
                             body={(rowData) => `${rowData.lastName} ${rowData.firstName}`}
                             sortable
                         />

@@ -68,7 +68,7 @@ export default function PaymentDialog({
                 <div className='flex justify-between items-center gap-2'>
                     <div className='text-xl font-medium text-gray-900 dark:text-white'>Tổng số tiền</div>
                     <div className='text-xl font-medium text-primary-700 dark:text-white'>
-                        {formatCurrency(totalAmount)}
+                        {formatCurrency(Math.max(0, totalAmount))}
                     </div>
                 </div>
                 <div className='flex justify-center items-center gap-2'>
@@ -127,7 +127,7 @@ export default function PaymentDialog({
                         <PayOSForm
                             paymentOSRequest={{
                                 items: [],
-                                amount: Number(totalAmount.toFixed(0)),
+                                amount: Number(totalAmount.toFixed(0)) <= 0 ? 2000 : Number(totalAmount.toFixed(0)),
                                 description: 'thanh toan hang'
                             }}
                             setVisible={setVisible}

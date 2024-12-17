@@ -295,7 +295,7 @@ const ListView = () => {
                         </div>
                         <div className='field col-12'>
                             <label htmlFor='discountPercentage'>
-                                Discount Percentage ({searchParams.discountPercentage[0]}% -{' '}
+                                Phần trăm giảm giá ({searchParams.discountPercentage[0]}% -{' '}
                                 {searchParams.discountPercentage[1]}%)
                             </label>
                             <Slider

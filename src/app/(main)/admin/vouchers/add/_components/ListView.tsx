@@ -264,8 +264,8 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
             <Toast ref={toast} />
             <div className='p-fluid grid'>
                 <div className='col-12 md:col-6'>
-                    <h3>Create Voucher</h3>
-                    <p>{isPublished ? 'Published vouchers' : 'Private vouchers'}</p>
+                    <h3>Tạo mã giảm giá</h3>
+                    <p>{isPublished ? 'Mã giảm giá công khai' : 'Mã giảm giá riêng tư'}</p>
                     <ToggleButton
                         onLabel='Public'
                         offLabel='Private'
@@ -283,21 +283,18 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                     />
 
                     <div className='field'>
-                        <label htmlFor='voucherName'>Voucher Name</label>
+                        <label htmlFor='voucherName'>Tên mã giảm giá</label>
                         <InputText
                             id='voucherName'
                             value={discountName}
                             onChange={(e) => setDiscountName(e.target.value)}
                             required
-                            placeholder='Enter voucher name'
-                            tooltip='Enter discount name'
-                            tooltipOptions={{ position: 'top' }}
                         />
                         {errors.discountName && <small className='p-error'>{errors.discountName}</small>}
                     </div>
                     <div className='field'>
                         <div className='flex align-items-center gap-3'>
-                            <span>Use Percentage</span>
+                            <span>Giảm giá theo phần trăm</span>
                             <InputSwitch
                                 id='discountTypeSwitch'
                                 checked={usePercentage}
@@ -315,7 +312,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                     </div>
                     <div className='flex'>
                         <div className='field'>
-                            <label htmlFor='value'>Value</label>
+                            <label htmlFor='value'>Giá trị</label>
                             <InputNumber
                                 inputId='value'
                                 value={value}
@@ -328,16 +325,13 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                                 mode={usePercentage ? 'decimal' : 'currency'}
                                 currency='VND'
                                 locale='vi-VN'
-                                placeholder='Enter discount value'
-                                tooltip='Enter discount value'
-                                tooltipOptions={{ position: 'top' }}
                             />
                             {errors.value && <small className='p-error'>{errors.value}</small>}
                         </div>
                         {usePercentage && (
                             <div className='field ml-5'>
                                 <label className='w-full' htmlFor='maxDiscountAmount'>
-                                    Max Discount Amount
+                                    Số tiền giảm tối đa
                                 </label>
                                 <InputNumber
                                     id='maxDiscountAmount'
@@ -359,7 +353,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                         )}
                     </div>
                     <div className='field'>
-                        <label htmlFor='minOrderAmount'>Min Order Amount</label>
+                        <label htmlFor='minOrderAmount'>Giá trị tối thiếu đơn hàng</label>
                         <InputNumber
                             id='minOrderAmount'
                             value={minOrderAmount}
@@ -377,7 +371,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                     </div>
                     <div className='flex flex-direction-column gap-6'>
                         <div className='field'>
-                            <label htmlFor='fromDate'>From Date</label>
+                            <label htmlFor='fromDate'>Từ ngày</label>
                             <Calendar
                                 id='fromDate'
                                 value={fromDate}
@@ -391,16 +385,14 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                                 hourFormat='12'
                                 touchUI
                                 dateFormat='dd/mm/yy'
-                                placeholder='Select start date'
-                                tooltip='Select start date'
-                                tooltipOptions={{ position: 'top' }}
+                                placeholder='Chọn ngày bắt đầu'
                                 showButtonBar
                                 required
                             />
                             {errors.fromDate && <small className='p-error'>{errors.fromDate}</small>}
                         </div>
                         <div className='field'>
-                            <label htmlFor='toDate'>To Date</label>
+                            <label htmlFor='toDate'>Đến ngày</label>
                             <Calendar
                                 id='toDate'
                                 value={toDate}
@@ -413,9 +405,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                                 showIcon
                                 minDate={minEndDate}
                                 dateFormat='dd/mm/yy'
-                                placeholder='Select end date'
-                                tooltip='Select end date'
-                                tooltipOptions={{ position: 'top' }}
+                                placeholder='Chọn ngày kết thúc'
                                 showButtonBar
                                 required
                                 hourFormat='12'
@@ -426,7 +416,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                     </div>
 
                     <div className='field'>
-                        <label htmlFor='couponCode'>Coupon Code</label>
+                        <label htmlFor='couponCode'>Mã giảm giá</label>
                         <InputMask
                             className='uppercase'
                             value={couponCode}
@@ -443,14 +433,14 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                             checked={isCumulative}
                         />
                         <label htmlFor='ingredient' className='ml-2'>
-                            Cumulative with other discounts
+                            Kết hợp với các mã khuyến mãi khác
                         </label>
                     </div>
                     <div className='flex justify-between'>
                         <div>
                             <div className='field flex items-center gap-4 mb-0'>
                                 <label className='mb-0' htmlFor='limitationTimes'>
-                                    Limitation Times
+                                    Số lượng mã giảm giá
                                 </label>
                                 <InputNumber
                                     style={{ width: '80px' }}
@@ -465,7 +455,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                         <div>
                             <div className='field flex items-center gap-4 mb-0'>
                                 <label className='mb-0' htmlFor='perCustomerLimit'>
-                                    Per Customer Limit
+                                    Giới hạn khách hàng
                                 </label>
                                 <InputNumber
                                     style={{ width: '80px' }}
@@ -482,27 +472,27 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                         <InputTextarea
                             value={comments}
                             onChange={(e) => setComments(e.target.value)}
-                            placeholder='Comments'
+                            placeholder='Ghi chú'
                             rows={5}
                             cols={30}
                         />
                     </div>
                     <Button
                         className='mt-4'
-                        label='Create Discount'
+                        label='Tạo mã giảm giá'
                         icon='pi pi-check'
                         onClick={handleCreateDiscount}
                     />
                 </div>
 
                 <div className='col-12 md:col-6'>
-                    <h4>Select Customers</h4>
+                    <h4>Chọn khách hàng cho giảm giá riêng tư</h4>
                     <div className='field'>
                         <InputText
                             id='productSearch'
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder='Search by name'
+                            placeholder='Tìm kiếm theo tên'
                         />
                     </div>
                     {errors.productError && <small className='p-error'>{errors.productError}</small>}
@@ -519,7 +509,7 @@ const DiscountForm = ({ initialCustomers }: DiscounProps) => {
                         <Column selectionMode='multiple' headerStyle={{ width: '3em' }} />
                         <Column header='STT' body={(_, { rowIndex }) => rowIndex + 1} sortable />
                         <Column
-                            header='Customer Name'
+                            header='Tên khách hàng'
                             body={(rowData) => `${rowData.lastName} ${rowData.firstName}`}
                             sortable
                         />

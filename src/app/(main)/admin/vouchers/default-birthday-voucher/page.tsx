@@ -50,7 +50,7 @@ const VoucherUpdateDefaultBirthday = () => {
             toast.current?.show({
                 severity: 'success',
                 summary: 'Voucher Updated',
-                detail: 'Voucher has been successfully updated.',
+                detail: 'Lưu thành công mã giảm giá.',
                 life: 3000
             })
             router.push('/admin/vouchers')
@@ -141,11 +141,11 @@ const VoucherUpdateDefaultBirthday = () => {
     return (
         <div className='card p-5'>
             <Toast ref={toast} />
-            <h2 className='text-center mb-4'>Birthday Default</h2>
+            <h2 className='text-center mb-4'>Mã giảm giá sinh nhật mặc định</h2>
             <div className='p-fluid grid mt-4'>
                 <div className='col-12'>
                     <div className='field'>
-                        <label htmlFor='voucherName'>Voucher Name</label>
+                        <label htmlFor='voucherName'>Tên mã giảm giá</label>
                         <InputText
                             type='text'
                             disabled
@@ -159,7 +159,7 @@ const VoucherUpdateDefaultBirthday = () => {
                     </div>
                     <div className='field'>
                         <div className='flex align-items-center gap-3'>
-                            <span>Use Percentage</span>
+                            <span>Giảm theo phần trăm</span>
                             <InputSwitch
                                 id='discountTypeSwitch'
                                 checked={usePercentage}
@@ -175,7 +175,7 @@ const VoucherUpdateDefaultBirthday = () => {
                     </div>
                     <div className='flex'>
                         <div className='field'>
-                            <label htmlFor='value'>Value</label>
+                            <label htmlFor='value'>Giá trị</label>
                             <InputNumber
                                 inputId='value'
                                 value={value}
@@ -194,7 +194,7 @@ const VoucherUpdateDefaultBirthday = () => {
                         {usePercentage && (
                             <div className='field ml-5'>
                                 <label className='w-full' htmlFor='maxDiscountAmount'>
-                                    Max Discount Amount
+                                    Tiền giảm tối đa
                                 </label>
                                 <InputNumber
                                     id='maxDiscountAmount'
@@ -216,7 +216,7 @@ const VoucherUpdateDefaultBirthday = () => {
                     </div>
 
                     <div className='field'>
-                        <label htmlFor='minOderAmount'>Min Order Amount</label>
+                        <label htmlFor='minOderAmount'>Giá trị đơn hàng tối thiểu</label>
                         <InputNumber
                             id='minOderAmount'
                             value={minOrderAmount}
@@ -234,13 +234,13 @@ const VoucherUpdateDefaultBirthday = () => {
                     <div className='my-4'>
                         <Checkbox id='ingredient' checked={false} />
                         <label htmlFor='ingredient' className='ml-2'>
-                            Cumulative with other discounts
+                            Kết hợp với các mã giảm giá khác
                         </label>
                         <small className='block mt-1 ml-4'>
                             <i className='pi pi-info-circle mr-2 text-xs'></i>Voucher sinh nhật không thể cộng dồn
                         </small>
                     </div>
-                    <Button className='mt-4' label='Update Voucher' icon='pi pi-check' onClick={handleUpdateVoucher} />
+                    <Button className='mt-4' label='Lưu' icon='pi pi-check' onClick={handleUpdateVoucher} />
                 </div>
             </div>
         </div>
