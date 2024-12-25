@@ -225,30 +225,6 @@ const AppConfig = (props: AppConfigProps) => {
                             />
                         </button>
                     </div>
-                    <div className='col-3'>
-                        <button className='p-link w-2rem h-2rem' onClick={() => _changeTheme('viva-light', 'light')}>
-                            <Image
-                                src='/layout/images/themes/viva-light.svg'
-                                className='w-2rem h-2rem'
-                                alt='Viva Light'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button className='p-link w-2rem h-2rem' onClick={() => _changeTheme('viva-dark', 'dark')}>
-                            <Image
-                                src='/layout/images/themes/viva-dark.svg'
-                                className='w-2rem h-2rem'
-                                alt='Viva Dark'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
                 </div>
 
                 <h5>Bootstrap</h5>
