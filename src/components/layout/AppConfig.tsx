@@ -183,42 +183,12 @@ const AppConfig = (props: AppConfigProps) => {
                     <div className='col-3'>
                         <button
                             className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('lara-light-purple', 'light')}
-                        >
-                            <Image
-                                src='/layout/images/themes/lara-light-purple.png'
-                                className='w-2rem h-2rem'
-                                alt='Lara Light Purple'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
                             onClick={() => _changeTheme('lara-dark-indigo', 'dark')}
                         >
                             <Image
                                 src='/layout/images/themes/lara-dark-indigo.png'
                                 className='w-2rem h-2rem'
                                 alt='Lara Dark Indigo'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('lara-dark-purple', 'dark')}
-                        >
-                            <Image
-                                src='/layout/images/themes/lara-dark-purple.png'
-                                className='w-2rem h-2rem'
-                                alt='Lara Dark Purple'
                                 layout='responsive'
                                 width={28}
                                 height={28}
@@ -247,42 +217,12 @@ const AppConfig = (props: AppConfigProps) => {
                     <div className='col-3'>
                         <button
                             className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('bootstrap4-light-purple', 'light')}
-                        >
-                            <Image
-                                src='/layout/images/themes/bootstrap4-light-purple.svg'
-                                className='w-2rem h-2rem'
-                                alt='Bootstrap Light Purple'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
                             onClick={() => _changeTheme('bootstrap4-dark-blue', 'dark')}
                         >
                             <Image
                                 src='/layout/images/themes/bootstrap4-dark-blue.svg'
                                 className='w-2rem h-2rem'
                                 alt='Bootstrap Dark Blue'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('bootstrap4-dark-purple', 'dark')}
-                        >
-                            <Image
-                                src='/layout/images/themes/bootstrap4-dark-purple.svg'
-                                className='w-2rem h-2rem'
-                                alt='Bootstrap Dark Purple'
                                 layout='responsive'
                                 width={28}
                                 height={28}
@@ -309,41 +249,11 @@ const AppConfig = (props: AppConfigProps) => {
                         </button>
                     </div>
                     <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('md-light-deeppurple', 'light')}
-                        >
-                            <Image
-                                src='/layout/images/themes/md-light-deeppurple.svg'
-                                className='w-2rem h-2rem'
-                                alt='Material Light DeepPurple'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
                         <button className='p-link w-2rem h-2rem' onClick={() => _changeTheme('md-dark-indigo', 'dark')}>
                             <Image
                                 src='/layout/images/themes/md-dark-indigo.svg'
                                 className='w-2rem h-2rem'
                                 alt='Material Dark Indigo'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('md-dark-deeppurple', 'dark')}
-                        >
-                            <Image
-                                src='/layout/images/themes/md-dark-deeppurple.svg'
-                                className='w-2rem h-2rem'
-                                alt='Material Dark DeepPurple'
                                 layout='responsive'
                                 width={28}
                                 height={28}
@@ -372,42 +282,12 @@ const AppConfig = (props: AppConfigProps) => {
                     <div className='col-3'>
                         <button
                             className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('mdc-light-deeppurple', 'light')}
-                        >
-                            <Image
-                                src='/layout/images/themes/md-light-deeppurple.svg'
-                                className='w-2rem h-2rem'
-                                alt='Material Light Deep Purple'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
                             onClick={() => _changeTheme('mdc-dark-indigo', 'dark')}
                         >
                             <Image
                                 src='/layout/images/themes/md-dark-indigo.svg'
                                 className='w-2rem h-2rem'
                                 alt='Material Dark Indigo'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('mdc-dark-deeppurple', 'dark')}
-                        >
-                            <Image
-                                src='/layout/images/themes/md-dark-deeppurple.svg'
-                                className='w-2rem h-2rem'
-                                alt='Material Dark Deep Purple'
                                 layout='responsive'
                                 width={28}
                                 height={28}
