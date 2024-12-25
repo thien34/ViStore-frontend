@@ -226,30 +226,6 @@ const AppConfig = (props: AppConfigProps) => {
                         </button>
                     </div>
                     <div className='col-3'>
-                        <button className='p-link w-2rem h-2rem' onClick={() => _changeTheme('soho-light', 'light')}>
-                            <Image
-                                src='/layout/images/themes/soho-light.png'
-                                className='w-2rem h-2rem'
-                                alt='Soho Light'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button className='p-link w-2rem h-2rem' onClick={() => _changeTheme('soho-dark', 'dark')}>
-                            <Image
-                                src='/layout/images/themes/soho-dark.png'
-                                className='w-2rem h-2rem'
-                                alt='Soho Dark'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
                         <button className='p-link w-2rem h-2rem' onClick={() => _changeTheme('viva-light', 'light')}>
                             <Image
                                 src='/layout/images/themes/viva-light.svg'
