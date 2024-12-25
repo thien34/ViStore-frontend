@@ -19,7 +19,6 @@ import { TreeSelect } from 'primereact/treeselect'
 import { useRef, useState } from 'react'
 import { Toast } from 'primereact/toast'
 import { useRouter } from 'next/navigation'
-import ManagerPath from '@/constants/ManagerPath'
 import Spinner from '@/components/spinner/Spinner'
 import RequiredIcon from '@/components/icon/RequiredIcon'
 import AtbDialog from './AtbDialog'
@@ -480,7 +479,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({ categories, manufacture
                     detail: 'Sản phẩm đã được thêm thành công',
                     life: 3000
                 })
-                router.push(ManagerPath.PRODUCT)
+                router.push('/admin/products')
             } catch (error) {
                 console.error('Error:', error)
                 toast.current?.show({
