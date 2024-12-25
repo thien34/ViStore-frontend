@@ -1,5 +1,4 @@
 'use client'
-
 import { PrimeReactContext } from 'primereact/api'
 import { Button } from 'primereact/button'
 import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch'
@@ -184,42 +183,12 @@ const AppConfig = (props: AppConfigProps) => {
                     <div className='col-3'>
                         <button
                             className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('lara-light-blue', 'light')}
-                        >
-                            <Image
-                                alt='Lara Light Blue'
-                                className='w-2rem h-2rem'
-                                src='/layout/images/themes/lara-light-blue.png'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
                             onClick={() => _changeTheme('lara-light-purple', 'light')}
                         >
                             <Image
                                 src='/layout/images/themes/lara-light-purple.png'
                                 className='w-2rem h-2rem'
                                 alt='Lara Light Purple'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button
-                            className='p-link w-2rem h-2rem'
-                            onClick={() => _changeTheme('lara-light-teal', 'light')}
-                        >
-                            <Image
-                                src='/layout/images/themes/lara-light-teal.png'
-                                className='w-2rem h-2rem'
-                                alt='Lara Light Teal'
                                 layout='responsive'
                                 width={28}
                                 height={28}
@@ -242,18 +211,6 @@ const AppConfig = (props: AppConfigProps) => {
                         </button>
                     </div>
                     <div className='col-3'>
-                        <button className='p-link w-2rem h-2rem' onClick={() => _changeTheme('lara-dark-blue', 'dark')}>
-                            <Image
-                                src='/layout/images/themes/lara-dark-blue.png'
-                                className='w-2rem h-2rem'
-                                alt='Lara Dark Blue'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
                         <button
                             className='p-link w-2rem h-2rem'
                             onClick={() => _changeTheme('lara-dark-purple', 'dark')}
@@ -262,18 +219,6 @@ const AppConfig = (props: AppConfigProps) => {
                                 src='/layout/images/themes/lara-dark-purple.png'
                                 className='w-2rem h-2rem'
                                 alt='Lara Dark Purple'
-                                layout='responsive'
-                                width={28}
-                                height={28}
-                            />
-                        </button>
-                    </div>
-                    <div className='col-3'>
-                        <button className='p-link w-2rem h-2rem' onClick={() => _changeTheme('lara-dark-teal', 'dark')}>
-                            <Image
-                                src='/layout/images/themes/lara-dark-teal.png'
-                                className='w-2rem h-2rem'
-                                alt='Lara Dark Teal'
                                 layout='responsive'
                                 width={28}
                                 height={28}
